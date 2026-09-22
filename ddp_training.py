@@ -7,6 +7,7 @@ Supports both NCCL and MPI backends with custom AllReduce hooks.
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
@@ -24,6 +25,7 @@ from config import TrainingConfig, create_model, get_data_loaders
 from communication_strategy import (
     get_comm_hook,
     open_first_bucket_compute_range,
+    pop_last_bucket_ready_event,
     reset_bucket_compute_markers,
     set_profiling_step,
     summarize_hook_timing,
@@ -105,6 +107,48 @@ def build_param_groups(model, weight_decay: float, wd_on_bn_bias: bool):
     ]
 
 
+def make_batch_transform(config):
+    """
+    Return a per-batch, on-GPU preprocessing function, or None.
+
+    All task-specific input handling lives HERE, not in the training loop.
+    train_epoch() and validate() only know "apply this if it exists", so the
+    loop itself stays agnostic about whether it is training on images, tokens,
+    or anything else.
+
+    Contract for the returned callable:
+        fn(inputs, targets) -> (inputs, targets)
+        - runs on GPU tensors, after .to(device)
+        - MUST be deterministic: the same function is applied at validation
+          time. Random augmentation belongs in the DataLoader transforms.
+
+    Current policy:
+        CIFAR is stored at 32x32 and the DataLoader keeps it there. If the
+        config asks for a larger image, upscale on the GPU. Doing this on the
+        CPU instead would send ~50x more bytes over PCIe per batch and turn
+        data loading into the bottleneck.
+
+        Every other case returns None, so nothing runs at all.
+    """
+    if config.dataset.startswith("cifar") and config.image_size != 32:
+        size = int(config.image_size)
+
+        def _upscale(inputs, targets):
+            if inputs.shape[-1] != size:
+                inputs = F.interpolate(
+                    inputs,
+                    size=(size, size),
+                    mode="bilinear",
+                    align_corners=False,
+                )
+            return inputs, targets
+
+        _upscale.description = f"gpu_upscale 32 -> {size}"
+        return _upscale
+
+    return None
+
+
 def train_epoch(
     model: DDP,
     train_loader,
@@ -117,6 +161,7 @@ def train_epoch(
     verify_last_batch: bool = False,
     grad_clip=None,
     iter_log_path=None,             # FIX 3
+    batch_transform=None,           # task-specific GPU preprocessing, or None
 ) -> tuple:
     """Train for one epoch. Returns (avg_loss, accuracy, iter_stats).
 
@@ -163,6 +208,8 @@ def train_epoch(
 
             _nvtx_range_push(f"forward epoch={epoch} batch={batch_idx}")
             try:
+                if batch_transform is not None:
+                    inputs, targets = batch_transform(inputs, targets)
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
             finally:
@@ -182,6 +229,24 @@ def train_epoch(
                 reset_bucket_compute_markers()
                 open_first_bucket_compute_range()
                 loss.backward()
+                
+                # GPU marker left by the last bucket's hook. None for hook=none:
+                # the built-in path never calls our hook, so both metrics are NaN.
+                e_ready = pop_last_bucket_ready_event()
+                
+                # temporary debugging: print gradient norms and rank spread
+                #torch.cuda.synchronize()
+                #gs = [p.grad.detach().double() for p in model.parameters() if p.grad is not None]
+                #t = torch.tensor([sum(g.sum() for g in gs).item(),
+                 #               torch.stack([g.norm() for g in gs]).norm().item()],
+                 #               dtype=torch.float64)                      # CPU tensor, so GTL isn't involved
+                #out = [torch.zeros(2, dtype=torch.float64) for _ in range(dist.get_world_size())]
+                #dist.all_gather(out, t)
+                #if rank == 0:
+                #    s = [o[0].item() for o in out]
+                #    print(f"[GRADCHK] it={batch_idx} loss={loss.item():.4f} "
+                #        f"gnorm={out[0][1].item():.4e} rank_spread={max(s)-min(s):.3e}", flush=True)
+                    
             finally:
                 reset_bucket_compute_markers()
                 _nvtx_range_pop()
@@ -212,7 +277,7 @@ def train_epoch(
         finally:
             _nvtx_range_pop()
 
-        ev_buf.append((e_start, e_fwd, e_bar0, e_bar1, e_bwd, e_opt))
+        ev_buf.append((e_start, e_fwd, e_bar0, e_bar1, e_bwd, e_opt, e_ready))
 
         total_loss += loss.item()
         _, predicted = outputs.max(1)
@@ -232,18 +297,27 @@ def train_epoch(
     torch.cuda.synchronize()
 
     records = []
-    for i, (e_start, e_fwd, e_bar0, e_bar1, e_bwd, e_opt) in enumerate(ev_buf):
+    for i, (e_start, e_fwd, e_bar0, e_bar1, e_bwd, e_opt, e_ready) in enumerate(ev_buf):
         t_fwd = e_start.elapsed_time(e_fwd)
         t_bar = e_bar0.elapsed_time(e_bar1)
         t_bwd = e_bar1.elapsed_time(e_bwd)      # compute + exposed allreduce
         t_opt = e_bwd.elapsed_time(e_opt)
         t_gpu = e_start.elapsed_time(e_opt)
+        if e_ready is not None:
+            # Same GPU clock as the rest: compute, then the comm the backward
+            # pass could not hide. t_compute + t_exposed == t_fwd + t_bar + t_bwd.
+            t_compute = e_start.elapsed_time(e_ready)
+            t_exposed = e_ready.elapsed_time(e_bwd)
+        else:
+            t_compute = t_exposed = float("nan")
         records.append({
             "epoch": epoch, "iter": i, "rank": rank,
             "t_data_ms":    round(data_ms[i], 4),
             "t_fwd_ms":     round(t_fwd, 4),
             "t_barrier_ms": round(t_bar, 4),
             "t_bwd_ms":     round(t_bwd, 4),
+            "t_compute_ms": round(t_compute, 4),
+            "t_exposed_ms": round(t_exposed, 4),
             "t_opt_ms":     round(t_opt, 4),
             "t_gpu_ms":     round(t_gpu, 4),
             "t_iter_ms":    round(t_gpu + data_ms[i], 4),
@@ -255,12 +329,15 @@ def train_epoch(
                 f.write(json.dumps(r) + "\n")
 
     def _med(key):
-        return statistics.median([r[key] for r in records]) if records else 0.0
+        vals = [r[key] for r in records if r[key] == r[key]]   # x != x filters NaN
+        return statistics.median(vals) if vals else float("nan")
 
     iter_stats = {
         "t_iter_median_ms":    _med("t_iter_ms"),
         "t_fwd_median_ms":     _med("t_fwd_ms"),
         "t_bwd_median_ms":     _med("t_bwd_ms"),
+        "t_compute_median_ms": _med("t_compute_ms"),
+        "t_exposed_median_ms": _med("t_exposed_ms"),
         "t_opt_median_ms":     _med("t_opt_ms"),
         "t_data_median_ms":    _med("t_data_ms"),
         "t_barrier_median_ms": _med("t_barrier_ms"),
@@ -272,8 +349,12 @@ def train_epoch(
     return total_loss / len(train_loader), 100.0 * correct / total, iter_stats
 
 
-def validate(model, val_loader, criterion, device):
-    """Validate on the FULL unsharded test set. Contains NO collective."""
+def validate(model, val_loader, criterion, device, batch_transform=None):
+    """Validate on the FULL unsharded test set. Contains NO collective.
+
+    batch_transform must be the SAME one used in training — if training sees
+    224x224 and validation sees 32x32, the accuracy numbers are meaningless.
+    """
     model.eval()
     total_loss = 0.0
     correct = 0
@@ -282,6 +363,8 @@ def validate(model, val_loader, criterion, device):
     with torch.no_grad():
         for inputs, targets in val_loader:
             inputs, targets = inputs.to(device), targets.to(device)
+            if batch_transform is not None:
+                inputs, targets = batch_transform(inputs, targets)
             outputs = model(inputs)
             # weight by sample count so the final divide is exact
             total_loss += criterion(outputs, targets).item() * targets.size(0)
@@ -410,6 +493,10 @@ def train(config: TrainingConfig) -> None:
                 device_id=torch.device(f"cuda:{_local_rank}"),
             )
     else:
+        # MPI backend new ersion so this workaround for no errors in logs
+        n = torch.cuda.device_count()
+        lr = os.environ.get("SLURM_LOCALID") or os.environ.get("PMI_LOCAL_RANK") or "0"
+        torch.cuda.set_device(int(lr) % n)
         dist.init_process_group(backend=config.backend)
 
 
@@ -477,6 +564,7 @@ def train(config: TrainingConfig) -> None:
             'batch_size', 'global_batch_size', 'num_epochs',
             # FIX 1: record the ablation setting in the results
             'wd_on_bn_bias', 'nesterov',
+            't_compute_median_ms', 't_exposed_median_ms',
         ])
 
     # Seed for reproducible model init (DDP broadcasts rank 0's params anyway)
@@ -610,6 +698,13 @@ def train(config: TrainingConfig) -> None:
         print(f"[Data] Train batches: {len(train_loader)}, "
               f"Val batches: {len(val_loader)}\n")
 
+    # Task-specific input preprocessing. None for every configuration that
+    # needs no on-GPU work, which includes the original 32x32 CIFAR runs.
+    batch_transform = make_batch_transform(config)
+    if rank == 0:
+        print(f"[Data] Batch transform: "
+              f"{getattr(batch_transform, 'description', 'none')}\n")
+
     # ── FIX 2: per-ITERATION scheduler ───────────────────────────────────
     # Built after the loader so steps_per_epoch is known. drop_last=True makes
     # len(train_loader) identical on every rank, so the schedule stays in sync.
@@ -662,6 +757,7 @@ def train(config: TrainingConfig) -> None:
                 verify_last_batch=(epoch == config.num_epochs),
                 grad_clip=config.grad_clip,
                 iter_log_path=iter_log_path,
+                batch_transform=batch_transform,
             )
         finally:
             _nvtx_range_pop()
@@ -679,7 +775,10 @@ def train(config: TrainingConfig) -> None:
         # phantom straggler in iteration 0 of the next epoch (which would
         # silently inflate t_bwd on every other rank).
         if rank == 0:
-            val_loss, val_acc = validate(model, val_loader, criterion, device)
+            val_loss, val_acc = validate(
+                model, val_loader, criterion, device,
+                batch_transform=batch_transform,
+            )
         else:
             val_loss, val_acc = float('nan'), float('nan')
         dist.barrier()
@@ -704,6 +803,26 @@ def train(config: TrainingConfig) -> None:
                   f"opt {iter_stats['t_opt_median_ms']:.2f} | "
                   f"data {iter_stats['t_data_median_ms']:.2f})  |  "
                   f"train-only epoch: {iter_stats['t_epoch_train_s']:.1f}s")
+            # GPU-clock split of the iteration: compute (forward + backward,
+            # including any comm the backward hid) and the comm it could not hide.
+            # NaN for hook=none, which never calls our hook. The sum check should
+            # land within ~1 ms of t_iter; data loading accounts for the rest.
+            print(f"[Epoch {epoch}] compute {iter_stats['t_compute_median_ms']:.2f} ms  |  "
+                  f"exposed comm {iter_stats['t_exposed_median_ms']:.2f} ms  |  "
+                  f"sum check "
+                  f"{iter_stats['t_compute_median_ms'] + iter_stats['t_exposed_median_ms'] + iter_stats['t_opt_median_ms']:.2f}"
+                  f" vs t_iter {iter_stats['t_iter_median_ms']:.2f} ms")
+            # Allocator high-water mark. Free to read, no sync, outside the
+            # timed region. If this stays far below the card's capacity, the
+            # local batch size can be raised - a cheaper way to add compute
+            # than a bigger image. Note it excludes NCCL/ZFP/context memory,
+            # so real usage is higher; nvidia-smi is the ground truth.
+            print(f"[Epoch {epoch}] peak GPU mem: "
+                  f"{torch.cuda.max_memory_allocated(device) / 1024**3:.2f} GiB "
+                  f"allocated, "
+                  f"{torch.cuda.max_memory_reserved(device) / 1024**3:.2f} GiB "
+                  f"reserved"
+                  f" | wd_on_bn_bias: {wd_on_bn_bias}, nesterov: {nesterov}")
 
             csv_writer.writerow([
                 epoch, f"{epoch_lr:.8f}",
@@ -724,6 +843,8 @@ def train(config: TrainingConfig) -> None:
                 config.batch_size * world_size,
                 config.num_epochs,
                 wd_on_bn_bias, nesterov,
+                f"{iter_stats['t_compute_median_ms']:.4f}",
+                f"{iter_stats['t_exposed_median_ms']:.4f}",
             ])
             csv_file.flush()
 

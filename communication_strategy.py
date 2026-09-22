@@ -92,6 +92,7 @@ import threading
 
 import torch
 import torch.distributed as dist
+import contextlib
 
 try:
     from zfp_api import (
@@ -231,6 +232,19 @@ _bucket_fire_seq: int = 0
 _known_num_buckets: Optional[int] = None
 _compute_range_open: bool = False
 
+# _LAST_READY_EVENT    = CUDA event recorded when the LAST bucket's hook fires.
+#                        On the GPU timeline it is reached when the backward
+#                        compute is done but before this bucket's comm runs, so
+#                        e_start→event = compute and event→e_bwd = exposed comm.
+_LAST_READY_EVENT = None
+
+
+def pop_last_bucket_ready_event():
+    """Return and clear this iteration's last-bucket event (None if no hook ran)."""
+    global _LAST_READY_EVENT
+    ev, _LAST_READY_EVENT = _LAST_READY_EVENT, None
+    return ev
+
 
 def reset_bucket_compute_markers() -> None:
     """Close any leftover compute range from the previous backward. Call before loss.backward()."""
@@ -314,7 +328,7 @@ def summarize_hook_timing(epoch: int) -> None:
         )
 
 def _profiled_hook(label: str, hook_fn, state, bucket: dist.GradBucket):
-    global _bucket_fire_seq, _known_num_buckets, _compute_range_open
+    global _bucket_fire_seq, _known_num_buckets, _compute_range_open, _LAST_READY_EVENT
     tensor = bucket.buffer()
     numel = tensor.numel()
     epoch, batch = _current_epoch, _current_batch
@@ -332,6 +346,13 @@ def _profiled_hook(label: str, hook_fn, state, bucket: dist.GradBucket):
         _known_num_buckets = b_idx + 1
     elif _known_num_buckets is not None:
         is_last_bucket = b_idx == _known_num_buckets - 1
+        
+    # GPU-side marker for "backward compute done, this bucket's comm not yet run".
+    # Must be recorded BEFORE hook_fn queues any of its own work below.
+    if is_last_bucket and tensor.is_cuda:
+        ev = torch.cuda.Event(enable_timing=True)
+        ev.record(torch.cuda.current_stream(tensor.device))
+        _LAST_READY_EVENT = ev
 
     if _compute_range_open:
         _nvtx_range_pop()
@@ -474,31 +495,31 @@ nccl_default_allreduce_hook = _default_allreduce_hook
 mpi_default_allreduce_hook = _default_allreduce_hook
 
 def _default_allreduce_sync_hook(state, bucket):
+    """Baseline: MPI_Allreduce with the stream synchronized first.
+
+    PyTorch's MPI backend calls MPI_Allreduce from a background thread and does
+    NOT wait for queued GPU work (pytorch#38642, open since 2020). Without the
+    wait below, GTL reads the bucket while the gradients and the div_ are still
+    being written: ranks then disagree on ~99% of iterations and gradients grow
+    ~4x per step until they overflow to NaN. This is the correct baseline to use
+    instead of the built-in path (hook=none), which has no such wait.
+    """
     t = bucket.buffer()
-    rank = dist.get_rank()
-    ws = dist.get_world_size()
+    label = f"{dist.get_backend()}:default_sync"
+
+    t.div_(dist.get_world_size())
 
     if t.is_cuda:
-        torch.cuda.synchronize(t.device)   # IMPORTANT: before isfinite/div_
+        # Everything this bucket depends on is on the current stream, so the
+        # stream-level wait is enough; no need for a device-wide synchronize.
+        torch.cuda.current_stream(device=t.device).synchronize()
 
-    if not torch.isfinite(t).all():
-        raise RuntimeError(f"[Rank {rank}] bucket {bucket.index()} non-finite BEFORE allreduce")
-
-    t.div_(ws)
-
-    if t.is_cuda:
-        torch.cuda.synchronize(t.device)   # ensure div_ finished before MPI touches it
-
-    # For debugging, you may even want async_op=False to remove more timing variables
-    work = dist.all_reduce(t, op=dist.ReduceOp.SUM, async_op=True)
-    fut = work.get_future()
+    work_start = time.perf_counter()
+    fut = dist.all_reduce(t, op=dist.ReduceOp.SUM, async_op=True).get_future()
 
     def _finish(f):
         out = f.value()[0]
-        if t.is_cuda:
-            torch.cuda.synchronize(t.device)
-        if not torch.isfinite(out).all():
-            raise RuntimeError(f"[Rank {rank}] bucket {bucket.index()} non-finite AFTER allreduce")
+        _record_hook_work_timing(label, (time.perf_counter() - work_start) * 1000.0)
         return out
 
     return fut.then(_finish)
@@ -604,7 +625,8 @@ class RingBucketState:
     bucket_id:  int                    = 0
     call_count: int                    = 0
     ready:      bool                   = False
-    token:      Optional[torch.Tensor] = None  # unused — token allreduce removed
+    token:      Optional[torch.Tensor] = None  
+    stream:     Optional[torch.cuda.Stream] = None   # ADD: private stream for this bucket's copies
 
     def initialize(self, tensor: torch.Tensor, world_size: int,
                    bucket_id: int) -> None:
@@ -632,6 +654,14 @@ class RingBucketState:
             for i in range(world_size)
         ]
         self.bucket_id = bucket_id
+        
+        # ADD: private stream so our copies don't queue behind (and wait for)
+        # the backward kernels the autograd engine keeps putting on the default
+        # stream while this hook runs on the worker thread.
+        self.stream = (torch.cuda.Stream(device=tensor.device)
+                       if tensor.is_cuda else None)
+        self.ready     = True
+        
         self.ready     = True
 
 
@@ -691,6 +721,22 @@ def _cuda_device_sync(t: torch.Tensor) -> None:
     """Full-device sync for external CUDA libraries not stream-ordered with PyTorch."""
     if t.is_cuda:
         torch.cuda.synchronize(device=t.device)
+        
+def _ring_sync(bstate, t: torch.Tensor) -> None:
+    """Wait for the bucket's private stream (falls back to the current stream).
+
+    Used instead of _cuda_sync inside the ring / recursive-doubling bodies: the
+    copies now run on bstate.stream, so we must wait for THAT stream, and only
+    for it — not for backward kernels the autograd engine is still queueing on
+    the default stream.
+    """
+    if not t.is_cuda:
+        return
+    stream = getattr(bstate, "stream", None)
+    if stream is not None:
+        stream.synchronize()
+    else:
+        torch.cuda.current_stream(device=t.device).synchronize()
 
 
 def _require_zfp_cuda() -> None:
@@ -721,111 +767,122 @@ def _ring_allreduce_sum(tensor: torch.Tensor, bstate: RingBucketState,
 
     pfx = f"[R{rank}|B{bstate.bucket_id}|C{call_n}]"
 
-    bstate.flat.copy_(tensor.flatten())
+    # Everything below runs on the bucket's private stream. wait_stream makes it
+    # wait ONCE for the gradients (and DDP's copy into the bucket), which are
+    # produced on the default stream; after that our per-step syncs wait only for
+    # our own copies, not for unrelated backward compute.
+    _ring_stream = bstate.stream if tensor.is_cuda else None
+    if _ring_stream is not None:
+        _ring_stream.wait_stream(torch.cuda.current_stream(device=tensor.device))
+    _ring_ctx = (torch.cuda.stream(_ring_stream) if _ring_stream is not None
+                 else contextlib.nullcontext())
 
-    chunks = [
-        bstate.flat[bstate.displs[i]: bstate.displs[i] + bstate.cnts[i]]
-        for i in range(world_size)
-    ]
+    with _ring_ctx:
+        bstate.flat.copy_(tensor.flatten())
 
-    src = (rank - 1 + world_size) % world_size
-    dst = (rank + 1) % world_size
+        chunks = [
+            bstate.flat[bstate.displs[i]: bstate.displs[i] + bstate.cnts[i]]
+            for i in range(world_size)
+        ]
 
-    if log:
-        print(f"{pfx} flat after copy from tensor: {_fmt(bstate.flat)}", flush=True)
-        for i in range(world_size):
-            owned = " <-- OWNED" if i == rank else ""
-            print(f"{pfx}   chunk[{i}] displ={bstate.displs[i]} "
-                  f"cnt={bstate.cnts[i]}{owned}: {_fmt(chunks[i])}", flush=True)
-
-    # ── Phase 1: Reduce-scatter ───────────────────────────────────────────────
-    _nvtx_range_push(f"ring_reduce_scatter:B{bstate.bucket_id} rank={rank}")
-    for step in range(world_size - 1):
-        send_idx = (rank - step - 1 + world_size) % world_size
-        recv_idx = (rank - step - 2 + world_size) % world_size
-
-        # Fresh unique tag — Cray MPICH will never reuse a cached registration
-        tag = _next_tag()
-
-        bstate.send_bufs[send_idx].copy_(chunks[send_idx])
-        _nvtx_range_push(f"cuda_sync_pre_mpi:B{bstate.bucket_id} phase=1 step={step}")
-        _cuda_sync(bstate.send_bufs[send_idx])
-        _nvtx_range_pop()
+        src = (rank - 1 + world_size) % world_size
+        dst = (rank + 1) % world_size
 
         if log:
-            print(f"{pfx} P1 step={step} tag={tag} "
-                  f"SENDING chunk[{send_idx}]→rank{dst}: {_fmt(bstate.send_bufs[send_idx])} | "
-                  f"EXPECTING recv chunk[{recv_idx}]←rank{src}", flush=True)
+            print(f"{pfx} flat after copy from tensor: {_fmt(bstate.flat)}", flush=True)
+            for i in range(world_size):
+                owned = " <-- OWNED" if i == rank else ""
+                print(f"{pfx}   chunk[{i}] displ={bstate.displs[i]} "
+                    f"cnt={bstate.cnts[i]}{owned}: {_fmt(chunks[i])}", flush=True)
 
-        reqs = dist.batch_isend_irecv([
-            dist.P2POp(dist.irecv, bstate.recv_bufs[recv_idx], src, tag=tag),
-            dist.P2POp(dist.isend, bstate.send_bufs[send_idx], dst, tag=tag),
-        ])
-        for req in reqs:
-            req.wait()
+        # ── Phase 1: Reduce-scatter ───────────────────────────────────────────────
+        _nvtx_range_push(f"ring_reduce_scatter:B{bstate.bucket_id} rank={rank}")
+        for step in range(world_size - 1):
+            send_idx = (rank - step - 1 + world_size) % world_size
+            recv_idx = (rank - step - 2 + world_size) % world_size
 
-        before = chunks[recv_idx][:4].tolist() if log else None
-        chunks[recv_idx].add_(bstate.recv_bufs[recv_idx])
+            # Fresh unique tag — Cray MPICH will never reuse a cached registration
+            tag = _next_tag()
 
-        if log:
-            print(f"{pfx} P1 step={step} RECVD chunk[{recv_idx}]←rank{src}: "
-                  f"{_fmt(bstate.recv_bufs[recv_idx])}", flush=True)
-            print(f"{pfx}   chunk[{recv_idx}] before_add={before} "
-                  f"after_add={chunks[recv_idx][:4].tolist()} "
-                  f"... ({bstate.cnts[recv_idx] - 4} more elements)", flush=True)
+            bstate.send_bufs[send_idx].copy_(chunks[send_idx])
+            _nvtx_range_push(f"cuda_sync_pre_mpi:B{bstate.bucket_id} phase=1 step={step}")
+            _ring_sync(bstate, bstate.send_bufs[send_idx])
+            _nvtx_range_pop()
 
-    if log:
-        print(f"{pfx} === AFTER Phase 1 (reduce-scatter) ===", flush=True)
-        for i in range(world_size):
-            owned = " <-- fully reduced" if i == rank else ""
-            print(f"{pfx}   chunk[{i}]{owned}: {_fmt(chunks[i])}", flush=True)
+            if log:
+                print(f"{pfx} P1 step={step} tag={tag} "
+                    f"SENDING chunk[{send_idx}]→rank{dst}: {_fmt(bstate.send_bufs[send_idx])} | "
+                    f"EXPECTING recv chunk[{recv_idx}]←rank{src}", flush=True)
 
-    _nvtx_range_pop()  # ring_reduce_scatter
+            reqs = dist.batch_isend_irecv([
+                dist.P2POp(dist.irecv, bstate.recv_bufs[recv_idx], src, tag=tag),
+                dist.P2POp(dist.isend, bstate.send_bufs[send_idx], dst, tag=tag),
+            ])
+            for req in reqs:
+                req.wait()
 
-    # ── Phase 2: Allgather ────────────────────────────────────────────────────
-    _nvtx_range_push(f"ring_allgather:B{bstate.bucket_id} rank={rank}")
-    for step in range(world_size - 1):
-        send_idx = (rank - step     + world_size) % world_size
-        recv_idx = (rank - step - 1 + world_size) % world_size
+            before = chunks[recv_idx][:4].tolist() if log else None
+            chunks[recv_idx].add_(bstate.recv_bufs[recv_idx])
 
-        tag = _next_tag()
-
-        bstate.send_bufs[send_idx].copy_(chunks[send_idx])
-        _nvtx_range_push(f"cuda_sync_pre_mpi:B{bstate.bucket_id} phase=2 step={step}")
-        _cuda_sync(bstate.send_bufs[send_idx])
-        _nvtx_range_pop()
-
-        if log:
-            print(f"{pfx} P2 step={step} tag={tag} "
-                  f"SENDING chunk[{send_idx}]→rank{dst}: {_fmt(bstate.send_bufs[send_idx])} | "
-                  f"EXPECTING recv chunk[{recv_idx}]←rank{src}", flush=True)
-
-        reqs = dist.batch_isend_irecv([
-            dist.P2POp(dist.irecv, bstate.recv_bufs[recv_idx], src, tag=tag),
-            dist.P2POp(dist.isend, bstate.send_bufs[send_idx], dst, tag=tag),
-        ])
-        for req in reqs:
-            req.wait()
-
-        chunks[recv_idx].copy_(bstate.recv_bufs[recv_idx])
+            if log:
+                print(f"{pfx} P1 step={step} RECVD chunk[{recv_idx}]←rank{src}: "
+                    f"{_fmt(bstate.recv_bufs[recv_idx])}", flush=True)
+                print(f"{pfx}   chunk[{recv_idx}] before_add={before} "
+                    f"after_add={chunks[recv_idx][:4].tolist()} "
+                    f"... ({bstate.cnts[recv_idx] - 4} more elements)", flush=True)
 
         if log:
-            print(f"{pfx} P2 step={step} RECVD chunk[{recv_idx}]←rank{src}: "
-                  f"{_fmt(bstate.recv_bufs[recv_idx])}", flush=True)
-            print(f"{pfx}   chunk[{recv_idx}] now={chunks[recv_idx][:4].tolist()} "
-                  f"... ({bstate.cnts[recv_idx] - 4} more elements)", flush=True)
+            print(f"{pfx} === AFTER Phase 1 (reduce-scatter) ===", flush=True)
+            for i in range(world_size):
+                owned = " <-- fully reduced" if i == rank else ""
+                print(f"{pfx}   chunk[{i}]{owned}: {_fmt(chunks[i])}", flush=True)
 
-    if log:
-        print(f"{pfx} === AFTER Phase 2 (allgather) ===", flush=True)
-        for i in range(world_size):
-            print(f"{pfx}   chunk[{i}]: {_fmt(chunks[i])}", flush=True)
+        _nvtx_range_pop()  # ring_reduce_scatter
 
-    _nvtx_range_pop()  # ring_allgather
+        # ── Phase 2: Allgather ────────────────────────────────────────────────────
+        _nvtx_range_push(f"ring_allgather:B{bstate.bucket_id} rank={rank}")
+        for step in range(world_size - 1):
+            send_idx = (rank - step     + world_size) % world_size
+            recv_idx = (rank - step - 1 + world_size) % world_size
 
-    tensor.copy_(bstate.flat.view_as(tensor))
-    tensor.div_(world_size)
+            tag = _next_tag()
+
+            bstate.send_bufs[send_idx].copy_(chunks[send_idx])
+            _nvtx_range_push(f"cuda_sync_pre_mpi:B{bstate.bucket_id} phase=2 step={step}")
+            _ring_sync(bstate, bstate.send_bufs[send_idx])
+            _nvtx_range_pop()
+
+            if log:
+                print(f"{pfx} P2 step={step} tag={tag} "
+                    f"SENDING chunk[{send_idx}]→rank{dst}: {_fmt(bstate.send_bufs[send_idx])} | "
+                    f"EXPECTING recv chunk[{recv_idx}]←rank{src}", flush=True)
+
+            reqs = dist.batch_isend_irecv([
+                dist.P2POp(dist.irecv, bstate.recv_bufs[recv_idx], src, tag=tag),
+                dist.P2POp(dist.isend, bstate.send_bufs[send_idx], dst, tag=tag),
+            ])
+            for req in reqs:
+                req.wait()
+
+            chunks[recv_idx].copy_(bstate.recv_bufs[recv_idx])
+
+            if log:
+                print(f"{pfx} P2 step={step} RECVD chunk[{recv_idx}]←rank{src}: "
+                    f"{_fmt(bstate.recv_bufs[recv_idx])}", flush=True)
+                print(f"{pfx}   chunk[{recv_idx}] now={chunks[recv_idx][:4].tolist()} "
+                    f"... ({bstate.cnts[recv_idx] - 4} more elements)", flush=True)
+
+        if log:
+            print(f"{pfx} === AFTER Phase 2 (allgather) ===", flush=True)
+            for i in range(world_size):
+                print(f"{pfx}   chunk[{i}]: {_fmt(chunks[i])}", flush=True)
+
+        _nvtx_range_pop()  # ring_allgather
+
+        tensor.copy_(bstate.flat.view_as(tensor))
+        tensor.div_(world_size)
     _nvtx_range_push(f"cuda_sync_post_ring:B{bstate.bucket_id} rank={rank}")
-    _cuda_sync(tensor)   # ensure div_ has landed before hook resolves the future
+    _ring_sync(bstate, tensor)   # ensure div_ has landed before hook resolves the future
     _nvtx_range_pop()
 
 # Hook: plain ring allreduce with no compression.
@@ -970,12 +1027,18 @@ class RecursiveDoublingBucketState:
     tmp:        Optional[torch.Tensor] = None
     bucket_id:  int                    = 0
     call_count: int                    = 0
+    stream:     Optional[torch.cuda.Stream] = None   # private stream for this bucket's copies
+
 
     def initialize(self, tensor: torch.Tensor, bucket_id: int) -> None:
         numel = tensor.numel()
         self.flat = torch.empty(numel, dtype=tensor.dtype, device=tensor.device)
         self.tmp = torch.empty_like(self.flat)
         self.bucket_id = bucket_id
+        # Private stream: our copies don't queue behind (and wait for) backward
+        # kernels the autograd engine keeps putting on the default stream.
+        self.stream = (torch.cuda.Stream(device=tensor.device)
+                       if tensor.is_cuda else None)
 
 
 @dataclass
@@ -1024,111 +1087,122 @@ def _recursive_doubling_allreduce_sum(
     work = bstate.flat
     tmp = bstate.tmp
 
-    work.copy_(tensor.flatten())
+    # Everything below runs on the bucket's private stream. wait_stream makes it
+    # wait ONCE for the gradients (and DDP's copy into the bucket), which are
+    # produced on the default stream; after that our per-phase syncs wait only
+    # for our own copies, not for unrelated backward compute.
+    _rd_stream = bstate.stream if tensor.is_cuda else None
+    if _rd_stream is not None:
+        _rd_stream.wait_stream(torch.cuda.current_stream(device=tensor.device))
+    _rd_ctx = (torch.cuda.stream(_rd_stream) if _rd_stream is not None
+               else contextlib.nullcontext())
 
-    if log:
-        print(f"{pfx} flat after copy from tensor: {_fmt(work)}", flush=True)
+    with _rd_ctx:
+        work.copy_(tensor.flatten())
 
-    pof2 = 1
-    while pof2 <= world_size:
-        pof2 <<= 1
-    pof2 >>= 1
-    rem = world_size - pof2
+        if log:
+            print(f"{pfx} flat after copy from tensor: {_fmt(work)}", flush=True)
 
-    newrank = -1
+        pof2 = 1
+        while pof2 <= world_size:
+            pof2 <<= 1
+        pof2 >>= 1
+        rem = world_size - pof2
 
-    _nvtx_range_push(f"recursive_doubling_peel:B{bstate.bucket_id} rank={rank}")
-    peel_tag = _next_tag()
-    if rank < 2 * rem:
-        partner = rank + 1 if rank % 2 == 0 else rank - 1
-        _nvtx_range_push(f"cuda_sync_pre_mpi:B{bstate.bucket_id} phase=peel")
-        _cuda_sync(work)
-        _nvtx_range_pop()
-        if rank % 2 == 0:
-            if log:
-                print(f"{pfx} peel tag={peel_tag} SENDING -> rank{partner}: {_fmt(work)}",
-                      flush=True)
-            req = dist.isend(work, dst=partner, tag=peel_tag)
-            req.wait()
-            newrank = -1
-        else:
-            if log:
-                print(f"{pfx} peel tag={peel_tag} EXPECTING <- rank{partner}",
-                      flush=True)
-            req = dist.irecv(tmp, src=partner, tag=peel_tag)
-            req.wait()
-            work.add_(tmp)
-            newrank = rank // 2
-            if log:
-                print(f"{pfx} peel tag={peel_tag} RECVD <- rank{partner}: {_fmt(tmp)}",
-                      flush=True)
-                print(f"{pfx}   after peel add: {_fmt(work)}", flush=True)
-    else:
-        newrank = rank - rem
-    _nvtx_range_pop()
+        newrank = -1
 
-    _nvtx_range_push(f"recursive_doubling_main:B{bstate.bucket_id} rank={rank}")
-    mask = 1
-    while mask < pof2:
-        step_tag = _next_tag()
-        if newrank != -1:
-            newdst = newrank ^ mask
-            dst = (newdst << 1) + 1 if newdst < rem else newdst + rem
-
-            _nvtx_range_push(
-                f"cuda_sync_pre_mpi:B{bstate.bucket_id} phase=main mask={mask}"
-            )
-            _cuda_sync(work)
+        _nvtx_range_push(f"recursive_doubling_peel:B{bstate.bucket_id} rank={rank}")
+        peel_tag = _next_tag()
+        if rank < 2 * rem:
+            partner = rank + 1 if rank % 2 == 0 else rank - 1
+            _nvtx_range_push(f"cuda_sync_pre_mpi:B{bstate.bucket_id} phase=peel")
+            _ring_sync(bstate, work)
             _nvtx_range_pop()
-
-            if log:
-                print(f"{pfx} main mask={mask} tag={step_tag} "
-                      f"SENDRECV <-> rank{dst}: {_fmt(work)}", flush=True)
-
-            reqs = dist.batch_isend_irecv([
-                dist.P2POp(dist.irecv, tmp, dst, tag=step_tag),
-                dist.P2POp(dist.isend, work, dst, tag=step_tag),
-            ])
-            for req in reqs:
+            if rank % 2 == 0:
+                if log:
+                    print(f"{pfx} peel tag={peel_tag} SENDING -> rank{partner}: {_fmt(work)}",
+                        flush=True)
+                req = dist.isend(work, dst=partner, tag=peel_tag)
                 req.wait()
-
-            work.add_(tmp)
-
-            if log:
-                print(f"{pfx} main mask={mask} tag={step_tag} "
-                      f"RECVD <- rank{dst}: {_fmt(tmp)}", flush=True)
-                print(f"{pfx}   after main add: {_fmt(work)}", flush=True)
-        mask <<= 1
-    _nvtx_range_pop()
-
-    _nvtx_range_push(f"recursive_doubling_finalize:B{bstate.bucket_id} rank={rank}")
-    final_tag = _next_tag()
-    if rank < 2 * rem:
-        partner = rank - 1 if rank % 2 else rank + 1
-        _nvtx_range_push(f"cuda_sync_pre_mpi:B{bstate.bucket_id} phase=final")
-        _cuda_sync(work)
-        _nvtx_range_pop()
-        if rank % 2:
-            if log:
-                print(f"{pfx} final tag={final_tag} SENDING -> rank{partner}: {_fmt(work)}",
-                      flush=True)
-            req = dist.isend(work, dst=partner, tag=final_tag)
-            req.wait()
+                newrank = -1
+            else:
+                if log:
+                    print(f"{pfx} peel tag={peel_tag} EXPECTING <- rank{partner}",
+                        flush=True)
+                req = dist.irecv(tmp, src=partner, tag=peel_tag)
+                req.wait()
+                work.add_(tmp)
+                newrank = rank // 2
+                if log:
+                    print(f"{pfx} peel tag={peel_tag} RECVD <- rank{partner}: {_fmt(tmp)}",
+                        flush=True)
+                    print(f"{pfx}   after peel add: {_fmt(work)}", flush=True)
         else:
-            if log:
-                print(f"{pfx} final tag={final_tag} EXPECTING <- rank{partner}",
-                      flush=True)
-            req = dist.irecv(work, src=partner, tag=final_tag)
-            req.wait()
-            if log:
-                print(f"{pfx} final tag={final_tag} RECVD <- rank{partner}: {_fmt(work)}",
-                      flush=True)
-    _nvtx_range_pop()
+            newrank = rank - rem
+        _nvtx_range_pop()
 
-    tensor.copy_(work.view_as(tensor))
-    tensor.div_(world_size)
+        _nvtx_range_push(f"recursive_doubling_main:B{bstate.bucket_id} rank={rank}")
+        mask = 1
+        while mask < pof2:
+            step_tag = _next_tag()
+            if newrank != -1:
+                newdst = newrank ^ mask
+                dst = (newdst << 1) + 1 if newdst < rem else newdst + rem
+
+                _nvtx_range_push(
+                    f"cuda_sync_pre_mpi:B{bstate.bucket_id} phase=main mask={mask}"
+                )
+                _ring_sync(bstate, work)
+                _nvtx_range_pop()
+
+                if log:
+                    print(f"{pfx} main mask={mask} tag={step_tag} "
+                        f"SENDRECV <-> rank{dst}: {_fmt(work)}", flush=True)
+
+                reqs = dist.batch_isend_irecv([
+                    dist.P2POp(dist.irecv, tmp, dst, tag=step_tag),
+                    dist.P2POp(dist.isend, work, dst, tag=step_tag),
+                ])
+                for req in reqs:
+                    req.wait()
+
+                work.add_(tmp)
+
+                if log:
+                    print(f"{pfx} main mask={mask} tag={step_tag} "
+                        f"RECVD <- rank{dst}: {_fmt(tmp)}", flush=True)
+                    print(f"{pfx}   after main add: {_fmt(work)}", flush=True)
+            mask <<= 1
+        _nvtx_range_pop()
+
+        _nvtx_range_push(f"recursive_doubling_finalize:B{bstate.bucket_id} rank={rank}")
+        final_tag = _next_tag()
+        if rank < 2 * rem:
+            partner = rank - 1 if rank % 2 else rank + 1
+            _nvtx_range_push(f"cuda_sync_pre_mpi:B{bstate.bucket_id} phase=final")
+            _ring_sync(bstate, work)
+            _nvtx_range_pop()
+            if rank % 2:
+                if log:
+                    print(f"{pfx} final tag={final_tag} SENDING -> rank{partner}: {_fmt(work)}",
+                        flush=True)
+                req = dist.isend(work, dst=partner, tag=final_tag)
+                req.wait()
+            else:
+                if log:
+                    print(f"{pfx} final tag={final_tag} EXPECTING <- rank{partner}",
+                        flush=True)
+                req = dist.irecv(work, src=partner, tag=final_tag)
+                req.wait()
+                if log:
+                    print(f"{pfx} final tag={final_tag} RECVD <- rank{partner}: {_fmt(work)}",
+                        flush=True)
+        _nvtx_range_pop()
+
+        tensor.copy_(work.view_as(tensor))
+        tensor.div_(world_size)
     _nvtx_range_push(f"cuda_sync_post_recursive_doubling:B{bstate.bucket_id} rank={rank}")
-    _cuda_sync(tensor)
+    _ring_sync(bstate, tensor)
     _nvtx_range_pop()
 
 # Hook: plain recursive-doubling allreduce with no compression.

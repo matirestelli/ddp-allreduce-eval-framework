@@ -86,7 +86,15 @@ class TrainingConfig:
             "nesterov=True requires momentum > 0"
 
         if self.dataset.startswith("cifar"):
-            assert self.image_size == 32, "CIFAR experiments should use image_size=32"
+            assert self.image_size >= 32, "image_size must be >= 32 for CIFAR"
+            # The CIFAR stem (stride-1 conv, no maxpool) is only meaningful at
+            # 32x32. At larger sizes it keeps full resolution through layer1 and
+            # blows up activation memory, so require the standard stem instead.
+            if self.cifar_stem:
+                assert self.image_size == 32, (
+                    "cifar_stem=True is only valid with image_size=32. "
+                    "For upscaled CIFAR set CIFAR_STEM=false."
+                )
         else:
             assert self.image_size > 0
 

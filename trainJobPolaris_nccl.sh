@@ -1,12 +1,12 @@
 #!/bin/bash -l
-#PBS -l select=8:system=polaris
+#PBS -l select=2:system=polaris
 #PBS -l walltime=01:00:00
 #PBS -l filesystems=home:eagle
 #PBS -q debug-scaling
 #PBS -A UIC-HPC
-#PBS -o ddp_train_PolarisNCCL_32gpus_4b_16b.%j.out
-#PBS -e ddp_train_PolarisNCCL_32gpus_4b_16b.%j.err
-#PBS -N ddp-train_PolarisNCCL_32gpus_4b_16b
+#PBS -o ddp_train_PolarisNCCL_8gpus_16b.%j.out
+#PBS -e ddp_train_PolarisNCCL_8gpus_16b.%j.err
+#PBS -N ddp-train_PolarisNCCL_8gpus_16b
 
 cd ${PBS_O_WORKDIR}
 
@@ -36,7 +36,7 @@ echo "MASTER_PORT=${MASTER_PORT}"
 # Edit these lists to run multiple experiments inside one queued job.
 # Leave only one active value in each list for a single run.
 
-NUM_PROCS=32
+NUM_PROCS=8
 PPN=4
 # processes per node
 
@@ -56,13 +56,13 @@ NUM_CLASSES_LIST=(
 )
 
 IMAGE_SIZES=(
-    "32"       # CIFAR
-    #"224"   # ImageNet / ImageNet-like
+    #"32"       # CIFAR
+    "224"   # ImageNet / ImageNet-like
 )
 
 NUM_EPOCHS_LIST=(
-    "10"
-    #"20"
+    #"10"
+    "20"
     # "50"
     # "100"
 )
@@ -137,8 +137,8 @@ PRETRAINED_VALUES=(
 )
 
 CIFAR_STEM_VALUES=(
-    "true"     # CIFAR from scratch
-    #"false"  # ImageNet / ImageNet-like
+    #"true"     # CIFAR from scratch
+    "false"  # ImageNet / ImageNet-like
 )
 
 DROP_LAST_VALUES=(
@@ -154,13 +154,13 @@ BACKENDS=(
 # "default" = built-in DDP allreduce wrapped with NVTX timing.
 # "none"    = no custom communication hook.
 EXPERIMENTS=(
-    "none:"
-    "ring:"
-    "ring_zfp_naive:16"
-    "ring_zfp_online_coll:16"
-    "ring_zfp_online_coll:8"
-    "recursive_doubling:"
-    "recursive_doubling_zfp_naive:16"
+    #"none:"
+    #"ring:"
+    #"ring_zfp_naive:16"
+    #"ring_zfp_online_coll:16"
+    #"ring_zfp_online_coll:8"
+    #"recursive_doubling:"
+    #"recursive_doubling_zfp_naive:16"
     "recursive_doubling_zfp_online_coll:16"
     "recursive_doubling_zfp_online_coll:8"
     #"default:"

@@ -1,12 +1,12 @@
 #!/bin/bash -l
-#PBS -l select=8:system=polaris
+#PBS -l select=4:system=polaris
 #PBS -l walltime=01:00:00
 #PBS -l filesystems=home:eagle
 #PBS -q debug-scaling
 #PBS -A UIC-HPC
-#PBS -o ddp_train_polaris_32gpu_64b.%j.out
-#PBS -e ddp_train_polaris_32gpu_64b.%j.err
-#PBS -N ddp-train_polaris_32gpu_64b
+#PBS -o ddp_train_polaris_16gpu_8b.%j.out
+#PBS -e ddp_train_polaris_16gpu_8b.%j.err
+#PBS -N ddp-train_polaris_16gpu_8b
 
 cd ${PBS_O_WORKDIR}
 
@@ -28,7 +28,7 @@ echo "MASTER_PORT=${MASTER_PORT}"
 # Edit these lists to run multiple experiments inside one queued job.
 # Leave only one active value in each list for a single run.
 
-NUM_PROCS=32
+NUM_PROCS=16
 PPN=4
 
 MODELS=(
@@ -47,21 +47,21 @@ NUM_CLASSES_LIST=(
 )
 
 IMAGE_SIZES=(
-    "32"       # CIFAR
-    #"224"   # ImageNet / ImageNet-like
+    #"32"       # CIFAR
+    "224"   # cifar10 boosted
 )
 
 NUM_EPOCHS_LIST=(
-    "10"
-    #"20"
+    #"10"
+    "20"
     # "50"
     # "100"
 )
 
 BATCH_SIZES=(
-    "4"
-    #"8"
-    "16"       # strong global 128 on 4 GPUs
+    #"4"
+    "8"
+    #"16"       # strong global 128 on 4 GPUs
     #"32"       # strong global 128 on 4 GPUs
     #"64"    # strong global 256 on 4 GPUs
     # "128"   # weak scaling local batch 128
@@ -127,8 +127,8 @@ PRETRAINED_VALUES=(
 )
 
 CIFAR_STEM_VALUES=(
-    "true"     # CIFAR from scratch
-    #"false"  # ImageNet / ImageNet-like
+    #"true"     # CIFAR from scratch
+    "false"  # ImageNet / ImageNet-like or boosted 224 images
 )
 
 DROP_LAST_VALUES=(
@@ -144,19 +144,19 @@ BACKENDS=(
 # "default" = built-in DDP allreduce wrapped with NVTX timing.
 # "none"    = no custom communication hook.
 EXPERIMENTS=(
-    #"none:"
-    # "default_sync:"
+    "none:"
+    "default_sync:"
     # "default_clone:"
     #"default_cpu_stage:"
     #"default:"
-    #"ring:"
-    #"ring_zfp_naive:16"
-    #"ring_zfp_online_coll:16"
+    "ring:"
+    "ring_zfp_naive:16"
+    "ring_zfp_online_coll:16"
     "ring_zfp_online_coll:8"
-    #"recursive_doubling:"
-    #"recursive_doubling_zfp_naive:16"
-    #"recursive_doubling_zfp_online_coll:16"
-    #"recursive_doubling_zfp_online_coll:8"
+    "recursive_doubling:"
+    "recursive_doubling_zfp_naive:16"
+    "recursive_doubling_zfp_online_coll:16"
+    "recursive_doubling_zfp_online_coll:8"
 )
 
 for MODEL_NAME in "${MODELS[@]}"; do
@@ -208,7 +208,7 @@ for WD_ON_BN_BIAS in "${WD_ON_BN_BIAS_VALUES[@]}"; do
             -env DROP_LAST="${DROP_LAST}"
             -env PRETRAINED="${PRETRAINED}"
             -env CIFAR_STEM="${CIFAR_STEM}"
-            -env INIT_CIFAR_STEM_FROM_PRETRAINED_CENTER="true"
+            -env INIT_CIFAR_STEM_FROM_PRETRAINED_CENTER="false"
             -env DATA_DIR="./data"
             -env CHECKPOINT_DIR="./checkpoints"
             -env SEED="42"
@@ -222,6 +222,9 @@ for WD_ON_BN_BIAS in "${WD_ON_BN_BIAS_VALUES[@]}"; do
         if [[ -n "${ZFP_RATE}" ]]; then
             MPI_ENV_ARGS+=(-env ZFP_RATE="${ZFP_RATE}")
         fi
+
+        #debug for none pytorch mpi not working
+        #export CUDA_LAUNCH_BLOCKING=1
 
         mpiexec -np ${NUM_PROCS} --ppn ${PPN} --depth=8 --cpu-bind depth \
             "${MPI_ENV_ARGS[@]}" \

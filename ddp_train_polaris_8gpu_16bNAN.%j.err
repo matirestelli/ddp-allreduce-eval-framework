@@ -1,0 +1,54 @@
+hostname: error while loading shared libraries: libcudart.so.13: cannot open shared object file: No such file or directory
+which: error while loading shared libraries: libcudart.so.13: cannot open shared object file: No such file or directory
+tail: error while loading shared libraries: libcudart.so.13: cannot open shared object file: No such file or directory
+tail: error while loading shared libraries: libcudart.so.13: cannot open shared object file: No such file or directory
+tail: error while loading shared libraries: libcudart.so.13: cannot open shared object file: No such file or directory
+tail: error while loading shared libraries: libcudart.so.13: cannot open shared object file: No such file or directory
+tail: error while loading shared libraries: libcudart.so.13: cannot open shared object file: No such file or directory
+tail: error while loading shared libraries: libcudart.so.13: cannot open shared object file: No such file or directory
+head: error while loading shared libraries: libcudart.so.13: cannot open shared object file: No such file or directory
+date: error while loading shared libraries: libcudart.so.13: cannot open shared object file: No such file or directory
+mpiexec: error while loading shared libraries: libcudart.so.13: cannot open shared object file: No such file or directory
+date: error while loading shared libraries: libcudart.so.13: cannot open shared object file: No such file or directory
+[1] This process is not using the same device it did during gtl_init.
+ Current device_id 1 original device_id 0.
+ Use of IPC is disabled from this point. IPC PUT protocol may be used instead 
+[5] This process is not using the same device it did during gtl_init.
+ Current device_id 1 original device_id 0.
+ Use of IPC is disabled from this point. IPC PUT protocol may be used instead 
+[6] This process is not using the same device it did during gtl_init.
+ Current device_id 2 original device_id 0.
+ Use of IPC is disabled from this point. IPC PUT protocol may be used instead 
+[2] This process is not using the same device it did during gtl_init.
+ Current device_id 2 original device_id 0.
+ Use of IPC is disabled from this point. IPC PUT protocol may be used instead 
+[7] This process is not using the same device it did during gtl_init.
+ Current device_id 3 original device_id 0.
+ Use of IPC is disabled from this point. IPC PUT protocol may be used instead 
+[3] This process is not using the same device it did during gtl_init.
+ Current device_id 3 original device_id 0.
+ Use of IPC is disabled from this point. IPC PUT protocol may be used instead 
+[1] This process is not using the same device it did during gtl_init.
+ Current device_id 1 original device_id 0.
+ Use of IPC is disabled from this point. IPC PUT protocol may be used instead 
+[5] This process is not using the same device it did during gtl_init.
+ Current device_id 1 original device_id 0.
+ Use of IPC is disabled from this point. IPC PUT protocol may be used instead 
+[6] This process is not using the same device it did during gtl_init.
+ Current device_id 2 original device_id 0.
+ Use of IPC is disabled from this point. IPC PUT protocol may be used instead 
+[2] This process is not using the same device it did during gtl_init.
+ Current device_id 2 original device_id 0.
+ Use of IPC is disabled from this point. IPC PUT protocol may be used instead 
+[1] This process is not using the same device it did during gtl_init.
+ Current device_id 1 original device_id 0.
+ Use of IPC is disabled from this point. IPC PUT protocol may be used instead 
+[6] This process is not using the same device it did during gtl_init.
+ Current device_id 2 original device_id 0.
+ Use of IPC is disabled from this point. IPC PUT protocol may be used instead 
+[5] This process is not using the same device it did during gtl_init.
+ Current device_id 1 original device_id 0.
+ Use of IPC is disabled from this point. IPC PUT protocol may be used instead 
+[2] This process is not using the same device it did during gtl_init.
+ Current device_id 2 original device_id 0.
+ Use of IPC is disabled from this point. IPC PUT protocol may be used instead 
