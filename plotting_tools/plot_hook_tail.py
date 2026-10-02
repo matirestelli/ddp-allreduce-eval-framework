@@ -471,12 +471,10 @@ def main():
         print(f"[DEBUG] method counts: {df['method'].value_counts().to_dict()}")
 
     backend = args.backend or backend_label(df)
-    # On Frontier, PyTorch reports the backend string as "nccl" even though the
-    # actual library is RCCL. Prefer RCCL when the path signals it.
-    if args.backend is None:
-        rs = str(args.root).lower()
-        if "rccl" in rs or "frontier" in rs:
-            backend = "RCCL"
+    # PyTorch reports "nccl" on Frontier even though the library is RCCL.
+    # Only remap that case — never override MPI or Gloo.
+    if args.backend is None and backend == "NCCL" and "frontier" in str(args.root).lower():
+        backend = "RCCL"
     df = prefer_online_rate8(df)
 
     # Baseline has no meaningful hook -> drop it everywhere.

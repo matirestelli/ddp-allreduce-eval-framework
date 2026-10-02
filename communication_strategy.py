@@ -183,11 +183,15 @@ def _record_hook_tail_timing(label: str, tail_ms: float) -> None:
 _current_epoch: int = 0
 _current_batch: int = 0
 
-# helper function to fix bug of bit/bytes missmatch in zfp
-def _zfp_pad_tail_to_B_(buf_u8: torch.Tensor, used_bits: int, B: int) -> int:
-    """Zero-fill buf_u8[used_bytes:B] where used_bits is returned by ZFP (bits). Returns used_bytes."""
-    used_bits = int(used_bits)
-    used_bytes = (used_bits + 7) // 8
+# Zero the unused tail of a fixed-size compressed buffer.
+# zfp_api returns the compressed size in BYTES (verified: rate 8, n=6,553,600
+# -> 6,553,600). The old version treated it as bits and divided by 8 again,
+# zeroing 7/8 of every compressed payload before sending.
+def _zfp_pad_tail_to_B_(buf_u8: torch.Tensor, used_bytes: int, B: int) -> int:
+    """Zero-fill buf_u8[used_bytes:B]. `used_bytes` is ZFP's return value (BYTES)."""
+    used_bytes = int(used_bytes)
+    if used_bytes <= 0:
+        raise RuntimeError(f"ZFP returned non-positive size: {used_bytes}")
     if used_bytes > B:
         raise RuntimeError(f"ZFP overflow: used_bytes={used_bytes} > B={B}")
     if used_bytes < B:
@@ -2049,6 +2053,15 @@ def _ring_allreduce_zfp_online_coll_sum(
             tag=tag,
         )
         send_reqs.append(send_req)
+        
+        # FIX 2 (replica consistency): the owner keeps exactly what every other
+        # rank will decode, so all replicas hold bit-identical gradients.
+        # Launched after the send is posted -> overlaps with communication.
+        if i == 0:
+            with torch.cuda.stream(bstate.streams[si]):
+                _zfp_decompress_into_current_stream(
+                    bstate.send_comp[si], send_B, chunks[si], cfg.rate,
+                )
 
         # Line 29.
         recv_req.wait()
@@ -2393,6 +2406,14 @@ def _recursive_doubling_zfp_online_coll_sum(
                 tag=tag,
             )
             send_reqs.append(send_req)
+            
+            # FIX 2 (replica consistency): replace our own contribution by its
+            # lossy version, so both partners compute D(C(a)) + D(C(b)) and end
+            # up bit-identical. Overlaps with the network wait below.
+            with torch.cuda.stream(reduce_stream):
+                _zfp_decompress_into_current_stream(
+                    bstate.send_comp[slot], B, work, cfg.rate,
+                )
 
             # Line 32.
             recv_req.wait()

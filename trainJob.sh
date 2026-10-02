@@ -1,12 +1,12 @@
 #!/bin/bash -l
-#PBS -l select=4:system=polaris
-#PBS -l walltime=01:00:00
+#PBS -l select=10:system=polaris
+#PBS -l walltime=03:00:00
 #PBS -l filesystems=home:eagle
-#PBS -q debug-scaling
+#PBS -q prod
 #PBS -A UIC-HPC
-#PBS -o ddp_train_polaris_16gpu_8b.%j.out
-#PBS -e ddp_train_polaris_16gpu_8b.%j.err
-#PBS -N ddp-train_polaris_16gpu_8b
+#PBS -o ddp_train_polaris_32gpu_4b.%j.out
+#PBS -e ddp_train_polaris_32gpu_4b.%j.err
+#PBS -N ddp-train_polaris_32gpu_4b
 
 cd ${PBS_O_WORKDIR}
 
@@ -28,7 +28,7 @@ echo "MASTER_PORT=${MASTER_PORT}"
 # Edit these lists to run multiple experiments inside one queued job.
 # Leave only one active value in each list for a single run.
 
-NUM_PROCS=16
+NUM_PROCS=32
 PPN=4
 
 MODELS=(
@@ -59,8 +59,8 @@ NUM_EPOCHS_LIST=(
 )
 
 BATCH_SIZES=(
-    #"4"
-    "8"
+    "4"
+    #"8"
     #"16"       # strong global 128 on 4 GPUs
     #"32"       # strong global 128 on 4 GPUs
     #"64"    # strong global 256 on 4 GPUs
@@ -144,13 +144,13 @@ BACKENDS=(
 # "default" = built-in DDP allreduce wrapped with NVTX timing.
 # "none"    = no custom communication hook.
 EXPERIMENTS=(
-    "none:"
-    "default_sync:"
-    # "default_clone:"
+    #"none:"
+    #"default_sync:"
+    #"default_clone:"
     #"default_cpu_stage:"
     #"default:"
-    "ring:"
-    "ring_zfp_naive:16"
+    #"ring:"
+    #"ring_zfp_naive:16"
     "ring_zfp_online_coll:16"
     "ring_zfp_online_coll:8"
     "recursive_doubling:"
