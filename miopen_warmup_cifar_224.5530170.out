@@ -1,0 +1,483 @@
+=== Warmup job started: Tue Sep 22 06:51:35 PM EDT 2026 ===
+=== Node: frontier10366 ===
+=== Node: frontier10366 ===
+=== Job: 5530170 ===
+=== Seeding local MIOpen cache from baseline (Lustre -> NVMe) ===
+Using ENV_TARBALL=/lustre/orion/gen243/proj-shared/matilderestelli/pytorch/conda_env_torch_vision_20260701_hipfix.tar.gz
+Using ENV_DIR=/mnt/bb/matilderestelli/torch_env
+PyTorch: 2.14.0a0
+Location: /mnt/bb/matilderestelli/torch_env/lib/python3.10/site-packages/torch/__init__.py
+HIP available: True gpus: 8
+MPI available: True
+Warmup cache local: /mnt/bb/matilderestelli/miopen_cache_5530170
+Warmup baseline:    /lustre/orion/gen243/proj-shared/matilderestelli/miopen_cache_baseline
+Warmup DB dir:      /mnt/bb/matilderestelli/miopen_cache_5530170/miopen_db
+Warmup cache dir:   /mnt/bb/matilderestelli/miopen_cache_5530170/kernel_cache
+MIOPEN_FIND_MODE=1 MIOPEN_FIND_ENFORCE=1
+=== Running interface.py at Tue Sep 22 06:51:57 PM EDT 2026 ===
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      wide_resnet50_2 (from scratch)
+  Dataset:    cifar10 (10 classes)
+  Image size: 224
+  LR:         0.001
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  sgd
+  Weight dec: 0.0005 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  built-in (no hook)
+  Epochs:     1
+  Batch/rank: 8
+  LR:         0.001
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  None
+  Drop last:  True
+  Data dir:   ./data
+================================================================================
+
+
+================================================================================
+Distributed Training: WIDE_RESNET50_2 on CIFAR10
+Backend: MPI, Algorithm: built-in (no hook)
+================================================================================
+Ranks: 1, Epochs: 1, Batch/rank: 8, Effective batch: 8
+LR: 0.001, Device: cuda:0
+
+[Cache] Pretrained weights cache (TORCH_HOME) = ./data/pretrained_weights_cache
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] No hook — using DDP built-in MPI allreduce
+[Optim] SGD: lr=0.001 momentum=0.9 nesterov=True wd=0.0005 wd_on_bn_bias=False
+[Optim]   group 0: 66,786,496 params, wd=0.0005
+[Optim]   group 1: 68,234 params, wd=0.0
+[Data] Train batches: 6250, Val batches: 1250
+
+[Data] Batch transform: gpu_upscale 32 -> 224
+
+[Sched] cosine: steps/epoch=6250, total_steps=6250, warmup_steps=0 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.001000)
+  Batch [50/6250] Loss: 2.6092, Acc: 10.25%, lr: 0.001000
+  Batch [100/6250] Loss: 2.5353, Acc: 14.38%, lr: 0.000999
+  Batch [150/6250] Loss: 2.5255, Acc: 15.25%, lr: 0.000999
+  Batch [200/6250] Loss: 2.4970, Acc: 15.19%, lr: 0.000997
+  Batch [250/6250] Loss: 2.4852, Acc: 15.25%, lr: 0.000996
+  Batch [300/6250] Loss: 2.4779, Acc: 16.25%, lr: 0.000994
+  Batch [350/6250] Loss: 2.4722, Acc: 16.14%, lr: 0.000992
+  Batch [400/6250] Loss: 2.4592, Acc: 16.47%, lr: 0.000990
+  Batch [450/6250] Loss: 2.4400, Acc: 17.22%, lr: 0.000987
+  Batch [500/6250] Loss: 2.4382, Acc: 17.40%, lr: 0.000984
+  Batch [550/6250] Loss: 2.4376, Acc: 17.61%, lr: 0.000981
+  Batch [600/6250] Loss: 2.4328, Acc: 17.73%, lr: 0.000977
+  Batch [650/6250] Loss: 2.4281, Acc: 17.63%, lr: 0.000974
+  Batch [700/6250] Loss: 2.4150, Acc: 17.93%, lr: 0.000969
+  Batch [750/6250] Loss: 2.4008, Acc: 18.23%, lr: 0.000965
+  Batch [800/6250] Loss: 2.3802, Acc: 18.64%, lr: 0.000960
+  Batch [850/6250] Loss: 2.3721, Acc: 18.88%, lr: 0.000955
+  Batch [900/6250] Loss: 2.3600, Acc: 19.42%, lr: 0.000950
+  Batch [950/6250] Loss: 2.3493, Acc: 19.68%, lr: 0.000944
+  Batch [1000/6250] Loss: 2.3423, Acc: 19.80%, lr: 0.000938
+  Batch [1050/6250] Loss: 2.3328, Acc: 19.83%, lr: 0.000932
+  Batch [1100/6250] Loss: 2.3236, Acc: 20.05%, lr: 0.000925
+  Batch [1150/6250] Loss: 2.3134, Acc: 20.38%, lr: 0.000919
+  Batch [1200/6250] Loss: 2.3044, Acc: 20.69%, lr: 0.000912
+  Batch [1250/6250] Loss: 2.2938, Acc: 20.86%, lr: 0.000905
+  Batch [1300/6250] Loss: 2.2870, Acc: 21.07%, lr: 0.000897
+  Batch [1350/6250] Loss: 2.2789, Acc: 21.30%, lr: 0.000889
+  Batch [1400/6250] Loss: 2.2694, Acc: 21.47%, lr: 0.000881
+  Batch [1450/6250] Loss: 2.2643, Acc: 21.47%, lr: 0.000873
+  Batch [1500/6250] Loss: 2.2572, Acc: 21.66%, lr: 0.000864
+  Batch [1550/6250] Loss: 2.2492, Acc: 21.85%, lr: 0.000856
+  Batch [1600/6250] Loss: 2.2446, Acc: 21.93%, lr: 0.000847
+  Batch [1650/6250] Loss: 2.2405, Acc: 22.10%, lr: 0.000838
+  Batch [1700/6250] Loss: 2.2325, Acc: 22.29%, lr: 0.000828
+  Batch [1750/6250] Loss: 2.2254, Acc: 22.43%, lr: 0.000819
+  Batch [1800/6250] Loss: 2.2189, Acc: 22.58%, lr: 0.000809
+  Batch [1850/6250] Loss: 2.2125, Acc: 22.67%, lr: 0.000799
+  Batch [1900/6250] Loss: 2.2069, Acc: 22.82%, lr: 0.000789
+  Batch [1950/6250] Loss: 2.2014, Acc: 22.94%, lr: 0.000778
+  Batch [2000/6250] Loss: 2.1967, Acc: 23.06%, lr: 0.000768
+  Batch [2050/6250] Loss: 2.1899, Acc: 23.32%, lr: 0.000757
+  Batch [2100/6250] Loss: 2.1818, Acc: 23.46%, lr: 0.000746
+  Batch [2150/6250] Loss: 2.1776, Acc: 23.53%, lr: 0.000735
+  Batch [2200/6250] Loss: 2.1704, Acc: 23.68%, lr: 0.000724
+  Batch [2250/6250] Loss: 2.1642, Acc: 23.81%, lr: 0.000713
+  Batch [2300/6250] Loss: 2.1577, Acc: 23.95%, lr: 0.000701
+  Batch [2350/6250] Loss: 2.1541, Acc: 24.03%, lr: 0.000690
+  Batch [2400/6250] Loss: 2.1465, Acc: 24.24%, lr: 0.000678
+  Batch [2450/6250] Loss: 2.1403, Acc: 24.50%, lr: 0.000666
+  Batch [2500/6250] Loss: 2.1343, Acc: 24.74%, lr: 0.000655
+  Batch [2550/6250] Loss: 2.1293, Acc: 24.84%, lr: 0.000643
+  Batch [2600/6250] Loss: 2.1228, Acc: 25.04%, lr: 0.000630
+  Batch [2650/6250] Loss: 2.1156, Acc: 25.23%, lr: 0.000618
+  Batch [2700/6250] Loss: 2.1116, Acc: 25.35%, lr: 0.000606
+  Batch [2750/6250] Loss: 2.1054, Acc: 25.55%, lr: 0.000594
+  Batch [2800/6250] Loss: 2.0997, Acc: 25.66%, lr: 0.000581
+  Batch [2850/6250] Loss: 2.0941, Acc: 25.86%, lr: 0.000569
+  Batch [2900/6250] Loss: 2.0888, Acc: 26.01%, lr: 0.000556
+  Batch [2950/6250] Loss: 2.0832, Acc: 26.18%, lr: 0.000544
+  Batch [3000/6250] Loss: 2.0796, Acc: 26.30%, lr: 0.000531
+  Batch [3050/6250] Loss: 2.0741, Acc: 26.49%, lr: 0.000519
+  Batch [3100/6250] Loss: 2.0693, Acc: 26.63%, lr: 0.000506
+  Batch [3150/6250] Loss: 2.0646, Acc: 26.79%, lr: 0.000494
+  Batch [3200/6250] Loss: 2.0596, Acc: 26.89%, lr: 0.000481
+  Batch [3250/6250] Loss: 2.0543, Acc: 27.02%, lr: 0.000469
+  Batch [3300/6250] Loss: 2.0509, Acc: 27.12%, lr: 0.000456
+  Batch [3350/6250] Loss: 2.0472, Acc: 27.25%, lr: 0.000444
+  Batch [3400/6250] Loss: 2.0415, Acc: 27.44%, lr: 0.000431
+  Batch [3450/6250] Loss: 2.0373, Acc: 27.55%, lr: 0.000419
+  Batch [3500/6250] Loss: 2.0331, Acc: 27.68%, lr: 0.000406
+  Batch [3550/6250] Loss: 2.0284, Acc: 27.83%, lr: 0.000394
+  Batch [3600/6250] Loss: 2.0234, Acc: 28.00%, lr: 0.000382
+  Batch [3650/6250] Loss: 2.0185, Acc: 28.12%, lr: 0.000370
+  Batch [3700/6250] Loss: 2.0136, Acc: 28.25%, lr: 0.000357
+  Batch [3750/6250] Loss: 2.0102, Acc: 28.35%, lr: 0.000345
+  Batch [3800/6250] Loss: 2.0060, Acc: 28.42%, lr: 0.000334
+  Batch [3850/6250] Loss: 2.0018, Acc: 28.56%, lr: 0.000322
+  Batch [3900/6250] Loss: 1.9980, Acc: 28.65%, lr: 0.000310
+  Batch [3950/6250] Loss: 1.9950, Acc: 28.69%, lr: 0.000299
+  Batch [4000/6250] Loss: 1.9904, Acc: 28.83%, lr: 0.000287
+  Batch [4050/6250] Loss: 1.9867, Acc: 28.93%, lr: 0.000276
+  Batch [4100/6250] Loss: 1.9832, Acc: 29.05%, lr: 0.000265
+  Batch [4150/6250] Loss: 1.9789, Acc: 29.15%, lr: 0.000254
+  Batch [4200/6250] Loss: 1.9754, Acc: 29.25%, lr: 0.000243
+  Batch [4250/6250] Loss: 1.9714, Acc: 29.36%, lr: 0.000232
+  Batch [4300/6250] Loss: 1.9681, Acc: 29.48%, lr: 0.000222
+  Batch [4350/6250] Loss: 1.9630, Acc: 29.64%, lr: 0.000211
+  Batch [4400/6250] Loss: 1.9586, Acc: 29.75%, lr: 0.000201
+  Batch [4450/6250] Loss: 1.9539, Acc: 29.87%, lr: 0.000191
+  Batch [4500/6250] Loss: 1.9499, Acc: 29.99%, lr: 0.000181
+  Batch [4550/6250] Loss: 1.9458, Acc: 30.11%, lr: 0.000172
+  Batch [4600/6250] Loss: 1.9413, Acc: 30.24%, lr: 0.000162
+  Batch [4650/6250] Loss: 1.9381, Acc: 30.32%, lr: 0.000153
+  Batch [4700/6250] Loss: 1.9346, Acc: 30.40%, lr: 0.000144
+  Batch [4750/6250] Loss: 1.9312, Acc: 30.52%, lr: 0.000136
+  Batch [4800/6250] Loss: 1.9270, Acc: 30.65%, lr: 0.000127
+  Batch [4850/6250] Loss: 1.9239, Acc: 30.76%, lr: 0.000119
+  Batch [4900/6250] Loss: 1.9200, Acc: 30.86%, lr: 0.000111
+  Batch [4950/6250] Loss: 1.9159, Acc: 30.98%, lr: 0.000103
+  Batch [5000/6250] Loss: 1.9123, Acc: 31.07%, lr: 0.000095
+  Batch [5050/6250] Loss: 1.9088, Acc: 31.17%, lr: 0.000088
+  Batch [5100/6250] Loss: 1.9060, Acc: 31.27%, lr: 0.000081
+  Batch [5150/6250] Loss: 1.9026, Acc: 31.40%, lr: 0.000075
+  Batch [5200/6250] Loss: 1.8982, Acc: 31.56%, lr: 0.000068
+  Batch [5250/6250] Loss: 1.8946, Acc: 31.69%, lr: 0.000062
+  Batch [5300/6250] Loss: 1.8915, Acc: 31.80%, lr: 0.000056
+  Batch [5350/6250] Loss: 1.8883, Acc: 31.92%, lr: 0.000050
+  Batch [5400/6250] Loss: 1.8848, Acc: 32.00%, lr: 0.000045
+  Batch [5450/6250] Loss: 1.8814, Acc: 32.11%, lr: 0.000040
+  Batch [5500/6250] Loss: 1.8794, Acc: 32.20%, lr: 0.000035
+  Batch [5550/6250] Loss: 1.8761, Acc: 32.32%, lr: 0.000031
+  Batch [5600/6250] Loss: 1.8724, Acc: 32.48%, lr: 0.000026
+  Batch [5650/6250] Loss: 1.8705, Acc: 32.56%, lr: 0.000023
+  Batch [5700/6250] Loss: 1.8681, Acc: 32.66%, lr: 0.000019
+  Batch [5750/6250] Loss: 1.8646, Acc: 32.79%, lr: 0.000016
+  Batch [5800/6250] Loss: 1.8617, Acc: 32.94%, lr: 0.000013
+  Batch [5850/6250] Loss: 1.8591, Acc: 33.02%, lr: 0.000010
+  Batch [5900/6250] Loss: 1.8568, Acc: 33.10%, lr: 0.000008
+  Batch [5950/6250] Loss: 1.8541, Acc: 33.20%, lr: 0.000006
+  Batch [6000/6250] Loss: 1.8509, Acc: 33.31%, lr: 0.000004
+  Batch [6050/6250] Loss: 1.8482, Acc: 33.41%, lr: 0.000003
+  Batch [6100/6250] Loss: 1.8455, Acc: 33.48%, lr: 0.000001
+  Batch [6150/6250] Loss: 1.8428, Acc: 33.55%, lr: 0.000001
+  Batch [6200/6250] Loss: 1.8406, Acc: 33.62%, lr: 0.000000
+  Batch [6250/6250] Loss: 1.8383, Acc: 33.71%, lr: 0.000000
+[Epoch 1] Train Loss: 1.8383, Acc: 33.71%  |  Val Loss: 1.4632, Acc: 46.99%  |  Time: 8747.6s
+[Epoch 1] t_iter median: 1242.38 ms  (fwd 470.49 | bwd+comm 772.79 | opt 6.38 | data 0.07)  |  train-only epoch: 8159.9s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1242.38 ms
+[Epoch 1] peak GPU mem: 2.32 GiB allocated, 2.44 GiB reserved | wd_on_bn_bias: False, nesterov: True
+  -> Best model saved (46.99%)
+[Epoch 1] Summarizing hook timing...
+[Epoch 1] Hook timing summary done
+
+================================================================================
+Done in 8748.9s | Best val acc: 46.99%
+Epoch times (train+val): mean=8747.6s  min=8747.6s  max=8747.6s
+================================================================================
+=== Running interface.py at Tue Sep 22 09:17:59 PM EDT 2026 ===
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      wide_resnet50_2 (from scratch)
+  Dataset:    cifar10 (10 classes)
+  Image size: 224
+  LR:         0.001
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  sgd
+  Weight dec: 0.0005 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  built-in (no hook)
+  Epochs:     1
+  Batch/rank: 16
+  LR:         0.001
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  None
+  Drop last:  True
+  Data dir:   ./data
+================================================================================
+
+
+================================================================================
+Distributed Training: WIDE_RESNET50_2 on CIFAR10
+Backend: MPI, Algorithm: built-in (no hook)
+================================================================================
+Ranks: 1, Epochs: 1, Batch/rank: 16, Effective batch: 16
+LR: 0.001, Device: cuda:0
+
+[Cache] Pretrained weights cache (TORCH_HOME) = ./data/pretrained_weights_cache
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] No hook — using DDP built-in MPI allreduce
+[Optim] SGD: lr=0.001 momentum=0.9 nesterov=True wd=0.0005 wd_on_bn_bias=False
+[Optim]   group 0: 66,786,496 params, wd=0.0005
+[Optim]   group 1: 68,234 params, wd=0.0
+[Data] Train batches: 3125, Val batches: 625
+
+[Data] Batch transform: gpu_upscale 32 -> 224
+
+[Sched] cosine: steps/epoch=3125, total_steps=3125, warmup_steps=0 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.001000)
+  Batch [50/3125] Loss: 2.4083, Acc: 13.25%, lr: 0.000999
+  Batch [100/3125] Loss: 2.3691, Acc: 14.00%, lr: 0.000997
+  Batch [150/3125] Loss: 2.3532, Acc: 15.62%, lr: 0.000994
+  Batch [200/3125] Loss: 2.3286, Acc: 16.44%, lr: 0.000990
+  Batch [250/3125] Loss: 2.3146, Acc: 17.25%, lr: 0.000984
+  Batch [300/3125] Loss: 2.3046, Acc: 17.60%, lr: 0.000977
+  Batch [350/3125] Loss: 2.2858, Acc: 17.89%, lr: 0.000969
+  Batch [400/3125] Loss: 2.2611, Acc: 18.58%, lr: 0.000960
+  Batch [450/3125] Loss: 2.2484, Acc: 19.12%, lr: 0.000950
+  Batch [500/3125] Loss: 2.2298, Acc: 19.66%, lr: 0.000938
+  Batch [550/3125] Loss: 2.2159, Acc: 20.06%, lr: 0.000925
+  Batch [600/3125] Loss: 2.1979, Acc: 20.64%, lr: 0.000912
+  Batch [650/3125] Loss: 2.1847, Acc: 21.12%, lr: 0.000897
+  Batch [700/3125] Loss: 2.1736, Acc: 21.42%, lr: 0.000881
+  Batch [750/3125] Loss: 2.1623, Acc: 21.62%, lr: 0.000864
+  Batch [800/3125] Loss: 2.1525, Acc: 21.92%, lr: 0.000847
+  Batch [850/3125] Loss: 2.1406, Acc: 22.35%, lr: 0.000828
+  Batch [900/3125] Loss: 2.1298, Acc: 22.76%, lr: 0.000809
+  Batch [950/3125] Loss: 2.1234, Acc: 22.99%, lr: 0.000789
+  Batch [1000/3125] Loss: 2.1159, Acc: 23.27%, lr: 0.000768
+  Batch [1050/3125] Loss: 2.1059, Acc: 23.60%, lr: 0.000746
+  Batch [1100/3125] Loss: 2.0959, Acc: 23.76%, lr: 0.000724
+  Batch [1150/3125] Loss: 2.0863, Acc: 24.07%, lr: 0.000701
+  Batch [1200/3125] Loss: 2.0761, Acc: 24.33%, lr: 0.000678
+  Batch [1250/3125] Loss: 2.0681, Acc: 24.64%, lr: 0.000655
+  Batch [1300/3125] Loss: 2.0584, Acc: 24.90%, lr: 0.000630
+  Batch [1350/3125] Loss: 2.0504, Acc: 25.19%, lr: 0.000606
+  Batch [1400/3125] Loss: 2.0421, Acc: 25.42%, lr: 0.000581
+  Batch [1450/3125] Loss: 2.0340, Acc: 25.66%, lr: 0.000556
+  Batch [1500/3125] Loss: 2.0261, Acc: 25.94%, lr: 0.000531
+  Batch [1550/3125] Loss: 2.0175, Acc: 26.25%, lr: 0.000506
+  Batch [1600/3125] Loss: 2.0089, Acc: 26.52%, lr: 0.000481
+  Batch [1650/3125] Loss: 2.0021, Acc: 26.76%, lr: 0.000456
+  Batch [1700/3125] Loss: 1.9953, Acc: 26.99%, lr: 0.000431
+  Batch [1750/3125] Loss: 1.9878, Acc: 27.26%, lr: 0.000406
+  Batch [1800/3125] Loss: 1.9814, Acc: 27.52%, lr: 0.000382
+  Batch [1850/3125] Loss: 1.9716, Acc: 27.82%, lr: 0.000357
+  Batch [1900/3125] Loss: 1.9650, Acc: 27.95%, lr: 0.000334
+  Batch [1950/3125] Loss: 1.9591, Acc: 28.08%, lr: 0.000310
+  Batch [2000/3125] Loss: 1.9520, Acc: 28.33%, lr: 0.000287
+  Batch [2050/3125] Loss: 1.9462, Acc: 28.57%, lr: 0.000265
+  Batch [2100/3125] Loss: 1.9394, Acc: 28.76%, lr: 0.000243
+  Batch [2150/3125] Loss: 1.9333, Acc: 28.93%, lr: 0.000222
+  Batch [2200/3125] Loss: 1.9261, Acc: 29.12%, lr: 0.000201
+  Batch [2250/3125] Loss: 1.9180, Acc: 29.43%, lr: 0.000181
+  Batch [2300/3125] Loss: 1.9113, Acc: 29.70%, lr: 0.000162
+  Batch [2350/3125] Loss: 1.9060, Acc: 29.88%, lr: 0.000144
+  Batch [2400/3125] Loss: 1.8988, Acc: 30.15%, lr: 0.000127
+  Batch [2450/3125] Loss: 1.8925, Acc: 30.40%, lr: 0.000111
+  Batch [2500/3125] Loss: 1.8862, Acc: 30.63%, lr: 0.000095
+  Batch [2550/3125] Loss: 1.8809, Acc: 30.81%, lr: 0.000081
+  Batch [2600/3125] Loss: 1.8743, Acc: 31.05%, lr: 0.000068
+  Batch [2650/3125] Loss: 1.8687, Acc: 31.25%, lr: 0.000056
+  Batch [2700/3125] Loss: 1.8629, Acc: 31.46%, lr: 0.000045
+  Batch [2750/3125] Loss: 1.8584, Acc: 31.62%, lr: 0.000035
+  Batch [2800/3125] Loss: 1.8528, Acc: 31.85%, lr: 0.000026
+  Batch [2850/3125] Loss: 1.8491, Acc: 31.98%, lr: 0.000019
+  Batch [2900/3125] Loss: 1.8433, Acc: 32.22%, lr: 0.000013
+  Batch [2950/3125] Loss: 1.8382, Acc: 32.40%, lr: 0.000008
+  Batch [3000/3125] Loss: 1.8328, Acc: 32.60%, lr: 0.000004
+  Batch [3050/3125] Loss: 1.8281, Acc: 32.77%, lr: 0.000001
+  Batch [3100/3125] Loss: 1.8239, Acc: 32.93%, lr: 0.000000
+[Epoch 1] Train Loss: 1.8219, Acc: 33.00%  |  Val Loss: 1.4687, Acc: 45.54%  |  Time: 4709.8s
+[Epoch 1] t_iter median: 1267.83 ms  (fwd 476.48 | bwd+comm 791.43 | opt 5.98 | data 0.08)  |  train-only epoch: 4411.4s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1267.83 ms
+[Epoch 1] peak GPU mem: 3.19 GiB allocated, 3.36 GiB reserved | wd_on_bn_bias: False, nesterov: True
+  -> Best model saved (45.54%)
+[Epoch 1] Summarizing hook timing...
+[Epoch 1] Hook timing summary done
+
+================================================================================
+Done in 4711.1s | Best val acc: 45.54%
+Epoch times (train+val): mean=4709.8s  min=4709.8s  max=4709.8s
+================================================================================
+=== Running interface.py at Tue Sep 22 10:36:42 PM EDT 2026 ===
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      wide_resnet50_2 (from scratch)
+  Dataset:    cifar10 (10 classes)
+  Image size: 224
+  LR:         0.001
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  sgd
+  Weight dec: 0.0005 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  built-in (no hook)
+  Epochs:     1
+  Batch/rank: 32
+  LR:         0.001
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  None
+  Drop last:  True
+  Data dir:   ./data
+================================================================================
+
+
+================================================================================
+Distributed Training: WIDE_RESNET50_2 on CIFAR10
+Backend: MPI, Algorithm: built-in (no hook)
+================================================================================
+Ranks: 1, Epochs: 1, Batch/rank: 32, Effective batch: 32
+LR: 0.001, Device: cuda:0
+
+[Cache] Pretrained weights cache (TORCH_HOME) = ./data/pretrained_weights_cache
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] No hook — using DDP built-in MPI allreduce
+[Optim] SGD: lr=0.001 momentum=0.9 nesterov=True wd=0.0005 wd_on_bn_bias=False
+[Optim]   group 0: 66,786,496 params, wd=0.0005
+[Optim]   group 1: 68,234 params, wd=0.0
+[Data] Train batches: 1562, Val batches: 313
+
+[Data] Batch transform: gpu_upscale 32 -> 224
+
+[Sched] cosine: steps/epoch=1562, total_steps=1562, warmup_steps=0 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.001000)
+  Batch [50/1562] Loss: 2.3611, Acc: 12.00%, lr: 0.000997
+  Batch [100/1562] Loss: 2.3287, Acc: 13.53%, lr: 0.000990
+  Batch [150/1562] Loss: 2.2921, Acc: 14.85%, lr: 0.000977
+  Batch [200/1562] Loss: 2.2518, Acc: 15.62%, lr: 0.000960
+  Batch [250/1562] Loss: 2.2226, Acc: 16.59%, lr: 0.000938
+  Batch [300/1562] Loss: 2.1960, Acc: 17.61%, lr: 0.000912
+  Batch [350/1562] Loss: 2.1726, Acc: 18.62%, lr: 0.000881
+  Batch [400/1562] Loss: 2.1525, Acc: 19.39%, lr: 0.000847
+  Batch [450/1562] Loss: 2.1326, Acc: 20.34%, lr: 0.000809
+  Batch [500/1562] Loss: 2.1150, Acc: 20.97%, lr: 0.000768
+  Batch [550/1562] Loss: 2.0959, Acc: 21.68%, lr: 0.000724
+  Batch [600/1562] Loss: 2.0783, Acc: 22.21%, lr: 0.000678
+  Batch [650/1562] Loss: 2.0615, Acc: 22.72%, lr: 0.000630
+  Batch [700/1562] Loss: 2.0445, Acc: 23.29%, lr: 0.000581
+  Batch [750/1562] Loss: 2.0289, Acc: 23.86%, lr: 0.000531
+  Batch [800/1562] Loss: 2.0129, Acc: 24.43%, lr: 0.000481
+  Batch [850/1562] Loss: 2.0009, Acc: 24.84%, lr: 0.000431
+  Batch [900/1562] Loss: 1.9888, Acc: 25.34%, lr: 0.000381
+  Batch [950/1562] Loss: 1.9754, Acc: 25.79%, lr: 0.000333
+  Batch [1000/1562] Loss: 1.9638, Acc: 26.28%, lr: 0.000287
+  Batch [1050/1562] Loss: 1.9548, Acc: 26.62%, lr: 0.000242
+  Batch [1100/1562] Loss: 1.9446, Acc: 26.98%, lr: 0.000201
+  Batch [1150/1562] Loss: 1.9316, Acc: 27.43%, lr: 0.000162
+  Batch [1200/1562] Loss: 1.9231, Acc: 27.74%, lr: 0.000127
+  Batch [1250/1562] Loss: 1.9125, Acc: 28.17%, lr: 0.000095
+  Batch [1300/1562] Loss: 1.9036, Acc: 28.51%, lr: 0.000068
+  Batch [1350/1562] Loss: 1.8952, Acc: 28.82%, lr: 0.000045
+  Batch [1400/1562] Loss: 1.8872, Acc: 29.10%, lr: 0.000026
+  Batch [1450/1562] Loss: 1.8798, Acc: 29.41%, lr: 0.000013
+  Batch [1500/1562] Loss: 1.8726, Acc: 29.69%, lr: 0.000004
+  Batch [1550/1562] Loss: 1.8664, Acc: 29.95%, lr: 0.000000
+[Epoch 1] Train Loss: 1.8650, Acc: 30.01%  |  Val Loss: 1.6125, Acc: 39.34%  |  Time: 2547.5s
+[Epoch 1] t_iter median: 1202.06 ms  (fwd 461.15 | bwd+comm 745.69 | opt 5.93 | data 0.08)  |  train-only epoch: 2390.8s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1202.06 ms
+[Epoch 1] peak GPU mem: 5.20 GiB allocated, 5.39 GiB reserved | wd_on_bn_bias: False, nesterov: True
+  -> Best model saved (39.34%)
+[Epoch 1] Summarizing hook timing...
+[Epoch 1] Hook timing summary done
+
+================================================================================
+Done in 2548.8s | Best val acc: 39.34%
+Epoch times (train+val): mean=2547.5s  min=2547.5s  max=2547.5s
+================================================================================
+=== Running interface.py at Tue Sep 22 11:19:16 PM EDT 2026 ===
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      wide_resnet50_2 (from scratch)
+  Dataset:    cifar10 (10 classes)
+  Image size: 224
+  LR:         0.001
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  sgd
+  Weight dec: 0.0005 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  built-in (no hook)
+  Epochs:     1
+  Batch/rank: 64
+  LR:         0.001
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  None
+  Drop last:  True
+  Data dir:   ./data
+================================================================================
+
+
+================================================================================
+Distributed Training: WIDE_RESNET50_2 on CIFAR10
+Backend: MPI, Algorithm: built-in (no hook)
+================================================================================
+Ranks: 1, Epochs: 1, Batch/rank: 64, Effective batch: 64
+LR: 0.001, Device: cuda:0
+
+[Cache] Pretrained weights cache (TORCH_HOME) = ./data/pretrained_weights_cache
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] No hook — using DDP built-in MPI allreduce
+[Optim] SGD: lr=0.001 momentum=0.9 nesterov=True wd=0.0005 wd_on_bn_bias=False
+[Optim]   group 0: 66,786,496 params, wd=0.0005
+[Optim]   group 1: 68,234 params, wd=0.0
+[Data] Train batches: 781, Val batches: 157
+
+[Data] Batch transform: gpu_upscale 32 -> 224
+
+[Sched] cosine: steps/epoch=781, total_steps=781, warmup_steps=0 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.001000)
+  Batch [50/781] Loss: 2.3107, Acc: 12.53%, lr: 0.000990
+  Batch [100/781] Loss: 2.2693, Acc: 14.52%, lr: 0.000960
+  Batch [150/781] Loss: 2.2223, Acc: 16.17%, lr: 0.000912
+  Batch [200/781] Loss: 2.1858, Acc: 17.52%, lr: 0.000847
+  Batch [250/781] Loss: 2.1569, Acc: 18.76%, lr: 0.000768
+  Batch [300/781] Loss: 2.1286, Acc: 19.98%, lr: 0.000678
+  Batch [350/781] Loss: 2.1056, Acc: 20.78%, lr: 0.000581
+  Batch [400/781] Loss: 2.0815, Acc: 21.79%, lr: 0.000481
+  Batch [450/781] Loss: 2.0620, Acc: 22.57%, lr: 0.000381
+  Batch [500/781] Loss: 2.0448, Acc: 23.27%, lr: 0.000287
+  Batch [550/781] Loss: 2.0302, Acc: 23.86%, lr: 0.000201
+  Batch [600/781] Loss: 2.0144, Acc: 24.45%, lr: 0.000127
+  Batch [650/781] Loss: 2.0001, Acc: 25.14%, lr: 0.000068
+  Batch [700/781] Loss: 1.9873, Acc: 25.67%, lr: 0.000026
+  Batch [750/781] Loss: 1.9772, Acc: 26.17%, lr: 0.000004
+[Epoch 1] Train Loss: 1.9714, Acc: 26.42%  |  Val Loss: 1.7871, Acc: 34.47%  |  Time: 1554.2s
+[Epoch 1] t_iter median: 1219.95 ms  (fwd 464.37 | bwd+comm 741.99 | opt 5.90 | data 0.09)  |  train-only epoch: 1475.7s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1219.95 ms
+[Epoch 1] peak GPU mem: 9.64 GiB allocated, 9.76 GiB reserved | wd_on_bn_bias: False, nesterov: True
+  -> Best model saved (34.47%)
+[Epoch 1] Summarizing hook timing...
+[Epoch 1] Hook timing summary done
+
+================================================================================
+Done in 1555.6s | Best val acc: 34.47%
+Epoch times (train+val): mean=1554.2s  min=1554.2s  max=1554.2s
+================================================================================
+=== Saving cached DB/kernel cache back to Lustre baseline ===
+=== Warmup job finished: Wed Sep 23 12:52:27 AM EDT 2026 ===
