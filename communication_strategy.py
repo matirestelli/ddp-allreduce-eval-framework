@@ -187,11 +187,20 @@ _current_batch: int = 0
 # zfp_api returns the compressed size in BYTES (verified: rate 8, n=6,553,600
 # -> 6,553,600). The old version treated it as bits and divided by 8 again,
 # zeroing 7/8 of every compressed payload before sending.
-def _zfp_pad_tail_to_B_(buf_u8: torch.Tensor, used_bytes: int, B: int) -> int:
-    """Zero-fill buf_u8[used_bytes:B]. `used_bytes` is ZFP's return value (BYTES)."""
-    used_bytes = int(used_bytes)
-    if used_bytes <= 0:
-        raise RuntimeError(f"ZFP returned non-positive size: {used_bytes}")
+_ZFP_SIZE_DIV = None   # 1 if zfp_api returns bytes (Polaris), 8 if bits (Frontier)
+#because missmatch in how treated zfp library in the 2 different api with cuda vs hip integration
+
+def _zfp_pad_tail_to_B_(buf_u8: torch.Tensor, used: int, B: int) -> int:
+    global _ZFP_SIZE_DIV
+    used = int(used)
+    if used <= 0:
+        raise RuntimeError(f"ZFP returned non-positive size: {used}")
+    if _ZFP_SIZE_DIV is None:
+        # Fixed-rate: real size <= B always, so used > B means the unit is bits.
+        _ZFP_SIZE_DIV = 8 if used > B else 1
+        if not dist.is_initialized() or dist.get_rank() == 0:
+            print(f"[ZFP] size unit detected: {'bits' if _ZFP_SIZE_DIV == 8 else 'bytes'}", flush=True)
+    used_bytes = (used + _ZFP_SIZE_DIV - 1) // _ZFP_SIZE_DIV
     if used_bytes > B:
         raise RuntimeError(f"ZFP overflow: used_bytes={used_bytes} > B={B}")
     if used_bytes < B:
@@ -409,33 +418,41 @@ _COMM_HOOK_EXECUTOR = ThreadPoolExecutor(
     thread_name_prefix="ddp-comm-hook",
 )
 
-def _submit_async_hook_work(
-    label: str,
-    tensor: torch.Tensor,
-    work_fn,
-) -> torch.futures.Future[torch.Tensor]:
-    fut: torch.futures.Future[torch.Tensor] = torch.futures.Future()
+_WORKER_STREAMS: Dict[int, torch.cuda.Stream] = {}
+
+def _submit_async_hook_work(label, tensor, work_fn):
+    fut = torch.futures.Future()
     device_index = tensor.device.index if tensor.is_cuda else None
 
-    def _worker() -> None:
+    # Recorded on the autograd thread at hook time: marks "this bucket's grads are ready".
+    ready_ev = None
+    if tensor.is_cuda:
+        ready_ev = torch.cuda.Event()
+        ready_ev.record(torch.cuda.current_stream(tensor.device))
+
+    def _worker():
         try:
-            if device_index is not None:
-                torch.cuda.set_device(device_index)
+            if device_index is None:
+                work_fn()
+                fut.set_result(tensor)
+                return
+            torch.cuda.set_device(device_index)
+            stream = _WORKER_STREAMS.get(device_index)
+            if stream is None:
+                stream = torch.cuda.Stream(device=device_index)
+                _WORKER_STREAMS[device_index] = stream
 
             work_start = time.perf_counter()
-
             _nvtx_range_push(f"comm_work:{label}")
             try:
-                work_fn()
-                _cuda_sync(tensor)
+                with torch.cuda.stream(stream):
+                    stream.wait_event(ready_ev)   # wait for THIS bucket only
+                    work_fn()
+                stream.synchronize()              # our work only, not backward
             finally:
                 _nvtx_range_pop()
-
-            work_ms = (time.perf_counter() - work_start) * 1000.0
-            _record_hook_work_timing(label, work_ms)
-
+            _record_hook_work_timing(label, (time.perf_counter() - work_start) * 1000.0)
             fut.set_result(tensor)
-
         except BaseException as exc:
             fut.set_exception(exc)
 
@@ -2841,6 +2858,7 @@ class ZfpHierAllreduceState:
     _groups_ready: bool = False
     _native_fallback: bool = False
     _fallback_reason: str = ""
+    _fallback_logged: bool = False
  
     def get_or_init(self, bucket_index: int, tensor: torch.Tensor
                     ) -> Optional[ZfpHierBucketState]:
@@ -3038,9 +3056,15 @@ def _hier_zfp_online_coll_hook(
  
     if bstate is None:
         # Native fallback path — behaves exactly like the default hook.
-        if state._native_fallback and dist.get_rank() == 0 and bucket_index == 0:
+        if (
+            state._native_fallback
+            and dist.get_rank() == 0
+            and bucket_index == 0
+            and not state._fallback_logged
+        ):
             print(f"[HIER_ZFP] native fallback: {state._fallback_reason}",
                   flush=True)
+            state._fallback_logged = True
         tensor.div_(dist.get_world_size())
         return dist.all_reduce(
             tensor, op=dist.ReduceOp.SUM, async_op=True
@@ -3052,9 +3076,10 @@ def _hier_zfp_online_coll_hook(
     do_full_log = (FULL_LOG_CALLS > 0 and call_n <= FULL_LOG_CALLS)
  
     if do_full_log:
-        print(f"\n[HIER_ZFP_ONLINE_COLL | R{rank}|B{bstate.bucket_id}|C{call_n}] "
-              f"numel={tensor.numel()} {bstate.topo.describe()}", flush=True)
- 
+        # Keep this block non-empty so the file remains valid while suppressing
+        # repeated verbose per-bucket logging.
+        pass
+
     def _work() -> None:
         _hier_zfp_allreduce_sum(tensor, bstate, log=do_full_log, call_n=call_n)
  

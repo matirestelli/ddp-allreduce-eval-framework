@@ -1,18 +1,17 @@
 #!/bin/bash -l
 #SBATCH -A gen243
-#SBATCH -p batch
-#SBATCH -q debug
-#SBATCH -J ddp-train-frontier_rccl_32gpus_4b_16b
-#SBATCH -N 1
+#SBATCH -p extended
+#SBATCH -J ddp-train-frontier_rccl_32gpus_4b
+#SBATCH -N 4
 #SBATCH --ntasks-per-node=8
 #SBATCH --gpus-per-node=8
 #SBATCH --gpus-per-task=1
 #SBATCH --cpus-per-task=7
 #SBATCH --gpu-bind=closest
-#SBATCH -t 02:00:00
+#SBATCH -t 07:00:00
 #SBATCH -C nvme
-#SBATCH -o ddp_train_frontier_rccl_32gpus_4b_16b.%j.out
-#SBATCH -e ddp_train_frontier_rccl_32gpus_4b_16b.%j.err
+#SBATCH -o ddp_train_frontier_rccl_32gpus_4b.%j.out
+#SBATCH -e ddp_train_frontier_rccl_32gpus_4b.%j.err
  
 
 
@@ -48,7 +47,7 @@ export TORCH_DISTRIBUTED_DEBUG=OFF
 # Leave only one active value in each list for a single run.
 
 
-NUM_PROCS=8
+NUM_PROCS=32
 PPN=8
 # processes per node
 
@@ -68,24 +67,24 @@ NUM_CLASSES_LIST=(
 )
 
 IMAGE_SIZES=(
-    "32"       # CIFAR
-    #"224"   # ImageNet / ImageNet-like
+    #"32"       # CIFAR
+    "224"   # ImageNet / ImageNet-like
 )
 
 NUM_EPOCHS_LIST=(
-    "10"
-    #"20"
+    #"10"
+    "20"
     # "50"
     # "100"
 )
 
 BATCH_SIZES=(
-    #"4"
+    "4"
     #"8"       # weak scaling local batch 8, total 128
-    "16"       # weak scaling local batch 16 (only one that works on Polaris supercompter)
+    #"16"       # weak scaling local batch 16 (only one that works on Polaris supercompter)
     #"32"       # strong global scaling -> keep 32 fixed as local batch size, total 512 on 16 GPUs
     #"4"
-    "64"    # strong global 256 on 4 GPUs
+    #"64"    # strong global 256 on 4 GPUs
     # "128"   # weak scaling local batch 128
 )
 
@@ -147,8 +146,8 @@ PRETRAINED_VALUES=(
 )
 
 CIFAR_STEM_VALUES=(
-    "true"     # CIFAR from scratch
-    #"false"  # ImageNet / ImageNet-like
+    #"true"     # CIFAR from scratch
+    "false"  # ImageNet / ImageNet-like
 )
 
 DROP_LAST_VALUES=(
@@ -164,16 +163,16 @@ BACKENDS=(
 # "default" = built-in DDP allreduce wrapped with NVTX timing.
 # "none"    = no custom communication hook.
 EXPERIMENTS=(
-    #"none:"
-    #"ring:"
-    #"ring_zfp_naive:16"
+    "none:"
+    "default_sync:"
+    "ring:"
+    "ring_zfp_naive:16"
     "ring_zfp_online_coll:16"
-    #"ring_zfp_online_coll:8"
-    #"recursive_doubling:"
-    #"recursive_doubling_zfp_naive:16"
+    "ring_zfp_online_coll:8"
+    "recursive_doubling:"
+    "recursive_doubling_zfp_naive:16"
     "recursive_doubling_zfp_online_coll:16"
-    #"recursive_doubling_zfp_online_coll:8"
-    #"default:"
+    "recursive_doubling_zfp_online_coll:8"
 )
 
 RUN_IDX=0
