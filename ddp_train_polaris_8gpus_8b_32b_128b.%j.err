@@ -1,0 +1,7 @@
+=>> PBS: job killed: walltime 3620 exceeded limit 3600
+MPICH ERROR [Rank 4] [job id b732e4d1-1fa8-4d4d-8b79-40f37c46cb6d] [Thu Oct  8 17:51:17 2026] [x3206c0s19b1n0] - Abort(469789967) (rank 1 in comm 4): Fatal error in MPIR_CRAY_Bcast_Tree: Other MPI error, error stack:
+MPIR_CRAY_Bcast_Tree(184): message sizes do not match across processes in the collective routine: I am using 8 but a peer process on my node is using 1024476763
+
+=>> PBS: job killed: walltime 3616 exceeded limit 3600
+x3004c0s1b1n0.hsn.cm.polaris.alcf.anl.gov: rank 6 died from signal 11
+x3004c0s1b0n0.hsn.cm.polaris.alcf.anl.gov: rank 2 died from signal 15

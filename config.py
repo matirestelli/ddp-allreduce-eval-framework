@@ -10,14 +10,20 @@ Data layout expected by default:
         train/
         val/
 """
-
+import os
+import re
 from dataclasses import dataclass
 from typing import Optional
 
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, DistributedSampler
 from torchvision import datasets, models, transforms
+from nanogpt_model import GPT, GPTConfig   # verbatim nanoGPT model.py
+
+# Datasets stored as nanoGPT-format token files: <data_dir>/<name>/train.bin, val.bin
+TOKEN_DATASETS = ("openwebtext", "tinystories")
 
 
 @dataclass
@@ -67,9 +73,30 @@ class TrainingConfig:
     data_dir: str = "./data"
     checkpoint_dir: str = "./checkpoints"
     seed: int = 42
+    
+    # ── nanoGPT (only read when model_name is a GPT name) ────────────────
+    block_size: int = 1024          # nanoGPT train.py default
+    vocab_size: int = 50304         # nanoGPT: GPT-2 50257 padded to x64
+    gpt_bias: bool = False          # nanoGPT train.py default (model.py default is True!)
+    dropout: float = 0.0            # nanoGPT train.py default
+    adam_beta1: float = 0.9
+    adam_beta2: float = 0.95        # nanoGPT train.py default
+
+    # ── Shared extensions (defaults = old behaviour) ─────────────────────
+    grad_accum_global: Optional[int] = None  # micro-batches per optimizer step over ALL ranks; None = 1/rank
+    amp: str = "none"                         # "none" | "bf16" (nanoGPT default dtype)
+    allow_tf32: bool = False                  # nanoGPT sets True
+    warmup_iters: int = 0                     # >0 overrides warmup_epochs
+    min_lr_ratio: float = 0.0                 # cosine floor; nanoGPT min_lr/lr = 0.1
+    iters_per_epoch: Optional[int] = None     # cap optimizer steps per epoch
+    val_max_batches: Optional[int] = None     # cap rank-0 validation batches
+
+    @property
+    def is_lm(self) -> bool:
+        return is_gpt_model(self.model_name)
 
     def validate(self):
-        valid_datasets = ("cifar10", "cifar100", "imagenet", "imagenet_like")
+        valid_datasets = ("cifar10", "cifar100", "imagenet", "imagenet_like") + TOKEN_DATASETS
         valid_schedulers = ("constant", "cosine")
 
         assert self.dataset in valid_datasets, f"Unknown dataset: {self.dataset}"
@@ -84,8 +111,14 @@ class TrainingConfig:
         assert self.optimizer in ("sgd", "adamw"), f"Unknown optimizer: {self.optimizer}"
         assert not (self.optimizer == "sgd" and self.nesterov and self.momentum == 0), \
             "nesterov=True requires momentum > 0"
+        assert self.amp in ("none", "bf16"), f"Unknown amp: {self.amp}"
 
-        if self.dataset.startswith("cifar"):
+        if self.is_lm or self.dataset in TOKEN_DATASETS:
+            assert self.is_lm and self.dataset in TOKEN_DATASETS, (
+                f"GPT models need a token dataset {TOKEN_DATASETS} (and vice "
+                f"versa); got model={self.model_name}, dataset={self.dataset}"
+            )
+        elif self.dataset.startswith("cifar"):
             assert self.image_size >= 32, "image_size must be >= 32 for CIFAR"
             # The CIFAR stem (stride-1 conv, no maxpool) is only meaningful at
             # 32x32. At larger sizes it keeps full resolution through layer1 and
@@ -189,7 +222,55 @@ def create_model(
 
     return model
 
+_GPT_NAME = re.compile(r"^gpt2_(\d+)x(\d+)x(\d+)$")   # gpt2_<n_layer>x<n_head>x<n_embd>
 
+
+def is_gpt_model(model_name: str) -> bool:
+    return bool(_GPT_NAME.match(model_name))
+
+
+def create_model_from_config(config: TrainingConfig) -> nn.Module:
+    """Single entry point for every model family."""
+    if config.is_lm:
+        n_layer, n_head, n_embd = (int(v) for v in _GPT_NAME.match(config.model_name).groups())
+        return GPT(GPTConfig(
+            n_layer=n_layer, n_head=n_head, n_embd=n_embd,
+            block_size=config.block_size, vocab_size=config.vocab_size,
+            bias=config.gpt_bias, dropout=config.dropout,
+        ))
+    return create_model(
+        config.model_name,
+        config.num_classes,
+        cifar_stem=config.cifar_stem,
+        pretrained=config.pretrained,
+        init_cifar_stem_from_pretrained_center=config.init_cifar_stem_from_pretrained_center,
+    )
+
+class TokenWindowDataset(torch.utils.data.Dataset):
+    """Non-overlapping windows over a nanoGPT uint16 .bin token file.
+
+    Item i = (x, y) with x = tokens[s : s+T] and y = tokens[s+1 : s+T+1]:
+    exactly nanoGPT's get_batch() pair, but at fixed offsets so that
+    DistributedSampler / drop_last keep working. The memmap opens lazily so
+    every DataLoader worker gets its own handle.
+    """
+
+    def __init__(self, bin_path: str, block_size: int):
+        if not os.path.exists(bin_path):
+            raise FileNotFoundError(f"{bin_path} not found (run the data prep first)")
+        self.path, self.block, self.data = bin_path, block_size, None
+        self.n_tokens = os.path.getsize(bin_path) // 2   # uint16
+
+    def __len__(self):
+        return (self.n_tokens - 1) // self.block
+
+    def __getitem__(self, i):
+        if self.data is None:
+            self.data = np.memmap(self.path, dtype=np.uint16, mode="r")
+        s = i * self.block
+        buf = torch.from_numpy(self.data[s: s + self.block + 1].astype(np.int64))
+        return buf[:-1], buf[1:]
+    
 def _cifar_root(config: TrainingConfig) -> str:
     return f"{config.data_dir}/cifar"
 
@@ -260,6 +341,11 @@ def get_data_loaders(
                 normalize,
             ]),
         )
+        
+    elif config.dataset in TOKEN_DATASETS:
+        root = f"{config.data_dir}/{config.dataset}"
+        train_dataset = TokenWindowDataset(f"{root}/train.bin", config.block_size)
+        val_dataset = TokenWindowDataset(f"{root}/val.bin", config.block_size)
 
     elif config.dataset in ("imagenet", "imagenet_like"):
         normalize = transforms.Normalize(

@@ -20,8 +20,9 @@ import json
 import statistics
 import socket
 from datetime import datetime
+from contextlib import nullcontext
 
-from config import TrainingConfig, create_model, get_data_loaders
+from config import TrainingConfig, create_model_from_config, get_data_loaders
 from communication_strategy import (
     get_comm_hook,
     open_first_bucket_compute_range,
@@ -148,6 +149,17 @@ def make_batch_transform(config):
 
     return None
 
+def _forward_loss(model, criterion, inputs, targets, batch_transform, is_lm):
+    """One forward pass. Returns (outputs, loss, targets)."""
+    if batch_transform is not None:
+        inputs, targets = batch_transform(inputs, targets)
+    if is_lm:
+        # nanoGPT GPT.forward(idx, targets) -> (logits [B,T,V], mean CE loss)
+        outputs, loss = model(inputs, targets)
+    else:
+        outputs = model(inputs)
+        loss = criterion(outputs, targets)
+    return outputs, loss, targets
 
 def train_epoch(
     model: DDP,
@@ -162,6 +174,10 @@ def train_epoch(
     grad_clip=None,
     iter_log_path=None,             # FIX 3
     batch_transform=None,           # task-specific GPU preprocessing, or None
+    accum_steps: int = 1,           # micro-batches per optimizer step on this rank
+    max_iters=None,                 # cap optimizer steps in this epoch
+    is_lm: bool = False,
+    autocast_ctx=None,              # torch.autocast(...) or None
 ) -> tuple:
     """Train for one epoch. Returns (avg_loss, accuracy, iter_stats).
 
@@ -188,11 +204,20 @@ def train_epoch(
 
     t_data_start = time.perf_counter()
 
-    for batch_idx, (inputs, targets) in enumerate(train_loader):
+    if autocast_ctx is None:
+        autocast_ctx = nullcontext()
+    n_iters = len(train_loader) // accum_steps
+    if max_iters is not None:
+        n_iters = min(n_iters, max_iters)
+    loader_it = iter(train_loader)
+
+    for batch_idx in range(n_iters):
+        micro = [next(loader_it) for _ in range(accum_steps)]
         data_ms.append((time.perf_counter() - t_data_start) * 1e3)
 
-        inputs, targets = inputs.to(device), targets.to(device)
+        micro = [(x.to(device), y.to(device)) for x, y in micro]
         optimizer.zero_grad()
+        
         set_profiling_step(epoch, batch_idx)
 
         e_start = torch.cuda.Event(enable_timing=True)
@@ -206,12 +231,25 @@ def train_epoch(
         try:
             e_start.record()
 
+            loss_acc = torch.zeros((), device=device)
+            correct_acc = torch.zeros((), device=device, dtype=torch.long)
+            for k in range(accum_steps - 1):
+                x_k, y_k = micro[k]
+                with model.no_sync():
+                    with autocast_ctx:
+                        out_k, loss_k, y_k = _forward_loss(
+                            model, criterion, x_k, y_k, batch_transform, is_lm)
+                    (loss_k / accum_steps).backward()
+                loss_acc += loss_k.detach()
+                correct_acc += out_k.argmax(-1).eq(y_k).sum()
+                del out_k, loss_k   # free [B,T,V] logits before the next micro-step
+
+            inputs, targets = micro[-1]
             _nvtx_range_push(f"forward epoch={epoch} batch={batch_idx}")
             try:
-                if batch_transform is not None:
-                    inputs, targets = batch_transform(inputs, targets)
-                outputs = model(inputs)
-                loss = criterion(outputs, targets)
+                with autocast_ctx:
+                    outputs, loss, targets = _forward_loss(
+                        model, criterion, inputs, targets, batch_transform, is_lm)
             finally:
                 _nvtx_range_pop()
 
@@ -228,7 +266,7 @@ def train_epoch(
             try:
                 reset_bucket_compute_markers()
                 open_first_bucket_compute_range()
-                loss.backward()
+                (loss / accum_steps).backward()
                 
                 # GPU marker left by the last bucket's hook. None for hook=none:
                 # the built-in path never calls our hook, so both metrics are NaN.
@@ -279,16 +317,17 @@ def train_epoch(
 
         ev_buf.append((e_start, e_fwd, e_bar0, e_bar1, e_bwd, e_opt, e_ready))
 
-        total_loss += loss.item()
-        _, predicted = outputs.max(1)
-        total += targets.size(0)
-        correct += predicted.eq(targets).sum().item()
+        loss_acc += loss.detach()
+        correct_acc += outputs.argmax(-1).eq(targets).sum()
+        total_loss += loss_acc.item() / accum_steps     # mean over micro-batches
+        total += targets.numel() * accum_steps          # samples or tokens
+        correct += correct_acc.item()
 
         if rank == 0 and (batch_idx + 1) % 50 == 0:
             accuracy = 100.0 * correct / total
             avg_loss = total_loss / (batch_idx + 1)
             cur_lr = optimizer.param_groups[0]['lr']
-            print(f"  Batch [{batch_idx+1}/{len(train_loader)}] "
+            print(f"  Batch [{batch_idx+1}/{n_iters}] "
                   f"Loss: {avg_loss:.4f}, Acc: {accuracy:.2f}%, lr: {cur_lr:.6f}")
 
         t_data_start = time.perf_counter()
@@ -346,10 +385,11 @@ def train_epoch(
         "num_iters":           len(records),
     }
 
-    return total_loss / len(train_loader), 100.0 * correct / total, iter_stats
+    return total_loss / n_iters, 100.0 * correct / total, iter_stats
 
 
-def validate(model, val_loader, criterion, device, batch_transform=None):
+def validate(model, val_loader, criterion, device, batch_transform=None,
+             is_lm=False, max_batches=None, autocast_ctx=None):
     """Validate on the FULL unsharded test set. Contains NO collective.
 
     batch_transform must be the SAME one used in training — if training sees
@@ -361,16 +401,25 @@ def validate(model, val_loader, criterion, device, batch_transform=None):
     total = 0
 
     with torch.no_grad():
-        for inputs, targets in val_loader:
+        for i, (inputs, targets) in enumerate(val_loader):
+            if max_batches is not None and i >= max_batches:
+                break
             inputs, targets = inputs.to(device), targets.to(device)
+            
             if batch_transform is not None:
                 inputs, targets = batch_transform(inputs, targets)
-            outputs = model(inputs)
-            # weight by sample count so the final divide is exact
-            total_loss += criterion(outputs, targets).item() * targets.size(0)
-            _, predicted = outputs.max(1)
-            total += targets.size(0)
-            correct += predicted.eq(targets).sum().item()
+                
+            with (autocast_ctx or nullcontext()):
+                if is_lm:
+                    outputs, loss = model(inputs, targets)
+                else:
+                    outputs = model(inputs)
+                    loss = criterion(outputs, targets)
+            # weight by element count (samples or tokens) so the divide is exact
+            n = targets.numel()
+            total_loss += loss.item() * n
+            total += n
+            correct += outputs.argmax(-1).eq(targets).sum().item()
 
     return total_loss / total, 100.0 * correct / total
 
@@ -579,6 +628,7 @@ def train(config: TrainingConfig) -> None:
             torch.backends.cudnn.benchmark = False
         else:
             torch.backends.cudnn.benchmark = True
+        torch.backends.cuda.matmul.allow_tf32 = bool(config.allow_tf32)
 
     if rank == 0:
         print("\n" + "=" * 80)
@@ -607,13 +657,7 @@ def train(config: TrainingConfig) -> None:
     if config.pretrained and rank != 0:
         dist.barrier()
 
-    model = create_model(
-        config.model_name,
-        config.num_classes,
-        cifar_stem=config.cifar_stem,
-        pretrained=config.pretrained,
-        init_cifar_stem_from_pretrained_center=config.init_cifar_stem_from_pretrained_center,
-    ).to(device)
+    model = create_model_from_config(config).to(device)
 
     if config.pretrained and rank == 0:
         dist.barrier()
@@ -630,6 +674,21 @@ def train(config: TrainingConfig) -> None:
 
     if rank == 0:
         print(f"[Setup] Model on {device}, wrapped in DDP (static_graph=True)")
+        
+    
+    # Synced warm-up backward: needed for static_graph=True + no_sync().
+    if config.grad_accum_global is not None and config.grad_accum_global // world_size > 1:
+        if config.is_lm:
+            _x = torch.randint(0, config.vocab_size, (config.batch_size, config.block_size), device=device)
+            _out, _loss = model(_x, _x)
+        else:
+            _x = torch.randn(config.batch_size, 3, config.image_size, config.image_size, device=device)
+            _loss = model(_x).float().mean()
+        _loss.backward()
+        model.zero_grad(set_to_none=True)
+        del _x, _loss
+        if rank == 0:
+            print("[Setup] Synced warm-up backward done (static_graph + no_sync)")
 
     # ── Communication hook ───────────────────────────────────────────────
     # get_comm_hook returns (hook, state) or None.
@@ -664,7 +723,12 @@ def train(config: TrainingConfig) -> None:
 
     param_groups = build_param_groups(model, config.weight_decay, wd_on_bn_bias)
 
-    if optimizer_name == "adamw":
+    if config.is_lm:
+        optimizer = model.module.configure_optimizers(
+            config.weight_decay, config.learning_rate,
+            (config.adam_beta1, config.adam_beta2), "cuda",
+        )
+    elif optimizer_name == "adamw":
         optimizer = optim.AdamW(
             param_groups,
             lr=config.learning_rate,
@@ -708,9 +772,29 @@ def train(config: TrainingConfig) -> None:
     # ── FIX 2: per-ITERATION scheduler ───────────────────────────────────
     # Built after the loader so steps_per_epoch is known. drop_last=True makes
     # len(train_loader) identical on every rank, so the schedule stays in sync.
-    steps_per_epoch = len(train_loader)
+    if config.grad_accum_global is None:
+        accum_steps = 1
+    else:
+        assert config.grad_accum_global % world_size == 0, (
+            f"grad_accum_global={config.grad_accum_global} not divisible by "
+            f"world_size={world_size} (same assert as nanoGPT train.py)"
+        )
+        accum_steps = config.grad_accum_global // world_size
+
+    steps_per_epoch = len(train_loader) // accum_steps
+    if config.iters_per_epoch is not None:
+        steps_per_epoch = min(steps_per_epoch, config.iters_per_epoch)
     total_steps     = steps_per_epoch * config.num_epochs
-    warmup_steps    = steps_per_epoch * config.warmup_epochs
+    warmup_steps    = (config.warmup_iters if config.warmup_iters > 0
+                       else steps_per_epoch * config.warmup_epochs)
+
+    autocast_ctx = (torch.autocast(device_type="cuda", dtype=torch.bfloat16)
+                    if config.amp == "bf16" else nullcontext())
+    if rank == 0:
+        tok = (f", tokens/iter={accum_steps * world_size * config.batch_size * config.block_size:,}"
+               if config.is_lm else "")
+        print(f"[Accum] micro-steps/rank={accum_steps}, "
+              f"global micro-batches={accum_steps * world_size}{tok}, amp={config.amp}")
 
     if config.scheduler == "constant":
         scheduler = optim.lr_scheduler.LambdaLR(optimizer, lambda s: 1.0)
@@ -722,7 +806,8 @@ def train(config: TrainingConfig) -> None:
 
             progress = (step - warmup_steps) / max(total_steps - warmup_steps, 1)
             progress = min(max(progress, 0.0), 1.0)   # land exactly on 0 at the end
-            return 0.5 * (1.0 + math.cos(math.pi * progress))
+            cos = 0.5 * (1.0 + math.cos(math.pi * progress))
+            return config.min_lr_ratio + (1.0 - config.min_lr_ratio) * cos
 
         scheduler = optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
 
@@ -758,6 +843,10 @@ def train(config: TrainingConfig) -> None:
                 grad_clip=config.grad_clip,
                 iter_log_path=iter_log_path,
                 batch_transform=batch_transform,
+                accum_steps=accum_steps,
+                max_iters=steps_per_epoch,
+                is_lm=config.is_lm,
+                autocast_ctx=autocast_ctx,
             )
         finally:
             _nvtx_range_pop()
@@ -778,6 +867,9 @@ def train(config: TrainingConfig) -> None:
             val_loss, val_acc = validate(
                 model, val_loader, criterion, device,
                 batch_transform=batch_transform,
+                is_lm=config.is_lm,
+                max_batches=config.val_max_batches,
+                autocast_ctx=autocast_ctx,
             )
         else:
             val_loss, val_acc = float('nan'), float('nan')
@@ -854,7 +946,7 @@ def train(config: TrainingConfig) -> None:
                       f"possible gradient explosion from hook bug. "
                       f"Check that hook divides by world_size exactly once.")
 
-            if val_acc > best_val_acc:
+            if val_acc > best_val_acc and os.getenv("SAVE_CHECKPOINT", "1") == "1":
                 best_val_acc = val_acc
                 os.makedirs(config.checkpoint_dir, exist_ok=True)
                 path = os.path.join(

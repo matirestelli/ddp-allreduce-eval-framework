@@ -1,12 +1,12 @@
 #!/bin/bash -l
-#PBS -l select=4:system=polaris
-#PBS -l walltime=05:00:00
+#PBS -l select=25:system=polaris
+#PBS -l walltime=06:00:00
 #PBS -l filesystems=home:eagle
-#PBS -q capacity
+#PBS -q prod
 #PBS -A UIC-HPC
-#PBS -o ddp_train_PolarisNCCL_16gpus_8b.%j.out
-#PBS -e ddp_train_PolarisNCCL_16gpus_8b.%j.err
-#PBS -N ddp-train_PolarisNCCL_16gpus_8b
+#PBS -o ddp_train_PolarisNCCL_32gpus_4b.%j.out
+#PBS -e ddp_train_PolarisNCCL_32gpus_4b.%j.err
+#PBS -N ddp-train_PolarisNCCL_32gpus_4b
 
 cd ${PBS_O_WORKDIR}
 
@@ -36,7 +36,7 @@ echo "MASTER_PORT=${MASTER_PORT}"
 # Edit these lists to run multiple experiments inside one queued job.
 # Leave only one active value in each list for a single run.
 
-NUM_PROCS=16
+NUM_PROCS=32
 PPN=4
 # processes per node
 
@@ -68,8 +68,8 @@ NUM_EPOCHS_LIST=(
 )
 
 BATCH_SIZES=(
-    #"4"
-    "8"       # weak scaling local batch 8, total 128
+    "4"
+    #"8"       # weak scaling local batch 8, total 128
     #"16"       # weak scaling local batch 16 (only one that works on Polaris supercompter)
     #"32"       # strong global scaling -> keep 32 fixed as local batch size, total 512 on 16 GPUs
     #"64"    # strong global 256 on 4 GPUs

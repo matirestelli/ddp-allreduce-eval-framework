@@ -1,8 +1,8 @@
 #!/bin/bash -l
-#PBS -l select=10:system=polaris
-#PBS -l walltime=03:00:00
+#PBS -l select=8:system=polaris
+#PBS -l walltime=01:00:00
 #PBS -l filesystems=home:eagle
-#PBS -q prod
+#PBS -q debug-scaling
 #PBS -A UIC-HPC
 #PBS -o ddp_train_polaris_32gpu_4b.%j.out
 #PBS -e ddp_train_polaris_32gpu_4b.%j.err
@@ -151,7 +151,7 @@ EXPERIMENTS=(
     #"default:"
     #"ring:"
     #"ring_zfp_naive:16"
-    "ring_zfp_online_coll:16"
+    #"ring_zfp_online_coll:16"
     "ring_zfp_online_coll:8"
     "recursive_doubling:"
     "recursive_doubling_zfp_naive:16"

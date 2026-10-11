@@ -1,11 +1,11 @@
 #!/bin/bash -l
-#PBS -l select=10:system=polaris
-#PBS -l walltime=03:00:00
+#PBS -l select=4:system=polaris
+#PBS -l walltime=01:00:00
 #PBS -l filesystems=home:eagle
-#PBS -q prod
+#PBS -q debug-scaling
 #PBS -A UIC-HPC
-#PBS -o ddp_train_polaris_8gpus_8b_32b_128b.%j.out
-#PBS -e ddp_train_polaris_8gpus_8b_32b_128b.%j.err
+#PBS -o ddp_train_polaris_16gpus_8b_32b_128b.%j.out
+#PBS -e ddp_train_polaris_16gpus_8b_32b_128b.%j.err
 #PBS -N ddp-train-polaris
 
 # ── WEAK SCALING GRID (Polaris / PBS / A100) ─────────────────────────────────
@@ -45,12 +45,12 @@ echo "MASTER_ADDR=${MASTER_ADDR}"
 echo "MASTER_PORT=${MASTER_PORT}"
 
 # ── Polaris topology ─────────────────────────────────────────────────────────
-NUM_PROCS=8
+NUM_PROCS=16
 PPN=4                       # Polaris node = 4x A100
 NNODES=$(( (NUM_PROCS + PPN - 1) / PPN ))
 # Polaris: 32 CPU cores/node, 4 ranks/node -> 8 cores/rank (--depth=8).
-DEPTH=8
-NUM_WORKERS_VAL=$(( DEPTH - 1 ))   # leave 1 core for the main process
+DEPTH=16
+NUM_WORKERS_VAL=4
 
 MODELS=(
     "wide_resnet50_2"
@@ -68,21 +68,21 @@ NUM_CLASSES_LIST=(
 )
 
 IMAGE_SIZES=(
-    "32"       # CIFAR
-    #"224"   # ImageNet / ImageNet-like
+    #"32"       # CIFAR
+    "224"   # ImageNet / ImageNet-like
 )
 
 # BATCH_SIZE and LEARNING_RATE must be PAIRED here, not cross-producted.
 WEAK_CONFIGS=(
     # P=8   (select=2)
-    "8:0.05"     # gb 64
-    "32:0.20"    # gb 256
-    "128:0.80"   # gb 1024
+    #"8:0.05"     # gb 64
+    #"32:0.20"    # gb 256
+    #"128:0.80"   # gb 1024
 
     # P=16  (select=4)
-    # "8:0.10"    # gb 128
-    #"32:0.40"   # gb 512
-    #"128:1.60"  # gb 2048
+    "8:0.10"    # gb 128
+    "32:0.40"   # gb 512
+    "128:1.60"  # gb 2048
 
     # P=32  (select=8)
     #"8:0.20"    # gb 256
@@ -149,8 +149,8 @@ PRETRAINED_VALUES=(
 )
 
 CIFAR_STEM_VALUES=(
-    "true"     # CIFAR from scratch
-    #"false"  # ImageNet / ImageNet-like
+    #"true"     # CIFAR from scratch
+    "false"  # ImageNet / ImageNet-like
 )
 
 DROP_LAST_VALUES=(
@@ -167,19 +167,17 @@ BACKENDS=(
 # "none"    = no custom communication hook.
 # Full list only at bs=32 (main operating point). bs=8 and bs=128 bracket the regime.
 EXPERIMENTS=(
-   #"none:"
-    #"ring:"
-    #"ring_zfp_naive:16"
-   # "ring_zfp_online_coll:16"
-    #"ring_zfp_online_coll:10"
+    "none:"
+    "default_sync:"
+    "ring:"
+    "ring_zfp_naive:16"
+    "ring_zfp_online_coll:16"
     "ring_zfp_online_coll:8"
-    #"recursive_doubling:"
-    #"recursive_doubling_zfp_naive:16"
-    #"recursive_doubling_zfp_online_coll:16"
-    # "recursive_doubling_zfp_online_coll:8"
-    #"recursive_doubling_zfp_online_coll:4"
-    #"ring_zfp_online_coll:8"
-    #"ring_zfp_online_coll:4"
+    "recursive_doubling:"
+    "recursive_doubling_zfp_naive:16"
+    "recursive_doubling_zfp_online_coll:16"
+     "recursive_doubling_zfp_online_coll:8"
+
     # "default:"
     #"default_sync:"
     #"default_clone:"
