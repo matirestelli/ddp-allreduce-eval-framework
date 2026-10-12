@@ -3093,6 +3093,218 @@ nccl_ring_zfp_online_coll_allreduce_hook = _hier_zfp_online_coll_hook
 nccl_recursive_doubling_zfp_online_coll_allreduce_hook = _hier_zfp_online_coll_hook
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# DIRECT SENDRECV ALLREDUCE WITH THROTTLING
+# Chen, Yao, Subramoni, Panda — "Design and Optimization of GPU-Aware MPI
+# Allreduce Using Direct Sendrecv Communication", ICPP '25.
+#
+#   Reduce-Scatter (Alg. 1) + Allgather (Alg. 3), same chunking as the ring.
+#   Rank r owns chunk r. Peers are visited in batches of `throttle`:
+#     batch ii: k = ii .. ii+ss-1   (k = 0 is "myself", skipped)
+#       RS : irecv chunk r of rank (r+k)  into tmp      | isend my chunk (r-k) to rank (r-k)
+#       AG : irecv chunk (r+k) from rank (r+k) in place | isend my chunk r       to rank (r-k)
+#   Every rank uses the same k for a given pair in the same batch, so all
+#   sends/recvs match and no ordering deadlock is possible.
+#
+#   Paper optimizations (Sec. 3.4):
+#     - overlap:      the reduction of batch b is enqueued on the GPU stream
+#                     and runs while the host posts batch b+1's communication.
+#                     tmp is double-buffered so batch b+1 never writes rows that
+#                     batch b's reduction is still reading.
+#     - kernel fusion: one reduction per batch over all received rows
+#                     (sum over the batch, then a single add into chunk r),
+#                     instead of one Reduce_local per peer.
+#
+#   Throttle: DDP_DIRECT_THROTTLE env var (default 8), or "direct_t<N>" as the
+#   algorithm name (e.g. COMM_ALGORITHM=direct_t16). Paper Fig. 4: best 8 for
+#   32-512 MB on 64 GPUs, 32 for 8 MB, 4 for 1 GB.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+DIRECT_DEFAULT_THROTTLE = int(os.getenv("DDP_DIRECT_THROTTLE", "8"))
+
+
+@dataclass
+class DirectBucketState:
+    """Persistent buffers for one DDP bucket (paper: persistent tmp buffer)."""
+    flat:      Optional[torch.Tensor] = None   # sendbuf / recvbuf (in place)
+    tmp:       Optional[torch.Tensor] = None   # [2, throttle, max_cnt]  double-buffered
+    red_buf:   Optional[torch.Tensor] = None   # [max_cnt]  fused-reduction output
+    cnts:      List[int]              = field(default_factory=list)
+    displs:    List[int]              = field(default_factory=list)
+    throttle:  int                    = 8
+    bucket_id: int                    = 0
+    call_count: int                   = 0
+    stream:    Optional[torch.cuda.Stream] = None
+    red_done:  List[Optional[torch.cuda.Event]] = field(default_factory=list)
+
+    def initialize(self, tensor: torch.Tensor, world_size: int,
+                   bucket_id: int, throttle: int) -> None:
+        numel      = tensor.numel()
+        base_chunk = math.ceil(numel / world_size)
+
+        total = 0
+        self.cnts = []
+        for _ in range(world_size):
+            c = min(base_chunk, numel - total)
+            self.cnts.append(max(c, 0))
+            total += self.cnts[-1]
+        self.displs = [0]
+        for i in range(1, world_size):
+            self.displs.append(self.displs[-1] + self.cnts[i - 1])
+
+        self.throttle = max(1, min(throttle, world_size))
+        max_cnt = max(max(self.cnts), 1)
+        dev, dt = tensor.device, tensor.dtype
+        self.flat    = torch.empty(numel, dtype=dt, device=dev)
+        self.tmp     = torch.empty(2, self.throttle, max_cnt, dtype=dt, device=dev)
+        self.red_buf = torch.empty(max_cnt, dtype=dt, device=dev)
+        self.bucket_id = bucket_id
+        if tensor.is_cuda:
+            self.stream   = torch.cuda.Stream(device=dev)
+            self.red_done = [torch.cuda.Event(), torch.cuda.Event()]
+        else:
+            self.stream   = None
+            self.red_done = [None, None]
+
+
+@dataclass
+class DirectAllreduceState:
+    """Per-bucket Direct state, keyed by DDP bucket index (like RingAllreduceState)."""
+    throttle: int = DIRECT_DEFAULT_THROTTLE
+    buckets:  Dict[int, DirectBucketState] = field(default_factory=dict)
+    announced: bool = False
+
+    def get_or_init(self, bucket_index: int, tensor: torch.Tensor,
+                    world_size: int) -> DirectBucketState:
+        bs = self.buckets.get(bucket_index)
+        if bs is None or bs.flat is None or bs.flat.numel() != tensor.numel():
+            bs = DirectBucketState()
+            bs.initialize(tensor, world_size, bucket_index, self.throttle)
+            self.buckets[bucket_index] = bs
+        return bs
+
+
+def _direct_allreduce_sum(tensor: torch.Tensor, bstate: DirectBucketState) -> None:
+    """In-place Direct Sendrecv allreduce (mean) of `tensor`."""
+    rank       = dist.get_rank()
+    world_size = dist.get_world_size()
+    if world_size == 1:
+        return
+
+    P, r, t = world_size, rank, bstate.throttle
+    cnts, displs = bstate.cnts, bstate.displs
+    my_cnt = cnts[r]
+
+    def chunk(i: int) -> torch.Tensor:
+        return bstate.flat[displs[i]: displs[i] + cnts[i]]
+
+    stream = bstate.stream if tensor.is_cuda else None
+    if stream is not None:
+        stream.wait_stream(torch.cuda.current_stream(device=tensor.device))
+    ctx = torch.cuda.stream(stream) if stream is not None else contextlib.nullcontext()
+
+    with ctx:
+        bstate.flat.copy_(tensor.flatten())
+        _ring_sync(bstate, bstate.flat)      # GPU-direct MPI reads memory directly
+
+        # ── Phase 1: Direct Reduce-Scatter (Alg. 1) ──────────────────────────
+        _nvtx_range_push(f"direct_reduce_scatter:B{bstate.bucket_id} rank={r} t={t}")
+        for b, ii in enumerate(range(0, P, t)):
+            ss   = min(P - ii, t)
+            half = b % 2
+            # Double buffer: rows of `half` were last read by batch b-2's
+            # reduction; it must be finished before MPI writes into them.
+            if b >= 2 and bstate.red_done[half] is not None:
+                bstate.red_done[half].synchronize()
+
+            tag  = _next_tag()
+            ops  = []
+            rows = []                              # tmp rows that receive data
+            for i in range(ss):
+                k = i + ii
+                if k % P == 0:
+                    continue                       # myself
+                src = (r + k) % P                  # its copy of MY chunk r
+                dst = (r - k) % P                  # gets MY copy of ITS chunk
+                if my_cnt > 0:
+                    ops.append(dist.P2POp(dist.irecv,
+                                          bstate.tmp[half, i, :my_cnt], src, tag=tag))
+                    rows.append(i)
+                if cnts[dst] > 0:
+                    ops.append(dist.P2POp(dist.isend, chunk(dst), dst, tag=tag))
+            if ops:
+                for req in dist.batch_isend_irecv(ops):
+                    req.wait()                     # MPI_Waitall for this batch
+
+            if rows:
+                # Fused reduction: one sum over every row received in this
+                # batch, one add into my chunk. Enqueued on the stream; the
+                # host moves on to post the next batch (overlap).
+                lo, hi = rows[0], rows[-1] + 1     # rows are contiguous
+                torch.sum(bstate.tmp[half, lo:hi, :my_cnt], dim=0,
+                          out=bstate.red_buf[:my_cnt])
+                chunk(r).add_(bstate.red_buf[:my_cnt])
+                if bstate.red_done[half] is not None:
+                    bstate.red_done[half].record(stream)
+        _nvtx_range_pop()
+
+        # Chunk r is complete only when the last reductions have run.
+        _ring_sync(bstate, bstate.flat)
+
+        # ── Phase 2: Direct Allgather (Alg. 3) ───────────────────────────────
+        _nvtx_range_push(f"direct_allgather:B{bstate.bucket_id} rank={r} t={t}")
+        for ii in range(0, P, t):
+            ss  = min(P - ii, t)
+            tag = _next_tag()
+            ops = []
+            for i in range(ss):
+                k = i + ii
+                if k % P == 0:
+                    continue
+                src = (r + k) % P                  # its reduced chunk, in place
+                dst = (r - k) % P                  # gets my reduced chunk r
+                if cnts[src] > 0:
+                    ops.append(dist.P2POp(dist.irecv, chunk(src), src, tag=tag))
+                if my_cnt > 0:
+                    ops.append(dist.P2POp(dist.isend, chunk(r), dst, tag=tag))
+            if ops:
+                for req in dist.batch_isend_irecv(ops):
+                    req.wait()
+        _nvtx_range_pop()
+
+        tensor.copy_(bstate.flat.view_as(tensor))
+        tensor.div_(world_size)
+    _ring_sync(bstate, tensor)   # result landed before the future resolves
+
+
+def _direct_allreduce_hook(
+    state:  DirectAllreduceState,
+    bucket: dist.GradBucket,
+) -> torch.futures.Future[torch.Tensor]:
+    tensor     = bucket.buffer()
+    world_size = dist.get_world_size()
+    bstate = state.get_or_init(bucket.index(), tensor, world_size)
+    bstate.call_count += 1
+
+    if not state.announced:
+        state.announced = True
+        if dist.get_rank() == 0:
+            print(f"[DIRECT] Direct Sendrecv allreduce, throttle={state.throttle} "
+                  f"(effective per bucket: min(throttle, world_size)={bstate.throttle})",
+                  flush=True)
+
+    def _work() -> None:
+        _direct_allreduce_sum(tensor, bstate)
+
+    return _submit_async_hook_work(
+        f"{dist.get_backend()}:direct_t{state.throttle}", tensor, _work)
+
+
+# Hook aliases: same algorithm on both backends.
+nccl_direct_allreduce_hook = _direct_allreduce_hook
+mpi_direct_allreduce_hook  = _direct_allreduce_hook
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # HOOK FACTORY
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -3118,6 +3330,8 @@ _HOOK_REGISTRY = {
     ("mpi", "default_sync"): mpi_default_sync_allreduce_hook,
     ("mpi", "default_clone"): mpi_default_clone_allreduce_hook,
     ("mpi", "default_cpu_stage"): mpi_default_cpu_stage_allreduce_hook,
+    ("nccl", "direct"): nccl_direct_allreduce_hook,
+    ("mpi",  "direct"): mpi_direct_allreduce_hook,
 }
 
 
@@ -3137,14 +3351,25 @@ def get_comm_hook(
     """
     if algorithm is None:
         return None
-    key = (backend, algorithm)
+    # "direct" (throttle from DDP_DIRECT_THROTTLE) or "direct_t<N>" (throttle N)
+    direct_throttle = None
+    if algorithm == "direct" or algorithm.startswith("direct_t"):
+        direct_throttle = (int(algorithm[len("direct_t"):])
+                           if algorithm.startswith("direct_t")
+                           else DIRECT_DEFAULT_THROTTLE)
+        key = (backend, "direct")
+    else:
+        key = (backend, algorithm)
     if key not in _HOOK_REGISTRY:
         available = [f"{b}/{a}" for b, a in _HOOK_REGISTRY]
         raise ValueError(
             f"Unknown hook: {backend}/{algorithm}. Available: {available}"
         )
     base_hook = _HOOK_REGISTRY[key]
-    if algorithm == "ring":
+    
+    if direct_throttle is not None:
+        state = DirectAllreduceState(throttle=direct_throttle)
+    elif algorithm == "ring":
         state = RingAllreduceState()
     elif algorithm == "ring_zfp_naive":
         state = ZfpRingAllreduceState(rate=zfp_rate)
@@ -3161,6 +3386,7 @@ def get_comm_hook(
             state = ZfpRingAllreduceState(rate=zfp_rate)
         else:
             state = ZfpRecursiveDoublingOnlineAllreduceState(rate=zfp_rate)
+    
     else:
         state = None
 
