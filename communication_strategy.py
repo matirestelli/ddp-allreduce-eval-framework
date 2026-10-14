@@ -403,10 +403,10 @@ def _profiled_hook(label: str, hook_fn, state, bucket: dist.GradBucket):
 # Each P2POp gets a unique tag. Never reused → no RDMA cache reuse.
 # One counter per process (MPI rank = OS process, no sharing needed).
 _tag_counter: int = 0
-
+_TAG_UB = 8388607
 def _next_tag() -> int:
     global _tag_counter
-    t = _tag_counter
+    t = _tag_counter % (_TAG_UB + 1)
     _tag_counter += 1
     return t
 # ─────────────────────────────────────────────────────────────────────────────
