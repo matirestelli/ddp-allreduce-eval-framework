@@ -88,6 +88,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 import os
+import socket          # ← add (k-ring groups ranks by hostname)
 import threading
 
 import torch
@@ -1429,6 +1430,7 @@ def _ring_allreduce_zfp_sum(
 
         # Naive P2P compression on the sender side.
         _nvtx_range_push(f"zfp_compress:B{bstate.bucket_id} phase=1 step={step}")
+        _cuda_sync(chunks[send_idx])
         used_send = _zfp_compress_into(chunks[send_idx], bstate.send_comp[send_idx], cfg.rate)
         bstate.send_sizes[send_idx].fill_(used_send)
         _cuda_device_sync(bstate.send_comp[send_idx])
@@ -1481,6 +1483,7 @@ def _ring_allreduce_zfp_sum(
 
         # Intentional baseline inefficiency: recompress before forwarding.
         _nvtx_range_push(f"zfp_compress:B{bstate.bucket_id} phase=2 step={step}")
+        _cuda_sync(chunks[send_idx])
         used_send = _zfp_compress_into(chunks[send_idx], bstate.send_comp[send_idx], cfg.rate)
         bstate.send_sizes[send_idx].fill_(used_send)
         _cuda_device_sync(bstate.send_comp[send_idx])
@@ -3303,6 +3306,213 @@ def _direct_allreduce_hook(
 nccl_direct_allreduce_hook = _direct_allreduce_hook
 mpi_direct_allreduce_hook  = _direct_allreduce_hook
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# K-RING ALLREDUCE (Wilkins et al., CLUSTER'23, Sec. V-C/D, Fig. 6)
+#   g = p/k groups of k (node-aligned via hostnames). Each phase: k-1 intra-group
+#   ring steps + 1 inter-group step (G,j)->(G+1,j). p-1 steps total, same bytes
+#   as ring. RS = AG schedule reversed. k=1 and k=p are the plain ring.
+#   One code path for MPI and NCCL/RCCL: each step is one batch_isend_irecv.
+#   Names: "kring" (k = ranks per node) or "kring_k<N>".
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _kring_allgather_schedule(p: int, k: int, v: int) -> list:
+    """(is_inter, send_to, recv_from, send_block, recv_block) per step, virtual ranks."""
+    g = p // k
+    G, j = divmod(v, k)
+    steps = []
+    for h in range(g):
+        circ = (G - h) % g
+        for s in range(k - 1):
+            steps.append((False, G * k + (j + 1) % k, G * k + (j - 1) % k,
+                          circ * k + (j - s) % k, circ * k + (j - s - 1) % k))
+        if h < g - 1:
+            steps.append((True, ((G + 1) % g) * k + j, ((G - 1) % g) * k + j,
+                          circ * k + j, ((G - 1 - h) % g) * k + j))
+    return steps
+
+
+def _kring_reduce_scatter_schedule(p: int, k: int, v: int) -> list:
+    return [(inter, recv_from, send_to, recv_blk, send_blk)
+            for (inter, send_to, recv_from, send_blk, recv_blk)
+            in reversed(_kring_allgather_schedule(p, k, v))]
+
+
+@dataclass
+class KRingTopology:
+    world_size: int = 1
+    rank: int = 0
+    k: int = 1
+    ppn: Optional[int] = None
+    num_nodes: int = 1
+    node_aligned: bool = False
+    vrank: int = 0
+    v2r: List[int] = field(default_factory=list)
+    source: str = ""
+    note: str = ""
+
+
+def _kring_resolve_topology(k_req: int) -> KRingTopology:
+    """Collective (all_gather_object): call on ALL ranks, outside backward."""
+    t = KRingTopology()
+    t.world_size, t.rank = dist.get_world_size(), dist.get_rank()
+    p = t.world_size
+    try:
+        hosts = [None] * p
+        dist.all_gather_object(hosts, socket.gethostname())
+        order = list(dict.fromkeys(hosts))
+        node_ranks = [sorted(r for r in range(p) if hosts[r] == h) for h in order]
+        t.source = "hostnames"
+    except Exception as exc:
+        ppn_env = _ppn_from_env()
+        if ppn_env and p % ppn_env == 0:
+            node_ranks = [list(range(n * ppn_env, (n + 1) * ppn_env))
+                          for n in range(p // ppn_env)]
+            t.source = "env"
+        else:
+            node_ranks = [list(range(p))]
+            t.source = "identity"
+        t.note = f"hostname gather failed ({exc}); "
+    t.v2r = [r for nr in node_ranks for r in nr]
+    t.vrank = t.v2r.index(t.rank)
+    t.num_nodes = len(node_ranks)
+    sizes = {len(nr) for nr in node_ranks}
+    t.ppn = sizes.pop() if len(sizes) == 1 else None
+    k = k_req if k_req > 0 else (t.ppn or 1)
+    if k < 1 or p % k != 0:
+        t.note += f"k={k} does not divide world_size={p} → k=1; "
+        k = 1
+    t.k = k
+    t.node_aligned = t.ppn is not None and t.ppn % k == 0
+    if not t.node_aligned and k > 1:
+        t.note += "groups straddle nodes; "
+    return t
+
+
+@dataclass
+class KRingBucketState:
+    flat:       Optional[torch.Tensor] = None
+    tmp:        Optional[torch.Tensor] = None
+    numel:      int = 0
+    chunk:      int = 0
+    bucket_id:  int = 0
+    call_count: int = 0
+    stream:     Optional["torch.cuda.Stream"] = None
+
+    def initialize(self, tensor: torch.Tensor, world_size: int, bucket_id: int) -> None:
+        self.numel = tensor.numel()
+        self.chunk = max(1, math.ceil(self.numel / world_size))
+        self.flat = torch.zeros(world_size * self.chunk, dtype=tensor.dtype, device=tensor.device)
+        self.tmp = torch.empty(self.chunk, dtype=tensor.dtype, device=tensor.device)
+        self.bucket_id = bucket_id
+        self.stream = torch.cuda.Stream(device=tensor.device) if tensor.is_cuda else None
+
+
+@dataclass
+class KRingAllreduceState:
+    k_req: int = 0
+    topo: Optional[KRingTopology] = None
+    rs_steps: list = field(default_factory=list)
+    ag_steps: list = field(default_factory=list)
+    buckets: Dict[int, KRingBucketState] = field(default_factory=dict)
+    announced: bool = False
+
+    def resolve(self) -> None:
+        t = _kring_resolve_topology(self.k_req)
+        to_g = lambda steps: [(i, t.v2r[d], t.v2r[s], sb, rb) for (i, d, s, sb, rb) in steps]
+        self.rs_steps = to_g(_kring_reduce_scatter_schedule(t.world_size, t.k, t.vrank))
+        self.ag_steps = to_g(_kring_allgather_schedule(t.world_size, t.k, t.vrank))
+        self.topo = t
+
+    def get_or_init(self, bucket_index: int, tensor: torch.Tensor) -> KRingBucketState:
+        bs = self.buckets.get(bucket_index)
+        if bs is None or bs.numel != tensor.numel():
+            bs = KRingBucketState()
+            bs.initialize(tensor, self.topo.world_size, bucket_index)
+            self.buckets[bucket_index] = bs
+        return bs
+
+    def describe(self) -> str:
+        t = self.topo
+        n_inter = sum(1 for s in self.ag_steps if s[0])
+        return (f"p={t.world_size} k={t.k} groups={t.world_size // t.k} ppn={t.ppn} "
+                f"nodes={t.num_nodes} node_aligned={t.node_aligned} source={t.source} | "
+                f"per phase: {len(self.ag_steps) - n_inter} intra + {n_inter} inter steps"
+                + (f" | NOTE: {t.note}" if t.note else ""))
+
+
+def _kring_exchange(send_buf, dst, recv_buf, src, tag) -> None:
+    """One step, same call for MPI and NCCL/RCCL."""
+    reqs = dist.batch_isend_irecv([
+        dist.P2POp(dist.irecv, recv_buf, src, tag=tag),
+        dist.P2POp(dist.isend, send_buf, dst, tag=tag),
+    ])
+    for req in reqs:
+        req.wait()
+
+
+def _kring_allreduce_sum(tensor: torch.Tensor, state: KRingAllreduceState,
+                         bstate: KRingBucketState) -> None:
+    p = state.topo.world_size
+    if p == 1:
+        return
+    is_mpi = dist.get_backend() == "mpi"
+    n = bstate.numel
+    stream = bstate.stream if tensor.is_cuda else None
+    if stream is not None:
+        stream.wait_stream(torch.cuda.current_stream(device=tensor.device))
+    ctx = torch.cuda.stream(stream) if stream is not None else contextlib.nullcontext()
+
+    with ctx:
+        flat = bstate.flat
+        flat.narrow(0, 0, n).copy_(tensor.flatten())        # pad tail stays zero
+        chunks = flat.view(p, bstate.chunk)
+
+        _nvtx_range_push(f"kring_reduce_scatter:B{bstate.bucket_id} k={state.topo.k}")
+        for (_i, dst, src, sb, rb) in state.rs_steps:
+            tag = _next_tag()
+            if is_mpi:
+                _ring_sync(bstate, flat)        # GPU-direct RDMA bypasses stream order
+            _kring_exchange(chunks[sb], dst, bstate.tmp, src, tag)
+            chunks[rb].add_(bstate.tmp)
+        _nvtx_range_pop()
+
+        _nvtx_range_push(f"kring_allgather:B{bstate.bucket_id} k={state.topo.k}")
+        for (_i, dst, src, sb, rb) in state.ag_steps:
+            tag = _next_tag()
+            if is_mpi:
+                _ring_sync(bstate, flat)
+            _kring_exchange(chunks[sb], dst, chunks[rb], src, tag)
+        _nvtx_range_pop()
+
+        tensor.copy_(flat.narrow(0, 0, n).view_as(tensor))
+        tensor.div_(p)
+    _ring_sync(bstate, tensor)
+
+
+def _kring_allreduce_hook(state: KRingAllreduceState,
+                          bucket: dist.GradBucket) -> torch.futures.Future[torch.Tensor]:
+    tensor = bucket.buffer()
+    if state.topo is None:
+        state.resolve()                         # safety net; get_comm_hook resolves eagerly
+    if state.topo.world_size == 1:
+        fut = torch.futures.Future()
+        fut.set_result(tensor)
+        return fut
+    if not state.announced:
+        state.announced = True
+        if dist.get_rank() == 0:
+            print(f"[KRING] {state.describe()}", flush=True)
+    bstate = state.get_or_init(bucket.index(), tensor)
+    bstate.call_count += 1
+
+    def _work() -> None:
+        _kring_allreduce_sum(tensor, state, bstate)
+
+    return _submit_async_hook_work(f"{dist.get_backend()}:kring_k{state.topo.k}", tensor, _work)
+
+
+nccl_kring_allreduce_hook = _kring_allreduce_hook
+mpi_kring_allreduce_hook  = _kring_allreduce_hook
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # HOOK FACTORY
@@ -3332,6 +3542,8 @@ _HOOK_REGISTRY = {
     ("mpi", "default_cpu_stage"): mpi_default_cpu_stage_allreduce_hook,
     ("nccl", "direct"): nccl_direct_allreduce_hook,
     ("mpi",  "direct"): mpi_direct_allreduce_hook,
+    ("nccl", "kring"):  nccl_kring_allreduce_hook,   # ← add
+    ("mpi",  "kring"):  mpi_kring_allreduce_hook,    # ← add
 }
 
 
@@ -3353,11 +3565,16 @@ def get_comm_hook(
         return None
     # "direct" (throttle from DDP_DIRECT_THROTTLE) or "direct_t<N>" (throttle N)
     direct_throttle = None
+    kring_k = None 
     if algorithm == "direct" or algorithm.startswith("direct_t"):
         direct_throttle = (int(algorithm[len("direct_t"):])
                            if algorithm.startswith("direct_t")
                            else DIRECT_DEFAULT_THROTTLE)
         key = (backend, "direct")
+    elif algorithm == "kring" or algorithm.startswith("kring_k"):   # ← add
+        kring_k = (int(algorithm[len("kring_k"):])
+                   if algorithm.startswith("kring_k") else 0)
+        key = (backend, "kring")
     else:
         key = (backend, algorithm)
     if key not in _HOOK_REGISTRY:
@@ -3369,6 +3586,10 @@ def get_comm_hook(
     
     if direct_throttle is not None:
         state = DirectAllreduceState(throttle=direct_throttle)
+    elif kring_k is not None:                                        # ← add
+        state = KRingAllreduceState(k_req=kring_k)
+        if dist.is_available() and dist.is_initialized():
+            state.resolve()  
     elif algorithm == "ring":
         state = RingAllreduceState()
     elif algorithm == "ring_zfp_naive":
