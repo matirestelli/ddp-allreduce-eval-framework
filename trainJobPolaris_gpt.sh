@@ -4,9 +4,9 @@
 #PBS -l filesystems=home:eagle
 #PBS -q debug-scaling
 #PBS -A UIC-HPC
-#PBS -o ddp_gpt_polaris_32gpu.%j.out
-#PBS -e ddp_gpt_polaris_32gpu.%j.err
-#PBS -N ddp-gpt_polaris_32gpu
+#PBS -o ddp_gpt2_polaris_32gpu.%j.out
+#PBS -e ddp_gpt2_polaris_32gpu.%j.err
+#PBS -N ddp-gpt2_polaris_32gpu
 
 cd ${PBS_O_WORKDIR}
 
@@ -145,19 +145,30 @@ BACKENDS=(
 # "default" = built-in DDP allreduce wrapped with NVTX timing.
 # "none"    = no custom communication hook.
 EXPERIMENTS=(
-    #"none:"
+    "none:"
     #"default_sync:"
     #"default_clone:"
     #"default_cpu_stage:"
     #"default:"
     #"ring:"
-    "ring_zfp_naive:16"
-    "ring_zfp_online_coll:16"
-    "ring_zfp_online_coll:8"
-    "recursive_doubling:"
-    "recursive_doubling_zfp_naive:16"
-    "recursive_doubling_zfp_online_coll:16"
-    "recursive_doubling_zfp_online_coll:8"
+    #"ring_zfp_naive:16"
+    #"ring_zfp_online_coll:16"
+    #"ring_zfp_online_coll:8"
+
+    #"recursive_doubling:"
+    #"recursive_doubling_zfp_naive:16"
+    #"recursive_doubling_zfp_online_coll:16"
+    #"recursive_doubling_zfp_online_coll:8"
+
+    "hierarchical_zfp_online_coll:8"
+
+    "direct_t4:"
+    "direct_t8:"
+    "direct_t16:"
+    "direct_t32:"
+    "direct_t64:"
+    #"kring_k1:"                        # k-ring with k=1 = plain ring (sanity check)
+    "kring_k4:"                        # k = ranks per node on Polaris
 )
 
 for MODEL_NAME in "${MODELS[@]}"; do

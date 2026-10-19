@@ -677,7 +677,11 @@ def train(config: TrainingConfig) -> None:
         
     
     # Synced warm-up backward: needed for static_graph=True + no_sync().
-    if config.grad_accum_global is not None and config.grad_accum_global // world_size > 1:
+    # Always run it (before the hook is registered): the first static_graph
+    # backward launches an MPI_Allreduce of local_used_map on the PG thread that
+    # deadlocks against custom P2P hooks on pgGlobalMutex_ (seen at 64 GPUs,
+    # where micro-steps/rank=1 used to skip this warm-up).
+    if True:
         if config.is_lm:
             _x = torch.randint(0, config.vocab_size, (config.batch_size, config.block_size), device=device)
             _out, _loss = model(_x, _x)

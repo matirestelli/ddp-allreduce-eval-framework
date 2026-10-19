@@ -3095,6 +3095,156 @@ def _hier_zfp_online_coll_hook(
 nccl_ring_zfp_online_coll_allreduce_hook = _hier_zfp_online_coll_hook
 nccl_recursive_doubling_zfp_online_coll_allreduce_hook = _hier_zfp_online_coll_hook
 
+nccl_hier_zfp_online_coll_allreduce_hook = _hier_zfp_online_coll_hook
+
+
+# ── HIERARCHICAL ZFP — MPI BACKEND ───────────────────────────────────────────
+# Same algorithm/buffers as NCCL. ProcessGroupMPI is not stream-ordered, so:
+# send buffers fenced with event.synchronize(), recv buffers read only after
+# work.wait(), overlap via async_op=True. Phase 2 uses all_to_all_single with a
+# replicated send block (MPI PG has no all_gather_into_tensor).
+
+@dataclass
+class ZfpHierMpiBucketState(ZfpHierBucketState):
+    def initialize(self, tensor, topo, rate, num_chunks, bucket_id) -> None:
+        super().initialize(tensor, topo, rate, num_chunks, bucket_id)
+        if not topo.is_leader:
+            return
+        L, cb = topo.num_nodes, self.comp_bytes_shard_chunk
+        self.p2_send_comp = [
+            torch.empty(L * cb, dtype=torch.uint8, device=tensor.device)
+            for _ in range(self.num_chunks)
+        ]
+
+
+@dataclass
+class ZfpHierMpiAllreduceState(ZfpHierAllreduceState):
+    num_chunks: int = int(os.getenv("DDP_ZFP_HIER_MPI_CHUNKS",
+                                    str(ZFP_HIER_NUM_CHUNKS)))
+
+    def get_or_init(self, bucket_index, tensor):
+        bs = self.buckets.get(bucket_index)
+        if bs is not None and bs.flat is not None and bs.flat.numel() == tensor.numel():
+            return bs
+        topo = _resolve_topology(tensor)
+        if not topo.usable:
+            self._native_fallback, self._fallback_reason = True, topo.reason
+            return None
+        groups = _build_hier_groups(topo)
+        if groups is None:
+            self._native_fallback, self._fallback_reason = True, "group creation failed"
+            return None
+        topo.local_group = groups["local_group"]
+        topo.leader_group = groups["leader_group"]
+        bs = ZfpHierMpiBucketState()
+        bs.initialize(tensor, topo, self.rate, self.num_chunks, bucket_index)
+        self.buckets[bucket_index] = bs
+        return bs
+
+
+def _leader_compressed_allreduce_mpi_(bstate, log: bool, call_n: int) -> None:
+    topo, lg, L = bstate.topo, bstate.topo.leader_group, bstate.topo.num_nodes
+    rate, cb, cshard = bstate.rate, bstate.comp_bytes_shard_chunk, bstate.chunk_shard
+    nchunks, comp_s, dec_s = bstate.num_chunks, bstate.comp_stream, bstate.decomp_stream
+
+    cur = torch.cuda.current_stream(device=bstate.leader_buf.device)
+    comp_s.wait_stream(cur)
+    dec_s.wait_stream(cur)
+    view2d = bstate.leader_buf.view(L, bstate.shard_numel)
+
+    def p1_compress(c):
+        off, send = c * cshard, bstate.p1_send_comp[c]
+        with torch.cuda.stream(comp_s):
+            for j in range(L):
+                dst = send.narrow(0, j * cb, cb)
+                ub = _zfp_compress_into_current_stream(view2d[j].narrow(0, off, cshard), dst, rate)
+                _zfp_pad_tail_to_B_(dst, ub, cb)
+        ev = torch.cuda.Event(); ev.record(comp_s); return ev
+
+    def p1_decompress(c):
+        off, rc, rd = c * cshard, bstate.p1_recv_comp[c], bstate.p1_recv_decomp[c]
+        with torch.cuda.stream(dec_s):
+            for j in range(L):
+                _zfp_decompress_into_current_stream(
+                    rc.narrow(0, j * cb, cb), cb, rd.narrow(0, j * cshard, cshard), rate)
+            bstate.my_shard.narrow(0, off, cshard).copy_(rd.view(L, cshard).sum(dim=0))
+
+    def p2_compress(c):
+        off, s2 = c * cshard, bstate.p2_send_comp[c].view(L, cb)
+        with torch.cuda.stream(comp_s):
+            ub = _zfp_compress_into_current_stream(bstate.my_shard.narrow(0, off, cshard), s2[0], rate)
+            _zfp_pad_tail_to_B_(s2[0], ub, cb)
+            if L > 1:
+                s2[1:].copy_(s2[0:1].expand(L - 1, cb))
+        ev = torch.cuda.Event(); ev.record(comp_s); return ev
+
+    def p2_decompress(c):
+        off, rc = c * cshard, bstate.p2_recv_comp[c]
+        with torch.cuda.stream(dec_s):
+            for j in range(L):
+                _zfp_decompress_into_current_stream(
+                    rc.narrow(0, j * cb, cb), cb, view2d[j].narrow(0, off, cshard), rate)
+
+    def run_phase(compress, decompress, send_bufs, recv_bufs):
+        pending = None
+        for c in range(nchunks):
+            compress(c).synchronize()          # bytes in HBM before MPI RDMA
+            work = dist.all_to_all_single(recv_bufs[c], send_bufs[c], group=lg, async_op=True)
+            if pending is not None:
+                pending[1].wait(); decompress(pending[0])
+            pending = (c, work)
+        pending[1].wait(); decompress(pending[0])
+
+    run_phase(p1_compress, p1_decompress, bstate.p1_send_comp, bstate.p1_recv_comp)
+    ev_p1 = torch.cuda.Event(); ev_p1.record(dec_s); comp_s.wait_event(ev_p1)
+    run_phase(p2_compress, p2_decompress, bstate.p2_send_comp, bstate.p2_recv_comp)
+
+    ev_done = torch.cuda.Event(); ev_done.record(dec_s); cur.wait_event(ev_done)
+    if log:
+        print(f"[HIER_ZFP_MPI|R{topo.rank}|B{bstate.bucket_id}|C{call_n}] "
+              f"L={L} chunks={nchunks} shard={bstate.shard_numel} cb={cb}", flush=True)
+
+
+def _hier_zfp_allreduce_mpi_sum(tensor, bstate, log: bool, call_n: int = 0) -> None:
+    _require_zfp_cuda()
+    topo, flat = bstate.topo, bstate.flat
+    flat.copy_(tensor.flatten())
+    _cuda_sync(flat)
+    dist.all_reduce(flat, op=dist.ReduceOp.SUM, group=topo.local_group)
+    if topo.is_leader:
+        n = flat.numel()
+        bstate.leader_buf.narrow(0, 0, n).copy_(flat)
+        if bstate.leader_numel > n:
+            bstate.leader_buf.narrow(0, n, bstate.leader_numel - n).zero_()
+        _leader_compressed_allreduce_mpi_(bstate, log, call_n)
+        flat.copy_(bstate.leader_buf.narrow(0, 0, n))
+        _cuda_sync(flat)
+    dist.broadcast(flat, src=topo.leader_ranks[topo.node_id], group=topo.local_group)
+    flat.div_(topo.world_size)
+    tensor.copy_(flat.view_as(tensor))
+    _cuda_sync(tensor)
+
+
+def _hier_zfp_online_coll_mpi_hook(state, bucket):
+    tensor, bucket_index = bucket.buffer(), bucket.index()
+    bstate = state.get_or_init(bucket_index, tensor)
+    if bstate is None:
+        if dist.get_rank() == 0 and bucket_index == 0 and not state._fallback_logged:
+            print(f"[HIER_ZFP_MPI] native fallback: {state._fallback_reason}", flush=True)
+            state._fallback_logged = True
+        tensor.div_(dist.get_world_size())
+        return dist.all_reduce(tensor, op=dist.ReduceOp.SUM, async_op=True
+                               ).get_future().then(lambda f: f.value()[0])
+    bstate.call_count += 1
+    call_n = bstate.call_count
+    do_log = FULL_LOG_CALLS > 0 and call_n <= FULL_LOG_CALLS
+    return _submit_async_hook_work(
+        f"{dist.get_backend()}:hier_zfp_online_coll:rate{bstate.rate:g}", tensor,
+        lambda: _hier_zfp_allreduce_mpi_sum(tensor, bstate, log=do_log, call_n=call_n))
+
+
+mpi_hier_zfp_online_coll_allreduce_hook = _hier_zfp_online_coll_mpi_hook
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # DIRECT SENDRECV ALLREDUCE WITH THROTTLING
 # Chen, Yao, Subramoni, Panda — "Design and Optimization of GPU-Aware MPI
@@ -3544,6 +3694,9 @@ _HOOK_REGISTRY = {
     ("mpi",  "direct"): mpi_direct_allreduce_hook,
     ("nccl", "kring"):  nccl_kring_allreduce_hook,   # ← add
     ("mpi",  "kring"):  mpi_kring_allreduce_hook,    # ← add
+    
+    ("nccl", "hierarchical_zfp_online_coll"): nccl_hier_zfp_online_coll_allreduce_hook,
+    ("mpi",  "hierarchical_zfp_online_coll"): mpi_hier_zfp_online_coll_allreduce_hook,
 }
 
 
@@ -3598,6 +3751,9 @@ def get_comm_hook(
         state = RecursiveDoublingAllreduceState()
     elif algorithm == "recursive_doubling_zfp_naive":
         state = ZfpRecursiveDoublingAllreduceState(rate=zfp_rate)
+    elif algorithm == "hierarchical_zfp_online_coll":
+        state = (ZfpHierMpiAllreduceState(rate=zfp_rate) if backend == "mpi"
+                 else ZfpHierAllreduceState(rate=zfp_rate))
     # ── online_coll: NCCL/RCCL gets the hierarchical state, MPI keeps its own ──
     elif algorithm in ("ring_zfp_online_coll",
                        "recursive_doubling_zfp_online_coll"):
