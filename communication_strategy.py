@@ -3101,8 +3101,37 @@ nccl_hier_zfp_online_coll_allreduce_hook = _hier_zfp_online_coll_hook
 # ── HIERARCHICAL ZFP — MPI BACKEND ───────────────────────────────────────────
 # Same algorithm/buffers as NCCL. ProcessGroupMPI is not stream-ordered, so:
 # send buffers fenced with event.synchronize(), recv buffers read only after
-# work.wait(), overlap via async_op=True. Phase 2 uses all_to_all_single with a
+# work.wait(), overlap via async collectives. Phase 2 uses alltoall with a
 # replicated send block (MPI PG has no all_gather_into_tensor).
+
+def _build_hier_groups_mpi(topo: _HierTopology) -> Optional[dict]:
+    """Do NOT use dist.new_group on MPI: ProcessGroupMPI.create does
+    MPI_Barrier + MPI_Comm_create on MPI_COMM_WORLD, but new_group returns
+    early on non-members, so the leader group deadlocks. Here every rank calls
+    ProcessGroupMPI.create for every group (returns None on non-members)."""
+    from torch._C._distributed_c10d import ProcessGroupMPI
+    sig = ("mpi", topo.ppn, topo.num_nodes)
+    with _HIER_GROUP_LOCK:
+        cached = _HIER_GROUP_CACHE.get(sig)
+        if cached is not None:
+            return cached
+        try:
+            local_group = None
+            for n in range(topo.num_nodes):
+                g = ProcessGroupMPI.create(list(range(n * topo.ppn, (n + 1) * topo.ppn)))
+                if topo.node_id == n:
+                    local_group = g
+            leader_group = ProcessGroupMPI.create(list(topo.leader_ranks))  # None on non-leaders
+            if local_group is None or (topo.is_leader and leader_group is None):
+                raise RuntimeError("ProcessGroupMPI.create returned None for a member")
+            result = {"local_group": local_group, "leader_group": leader_group}
+            _HIER_GROUP_CACHE[sig] = result
+            return result
+        except Exception as exc:
+            print(f"[HIER_ZFP_MPI] group creation failed: {exc} — falling back to native",
+                  flush=True)
+            return None
+
 
 @dataclass
 class ZfpHierMpiBucketState(ZfpHierBucketState):
@@ -3130,7 +3159,7 @@ class ZfpHierMpiAllreduceState(ZfpHierAllreduceState):
         if not topo.usable:
             self._native_fallback, self._fallback_reason = True, topo.reason
             return None
-        groups = _build_hier_groups(topo)
+        groups = _build_hier_groups_mpi(topo)
         if groups is None:
             self._native_fallback, self._fallback_reason = True, "group creation failed"
             return None
@@ -3140,6 +3169,15 @@ class ZfpHierMpiAllreduceState(ZfpHierAllreduceState):
         bs.initialize(tensor, topo, self.rate, self.num_chunks, bucket_index)
         self.buckets[bucket_index] = bs
         return bs
+
+    def prepare(self) -> None:
+        """Create the MPI groups at registration, on all ranks, outside backward."""
+        topo = _resolve_topology(None)
+        if topo.usable:
+            _build_hier_groups_mpi(topo)
+        if dist.get_rank() == 0:
+            print(f"[HIER_ZFP_MPI] groups ready: {topo.reason} ppn={topo.ppn} "
+                  f"nodes={topo.num_nodes}", flush=True)
 
 
 def _leader_compressed_allreduce_mpi_(bstate, log: bool, call_n: int) -> None:
@@ -3189,7 +3227,7 @@ def _leader_compressed_allreduce_mpi_(bstate, log: bool, call_n: int) -> None:
         pending = None
         for c in range(nchunks):
             compress(c).synchronize()          # bytes in HBM before MPI RDMA
-            work = dist.all_to_all_single(recv_bufs[c], send_bufs[c], group=lg, async_op=True)
+            work = lg.alltoall_base(recv_bufs[c], send_bufs[c], [], [])   # raw MPI Backend, equal splits
             if pending is not None:
                 pending[1].wait(); decompress(pending[0])
             pending = (c, work)
@@ -3210,7 +3248,7 @@ def _hier_zfp_allreduce_mpi_sum(tensor, bstate, log: bool, call_n: int = 0) -> N
     topo, flat = bstate.topo, bstate.flat
     flat.copy_(tensor.flatten())
     _cuda_sync(flat)
-    dist.all_reduce(flat, op=dist.ReduceOp.SUM, group=topo.local_group)
+    topo.local_group.allreduce(flat, dist.ReduceOp.SUM).wait()
     if topo.is_leader:
         n = flat.numel()
         bstate.leader_buf.narrow(0, 0, n).copy_(flat)
@@ -3219,7 +3257,7 @@ def _hier_zfp_allreduce_mpi_sum(tensor, bstate, log: bool, call_n: int = 0) -> N
         _leader_compressed_allreduce_mpi_(bstate, log, call_n)
         flat.copy_(bstate.leader_buf.narrow(0, 0, n))
         _cuda_sync(flat)
-    dist.broadcast(flat, src=topo.leader_ranks[topo.node_id], group=topo.local_group)
+    topo.local_group.broadcast(flat, 0).wait()   # leader is rank 0 of its node group
     flat.div_(topo.world_size)
     tensor.copy_(flat.view_as(tensor))
     _cuda_sync(tensor)
@@ -3754,6 +3792,8 @@ def get_comm_hook(
     elif algorithm == "hierarchical_zfp_online_coll":
         state = (ZfpHierMpiAllreduceState(rate=zfp_rate) if backend == "mpi"
                  else ZfpHierAllreduceState(rate=zfp_rate))
+        if backend == "mpi" and dist.is_available() and dist.is_initialized():
+            state.prepare()
     # ── online_coll: NCCL/RCCL gets the hierarchical state, MPI keeps its own ──
     elif algorithm in ("ring_zfp_online_coll",
                        "recursive_doubling_zfp_online_coll"):
