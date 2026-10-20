@@ -1,15 +1,15 @@
 #!/bin/bash -l
 #SBATCH -A gen243
 #SBATCH -p extended
-#SBATCH -J ddp-gpt-frontier_16gpus
-#SBATCH -N 2
+#SBATCH -J ddp-gpt2-frontier_32gpus
+#SBATCH -N 4
 #SBATCH --ntasks-per-node=8
 #SBATCH --gpus-per-node=8
 #SBATCH --cpus-per-task=7
 #SBATCH -t 08:00:00
 #SBATCH -C nvme
-#SBATCH -o ddp_gpt_frontier_16gpus.%j.out
-#SBATCH -e ddp_gpt_frontier_16gpus.%j.err
+#SBATCH -o ddp_gpt2_frontier_32gpus.%j.out
+#SBATCH -e ddp_gpt2_frontier_32gpus.%j.err
 
 
 #ask for a compute node
@@ -41,7 +41,7 @@ export MPICH_OFI_NIC_POLICY=GPU
 #   16 GPUs -> -N 2 -> 4 micro-steps per rank
 #   32 GPUs -> -N 4 -> 2 micro-steps per rank
 #   64 GPUs -> -N 8 -> 1 micro-step  per rank
-NUM_PROCS=16
+NUM_PROCS=32
 PPN=8
 # processes per node
 
@@ -158,25 +158,30 @@ BACKENDS=(
 #                   (N peers per batch; t = 32 = all peers at once on 32 GPUs).
 #                   Paper Fig. 4 (64 GPUs): best t=32 @8 MB, 16 @16 MB, 8 @32-512 MB, 4 @1 GB.
 EXPERIMENTS=(
-    "none:"
+    #"none:"
     #"default_sync:"
-    "ring:"
-    "ring_zfp_naive:16"
-    "ring_zfp_online_coll:16"
-    "ring_zfp_online_coll:8"
-    
-    "recursive_doubling:"
-    "recursive_doubling_zfp_naive:16"
-    "recursive_doubling_zfp_online_coll:16"
-    "recursive_doubling_zfp_online_coll:8"
+    #"default_clone:"
+    #"default_cpu_stage:"
+    #"default:"
+    #"ring:"
+    ##"ring_zfp_naive:16"
+    #"ring_zfp_online_coll:16"
+    #"ring_zfp_online_coll:8"
+
+    #"recursive_doubling:"
+    #"recursive_doubling_zfp_naive:16"
+    #"recursive_doubling_zfp_online_coll:16"
+    #"recursive_doubling_zfp_online_coll:8"
+
+    "hierarchical_zfp_online_coll:8"
 
     "direct_t4:"
     "direct_t8:"
     "direct_t16:"
-    #"direct_t32:"
-    #"default:"
-    #"default_clone:"
-    #"default_cpu_stage:"
+    "direct_t32:"
+    #"direct_t64:"
+    #"kring_k1:"                        # k-ring with k=1 = plain ring (sanity check)
+    "kring_k4:"                        # k = ranks per node on Polaris
 )
 
 for MODEL_NAME in "${MODELS[@]}"; do
