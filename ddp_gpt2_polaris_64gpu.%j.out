@@ -1,0 +1,176 @@
+=== Job started: Tue Oct 20 11:12:56 AM UTC 2026 ===
+=== Node: x3001c0s25b0n0 ===
+[INFO] conda module: conda/2025-09-28
+[INFO] CUDA 12.9 libs: /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/12.9/targets/x86_64-linux/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/12.9/extras/CUPTI/lib64:/opt/nvidia/hpc_sdk/Linux_x86_64/25.9/math_libs/12.9/targets/x86_64-linux/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/25.9/math_libs/12.9/lib64
+[INFO] CUDA 13.0 runtime (for GTL): /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/13.0/targets/x86_64-linux/lib
+[INFO] MPI_HOME: /opt/cray/pe/mpich/default/ofi/gnu/12.3 -> /opt/cray/pe/mpich/9.1.0/ofi/gnu/12.3
+[INFO] GTL and PyTorch dependencies all resolve.
+[INFO] GTL_LIB=/opt/cray/pe/mpich/default/ofi/gnu/12.3/lib/libmpi_gtl_cuda.so.0 (preloaded only in MPI ranks via gpu_wrapper.sh)
+=============================================
+  Polaris DDP + Eagle PyTorch + Cray MPICH
+=============================================
+Node              : x3001c0s25b0n0
+conda module      : conda/2025-09-28
+ZFP_HOME          : /home/mrest/mpiAllReduceCompressed/zfp-install
+MPI_HOME          : /opt/cray/pe/mpich/default/ofi/gnu/12.3
+GTL_LIB           : /opt/cray/pe/mpich/default/ofi/gnu/12.3/lib/libmpi_gtl_cuda.so.0
+
+Python            : /soft/applications/conda/2025-09-28/mconda3/bin/python
+PyTorch version   : 2.8.0a0+gitba56102
+PyTorch location  : /lus/eagle/projects/UIC-HPC/mrest/pytorch_mpi_build/src/pytorch/torch/__init__.py
+CUDA available    : True 4
+CUDA built with   : 12.9
+MPI available     : True
+mpi4py            : MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1)
+=============================================
+MASTER_ADDR=x3001c0s25b0n0.hsn.cm.polaris.alcf.anl.gov
+MASTER_PORT=29500
+=== Starting training: model=gpt2_12x12x768, dataset=tinystories, procs=64, batch=12, accum=64, block=1024, lr=6e-4, amp=bf16, backend=mpi, hook=none, zfp_rate=none at Tue Oct 20 11:13:22 AM UTC 2026 ===
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768 (from scratch)
+  Dataset:    tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  built-in (no hook)
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768 on TINYSTORIES
+Backend: MPI, Algorithm: built-in (no hook)
+================================================================================
+Ranks: 64, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: cuda:0
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] No hook — using DDP built-in MPI allreduce
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 602, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=1, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: 6.9843, Acc: 9.37%, lr: 0.000532
+[Epoch 1] Train Loss: 6.9843, Acc: 9.37%  |  Val Loss: 5.7153, Acc: 10.34%  |  Time: 13.0s
+[Epoch 1] t_iter median: 211.82 ms  (fwd 96.62 | bwd+comm 111.11 | opt 4.02 | data 0.06)  |  train-only epoch: 11.6s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 211.82 ms
+[Epoch 1] peak GPU mem: 23.72 GiB allocated, 26.61 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+[HOOK_TIMING_SUMMARY] epoch=1 no hook timing samples
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: 5.6959, Acc: 10.97%, lr: 0.000234
+[Epoch 2] Train Loss: 5.6959, Acc: 10.97%  |  Val Loss: 5.5996, Acc: 10.28%  |  Time: 12.1s
+[Epoch 2] t_iter median: 211.79 ms  (fwd 96.61 | bwd+comm 111.09 | opt 4.03 | data 0.06)  |  train-only epoch: 10.8s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 211.79 ms
+[Epoch 2] peak GPU mem: 23.72 GiB allocated, 26.61 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+[HOOK_TIMING_SUMMARY] epoch=2 no hook timing samples
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: 5.4498, Acc: 12.88%, lr: 0.000060
+[Epoch 3] Train Loss: 5.4498, Acc: 12.88%  |  Val Loss: 5.2489, Acc: 13.56%  |  Time: 12.1s
+[Epoch 3] t_iter median: 211.81 ms  (fwd 96.57 | bwd+comm 111.15 | opt 4.01 | data 0.06)  |  train-only epoch: 10.8s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 211.81 ms
+[Epoch 3] peak GPU mem: 23.72 GiB allocated, 26.61 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+[HOOK_TIMING_SUMMARY] epoch=3 no hook timing samples
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 37.2s | Best val acc: 0.00%
+Epoch times (train+val): mean=12.4s  min=12.1s  max=13.0s
+Train-only epoch time (epochs 2..N): median=10.81s  min=10.79s  max=10.83s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768, dataset=tinystories, procs=64, batch=12, accum=64, lr=6e-4, backend=mpi, hook=none, zfp_rate=none, status=0 at Tue Oct 20 11:14:16 AM UTC 2026 ===
+=== Starting training: model=gpt2_12x12x768, dataset=tinystories, procs=64, batch=12, accum=64, block=1024, lr=6e-4, amp=bf16, backend=mpi, hook=ring, zfp_rate=none at Tue Oct 20 11:14:16 AM UTC 2026 ===
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768 (from scratch)
+  Dataset:    tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  ring
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768 on TINYSTORIES
+Backend: MPI, Algorithm: ring
+================================================================================
+Ranks: 64, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: cuda:0
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/ring
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 602, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=1, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)

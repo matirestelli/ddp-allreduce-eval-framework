@@ -145,7 +145,7 @@ BACKENDS=(
 # "default" = built-in DDP allreduce wrapped with NVTX timing.
 # "none"    = no custom communication hook.
 EXPERIMENTS=(
-    "none:"
+    #"none:"
     #"default_sync:"
     #"default_clone:"
     #"default_cpu_stage:"
