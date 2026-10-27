@@ -1,15 +1,16 @@
 #!/bin/bash -l
 #SBATCH -A gen243
-#SBATCH -p extended
-#SBATCH -J ddp-gpt2-frontier_32gpus
-#SBATCH -N 4
+#SBATCH -p batch
+#SBATCH -q debug
+#SBATCH -J ddp-gpt-frontier_64gpus
+#SBATCH -N 8
 #SBATCH --ntasks-per-node=8
 #SBATCH --gpus-per-node=8
 #SBATCH --cpus-per-task=7
-#SBATCH -t 08:00:00
+#SBATCH -t 02:00:00
 #SBATCH -C nvme
-#SBATCH -o ddp_gpt2_frontier_32gpus.%j.out
-#SBATCH -e ddp_gpt2_frontier_32gpus.%j.err
+#SBATCH -o ddp_gpt_frontier_64gpus.%j.out
+#SBATCH -e ddp_gpt_frontier_64gpus.%j.err
 
 
 #ask for a compute node
@@ -41,7 +42,7 @@ export MPICH_OFI_NIC_POLICY=GPU
 #   16 GPUs -> -N 2 -> 4 micro-steps per rank
 #   32 GPUs -> -N 4 -> 2 micro-steps per rank
 #   64 GPUs -> -N 8 -> 1 micro-step  per rank
-NUM_PROCS=32
+NUM_PROCS=64
 PPN=8
 # processes per node
 
@@ -175,13 +176,13 @@ EXPERIMENTS=(
 
     "hierarchical_zfp_online_coll:8"
 
-    "direct_t4:"
-    "direct_t8:"
-    "direct_t16:"
-    "direct_t32:"
+    #"direct_t4:"
+    #"direct_t8:"
+    #"direct_t16:"
+    #"direct_t32:"
     #"direct_t64:"
     #"kring_k1:"                        # k-ring with k=1 = plain ring (sanity check)
-    "kring_k4:"                        # k = ranks per node on Polaris
+    #"kring_k8:"                        # k = ranks per node on Polaris
 )
 
 for MODEL_NAME in "${MODELS[@]}"; do
