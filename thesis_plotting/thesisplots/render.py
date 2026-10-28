@@ -128,7 +128,6 @@ def create(runs,args,output):
     if not points:raise NoData(f'No recorded {metric} measurements after epoch 1')
     panels=sorted({p['panel'] for p in points});methods=sorted({p['method'] for p in points},key=st.sort_key);xs=sorted({p['x'] for p in points});lookup={(p['panel'],p['x'],p['method']):p['value'] for p in points}
     layout=args.layout
-    if layout=='hbar' and not paired and args.columns!=1:raise ValueError('Horizontal comparisons use one panel column to reserve readable method labels')
     if layout=='hbar' and len(xs)!=1:raise ValueError('Horizontal method comparison needs one x value: specify --gpus (or one batch for batch x)')
     if layout=='lines' and args.normalize in ('speedup','efficiency') and (mode!='strong' or args.x!='ranks'):raise ValueError('Scaling speedup/efficiency require strong mode and ranks on x')
     if args.normalize=='baseline':
@@ -150,7 +149,8 @@ def create(runs,args,output):
     width=args.width;panel_width=(width-.8)/cols
     if panel_width<4.6:raise ValueError('Panels too narrow for readable text: reduce --columns or increase --width')
     families=[f for f in st.ORDER if any(st.family(m)==f for m in methods)]
-    legend_cols=min(3,max(1,int((width-1)/2.4)));legend_rows=0 if paired else math.ceil(len(families)/legend_cols)
+    legend_cols = min(len(families), max(1, int((width - 1) / 2.4)))
+    legend_rows = 0 if paired else math.ceil(len(families) / legend_cols)
     legend_inches=.55 if paired else 0
     for row in range(legend_rows):
         fs=families[row*legend_cols:(row+1)*legend_cols]
@@ -164,7 +164,7 @@ def create(runs,args,output):
     xlab={'ranks':'GPU count (ranks)','global_batch':'Effective global batch','batch_per_rank':'Batch / rank'}[args.x]
     for ai,ax in enumerate(axs.flat):
         if ai>=len(panels):ax.set_visible(False);continue
-        if paired:
+        if layout == 'hbar':
             row,col=divmod(ai,cols);cell_width=width/cols
             if cell_width<8:raise ValueError('Paired tail panels need at least 8 physical inches each; increase --width or reduce --columns')
             available=top-bottom;cell_height=(available-(rows-1)*1.1/height)/rows
@@ -213,7 +213,7 @@ def create(runs,args,output):
         if args.ymax:
             if layout=='hbar':ax.set_xlim(0,args.ymax)
             else:ax.set_ylim(0,args.ymax)
-    if paired and args.share_y:
+    if layout == 'hbar' and args.share_y:
         upper=max(ax.get_xlim()[1] for ax in axs.flat if ax.get_visible())
         for ax in axs.flat:
             if ax.get_visible():ax.set_xlim(0,upper)

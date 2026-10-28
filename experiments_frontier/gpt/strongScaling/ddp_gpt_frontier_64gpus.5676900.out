@@ -1543,3 +1543,127 @@ Train-only epoch time (epochs 2..N): median=21.46s  min=21.45s  max=21.47s
 ================================================================================
 === Finished training: model=gpt2_12x12x768, dataset=tinystories, ws=64, batch=12, accum=64, lr=6e-4, backend=mpi, hook=kring_k8, zfp_rate=none, status=0 at Fri Oct 16 05:45:00 PM EDT 2026 ===
 === Job finished: Fri Oct 16 05:45:00 PM EDT 2026 ===
+
+
+=== Job started: Mon Oct 26 08:00:38 PM EDT 2026 ===
+=== Node: frontier08229 ===
+Using ENV_TARBALL=/lustre/orion/gen243/proj-shared/matilderestelli/pytorch/conda_env_torch_vision_20260701_hipfix.tar.gz
+Using ENV_DIR=/mnt/bb/matilderestelli/torch_env
+Deactivating conda environments
+Deactivating conda environments
+Deactivating conda environments
+Deactivating conda environments
+Deactivating conda environments
+Deactivating conda environments
+Deactivating conda environments
+Deactivating conda environments
+PyTorch: 2.14.0a0
+Location: /mnt/bb/matilderestelli/torch_env/lib/python3.10/site-packages/torch/__init__.py
+HIP available: True gpus: 8
+MPI available: True
+=== Starting: model=gpt2_12x12x768, dataset=tinystories, ws=64, bs=12, accum=64, block=1024, lr=6e-4, amp=bf16, backend=mpi, hook=hierarchical_zfp_online_coll, zfp=8 at Mon Oct 26 08:01:23 PM EDT 2026 ===
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768 (from scratch)
+  Dataset:    tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  hierarchical_zfp_online_coll
+  ZFP rate:   8
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=False
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lustre/orion/gen243/proj-shared/matilderestelli/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768 on TINYSTORIES
+Backend: MPI, Algorithm: hierarchical_zfp_online_coll
+================================================================================
+Ranks: 64, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: cuda:0
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lustre/orion/gen243/proj-shared/matilderestelli/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[HIER_ZFP_MPI] groups ready: ok ppn=8 nodes=8
+[Setup] Hook registered: mpi/hierarchical_zfp_online_coll
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 602, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=1, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+[ZFP] size unit detected: bits
+  Batch [50/50] Loss: 5.9742, Acc: 15.88%, lr: 0.000532
+[Epoch 1] Train Loss: 5.9742, Acc: 15.88%  |  Val Loss: 4.1178, Acc: 24.65%  |  Time: 36.5s
+[Epoch 1] t_iter median: 662.96 ms  (fwd 133.16 | bwd+comm 523.04 | opt 6.55 | data 0.08)  |  train-only epoch: 34.7s
+[Epoch 1] compute 310.03 ms  |  exposed comm 346.15 ms  |  sum check 662.73 vs t_iter 662.96 ms
+[Epoch 1] peak GPU mem: 24.57 GiB allocated, 28.98 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:hier_zfp_online_coll:rate8 calls=638 work_total_ms=31515.269 work_mean_ms=49.397 work_min_ms=24.440 work_max_ms=319.047
+[HOOK_TAIL_SUMMARY] label=mpi:hierarchical_zfp_online_coll:rate8 steps=51 tail_total_ms=30929.301 tail_mean_ms=606.457 tail_min_ms=269.104 tail_max_ms=627.282
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: 3.9028, Acc: 26.37%, lr: 0.000234
+[Epoch 2] Train Loss: 3.9028, Acc: 26.37%  |  Val Loss: 3.6249, Acc: 29.14%  |  Time: 35.6s
+[Epoch 2] t_iter median: 664.53 ms  (fwd 133.41 | bwd+comm 524.42 | opt 6.55 | data 0.08)  |  train-only epoch: 33.8s
+[Epoch 2] compute 310.69 ms  |  exposed comm 347.23 ms  |  sum check 664.47 vs t_iter 664.53 ms
+[Epoch 2] peak GPU mem: 24.57 GiB allocated, 28.98 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:hier_zfp_online_coll:rate8 calls=650 work_total_ms=32333.156 work_mean_ms=49.743 work_min_ms=24.425 work_max_ms=478.575
+[HOOK_TAIL_SUMMARY] label=mpi:hierarchical_zfp_online_coll:rate8 steps=50 tail_total_ms=31468.373 tail_mean_ms=629.367 tail_min_ms=623.940 tail_max_ms=783.857
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: 3.6179, Acc: 29.18%, lr: 0.000060
+[Epoch 3] Train Loss: 3.6179, Acc: 29.18%  |  Val Loss: 3.4633, Acc: 31.35%  |  Time: 35.3s
+[Epoch 3] t_iter median: 665.22 ms  (fwd 133.45 | bwd+comm 525.27 | opt 6.41 | data 0.08)  |  train-only epoch: 33.4s
+[Epoch 3] compute 310.78 ms  |  exposed comm 347.98 ms  |  sum check 665.16 vs t_iter 665.22 ms
+[Epoch 3] peak GPU mem: 24.57 GiB allocated, 28.98 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:hier_zfp_online_coll:rate8 calls=650 work_total_ms=32233.892 work_mean_ms=49.591 work_min_ms=24.389 work_max_ms=329.083
+[HOOK_TAIL_SUMMARY] label=mpi:hierarchical_zfp_online_coll:rate8 steps=50 tail_total_ms=31370.463 tail_mean_ms=627.409 tail_min_ms=625.518 tail_max_ms=650.383
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 107.7s | Best val acc: 0.00%
+Epoch times (train+val): mean=35.8s  min=35.3s  max=36.5s
+Train-only epoch time (epochs 2..N): median=33.62s  min=33.45s  max=33.80s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768, dataset=tinystories, ws=64, batch=12, accum=64, lr=6e-4, backend=mpi, hook=hierarchical_zfp_online_coll, zfp_rate=8, status=0 at Mon Oct 26 08:03:30 PM EDT 2026 ===
+=== Job finished: Mon Oct 26 08:03:30 PM EDT 2026 ===

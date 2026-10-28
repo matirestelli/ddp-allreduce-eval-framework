@@ -14,6 +14,7 @@ def run(system,argv=None):
     p.add_argument('--layouts',nargs='+',choices=['bars','lines','hbar'],default=['bars','lines','hbar'])
     p.add_argument('--normalizations',nargs='+',choices=['absolute','baseline','speedup','efficiency'],default=['absolute'])
     p.add_argument('--comparisons',action=argparse.BooleanOptionalAction,default=True,help='Also generate matching MPI/native-backend comparison panels')
+    p.add_argument('--comparisons-only',action='store_true',help='Regenerate only backend comparison figures')
     p.add_argument('--max-plots',type=int,help='Optional preview limit; manifest reports truncation')
     p.add_argument('--dry-run',action='store_true',help='Write planned jobs and audit only')
     p.add_argument('--skip-existing',action='store_true',help='Skip a figure when its JSON sidecar exists')
@@ -28,6 +29,8 @@ def run(system,argv=None):
         groups.setdefault(key,[]).append(r)
     jobs=[]
     def add(rr,scope,x,tag,layouts):
+        if args.comparisons_only and len({z['backend'] for z in rr}) < 2:
+            return
         r=rr[0]
         for metric in args.metrics:
             for layout in layouts:
@@ -87,6 +90,9 @@ def run(system,argv=None):
         else:
             aa=copy.copy(args)
             for k in ['x','metric','layout','normalize']:setattr(aa,k,j[k])
+            if len({z['backend'] for z in rr}) > 1:
+                aa.columns = 2
+                aa.width = max(18, aa.width)
             try:
                 result=create(rr,aa,stem);item.update(status='written',points=len(result['points']),omitted=len(result['omitted']))
             except NoData as exc:item.update(status='no_metric',reason=str(exc))
@@ -94,6 +100,14 @@ def run(system,argv=None):
         report['plots'].append(item)
         if (i+1)%20==0:print(f'{system}: {i+1}/{len(jobs)} figures processed',flush=True)
     if not runs:report['notice']='No matching runs; verify input path and system names. No fabricated figures generated.'
+    if args.comparisons_only and (base / 'manifest.json').exists():
+        previous = json.loads((base / 'manifest.json').read_text())
+        updated = {j['stem'] for j in report['plots']}
+        preserved = [
+            j for j in previous['plots']
+            if j['stem'] not in updated
+        ]
+        report['plots'] = preserved + report['plots']
     (base/'manifest.json').write_text(json.dumps(report,indent=2))
     links=[]
     for j in report['plots']:

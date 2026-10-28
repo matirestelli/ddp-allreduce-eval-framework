@@ -1,0 +1,1500 @@
+{
+  "tail_context": false,
+  "training_context_basis": null,
+  "title": "GPT \u00b7 strong scaling \u00b7 effective global batch 768",
+  "metric": "hook",
+  "unit": "auto",
+  "layout": "bars",
+  "width_inches": 18,
+  "height_inches": 6.580000000000001,
+  "min_font_pt": 11,
+  "mode": "strong",
+  "x": "ranks",
+  "normalize": "absolute",
+  "repeats": "median",
+  "points": [
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 16,
+      "method": "ring",
+      "value": 56.8677965,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_16gpus.5659411.out",
+          "line": 104,
+          "id": "51218697f6a0",
+          "raw_hook": "ring",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        56.8677965
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 16,
+      "method": "ring_zfp_naive:16",
+      "value": 65.7774555,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_16gpus.5659411.out",
+          "line": 206,
+          "id": "922a39ff443b",
+          "raw_hook": "ring_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        65.7774555
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 16,
+      "method": "ring_zfp_online_coll:16",
+      "value": 62.9277075,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_16gpus.5659411.out",
+          "line": 309,
+          "id": "69d533eb2938",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        62.9277075
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 16,
+      "method": "ring_zfp_online_coll:8",
+      "value": 62.507004,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_16gpus.5659411.out",
+          "line": 413,
+          "id": "87d7ca05a9ae",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        62.507004
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 16,
+      "method": "recursive_doubling",
+      "value": 58.068562,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_16gpus.5659411.out",
+          "line": 517,
+          "id": "8b19f00ce648",
+          "raw_hook": "recursive_doubling",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        58.068562
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 16,
+      "method": "recursive_doubling_zfp_naive:16",
+      "value": 58.140231,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_16gpus.5659411.out",
+          "line": 619,
+          "id": "8ebb3c251179",
+          "raw_hook": "recursive_doubling_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        58.140231
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 16,
+      "method": "recursive_doubling_zfp_online_coll:16",
+      "value": 58.473175,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_16gpus.5659411.out",
+          "line": 722,
+          "id": "43c226a61088",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        58.473175
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 16,
+      "method": "recursive_doubling_zfp_online_coll:8",
+      "value": 57.278721,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_16gpus.5659411.out",
+          "line": 826,
+          "id": "53d79f0be578",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        57.278721
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 16,
+      "method": "direct_p",
+      "value": 57.3487965,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_16gpus.5659411.out",
+          "line": 1136,
+          "id": "983599bdbb6d",
+          "raw_hook": "direct_t16",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        57.3487965
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 16,
+      "method": "hierarchical_zfp_online_coll:8",
+      "value": 62.5763005,
+      "n_runs": 2,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_16gpus.5659411.out",
+          "line": 1250,
+          "id": "14ea7248478e",
+          "raw_hook": "hierarchical_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        },
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_16gpus.5659411.out",
+          "line": 1482,
+          "id": "0e1872dc73b1",
+          "raw_hook": "hierarchical_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        61.976119,
+        63.176482
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 16,
+      "method": "kring_k8",
+      "value": 56.5917665,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_16gpus.5659411.out",
+          "line": 1358,
+          "id": "e6fb8392e477",
+          "raw_hook": "kring_k8",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        56.5917665
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 32,
+      "method": "ring",
+      "value": 33.672299,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_32gpus.5712239.out",
+          "line": 110,
+          "id": "7069414fef7f",
+          "raw_hook": "ring",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        33.672299
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 32,
+      "method": "ring_zfp_naive:16",
+      "value": 53.155576999999994,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_32gpus.5712239.out",
+          "line": 212,
+          "id": "9f468ae01c81",
+          "raw_hook": "ring_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        53.155576999999994
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 32,
+      "method": "ring_zfp_online_coll:16",
+      "value": 47.12959,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_32gpus.5712239.out",
+          "line": 318,
+          "id": "02532125d101",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        47.12959
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 32,
+      "method": "ring_zfp_online_coll:8",
+      "value": 46.724219000000005,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_32gpus.5712239.out",
+          "line": 425,
+          "id": "81a29340533f",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        46.724219000000005
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 32,
+      "method": "recursive_doubling",
+      "value": 36.9876125,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_32gpus.5712239.out",
+          "line": 532,
+          "id": "9e6557375bf5",
+          "raw_hook": "recursive_doubling",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        36.9876125
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 32,
+      "method": "recursive_doubling_zfp_naive:16",
+      "value": 36.168436,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_32gpus.5712239.out",
+          "line": 637,
+          "id": "6a4ea520691e",
+          "raw_hook": "recursive_doubling_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        36.168436
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 32,
+      "method": "recursive_doubling_zfp_online_coll:16",
+      "value": 36.3199695,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_32gpus.5712239.out",
+          "line": 740,
+          "id": "b4cac0665350",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        36.3199695
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 32,
+      "method": "recursive_doubling_zfp_online_coll:8",
+      "value": 34.42018,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_32gpus.5712239.out",
+          "line": 844,
+          "id": "8b4b0b2b1353",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        34.42018
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 32,
+      "method": "hierarchical_zfp_online_coll:8",
+      "value": 40.882346,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_32gpus.5712239.out",
+          "line": 960,
+          "id": "8acf2e6581d6",
+          "raw_hook": "hierarchical_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        40.882346
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 32,
+      "method": "direct_p",
+      "value": 35.2411495,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_32gpus.5712239.out",
+          "line": 1380,
+          "id": "e5ab8157c97f",
+          "raw_hook": "direct_t32",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        35.2411495
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 32,
+      "method": "kring_k8",
+      "value": 33.104592,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_32gpus.5712239.out",
+          "line": 1496,
+          "id": "a265b553ebf6",
+          "raw_hook": "kring_k8",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        33.104592
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 64,
+      "method": "ring",
+      "value": 21.099451,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_64gpus.5676900.out",
+          "line": 112,
+          "id": "bbf3b2da21fd",
+          "raw_hook": "ring",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        21.099451
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 64,
+      "method": "ring_zfp_naive:16",
+      "value": 67.1221905,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_64gpus.5676900.out",
+          "line": 213,
+          "id": "9e2812238639",
+          "raw_hook": "ring_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        67.1221905
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 64,
+      "method": "ring_zfp_online_coll:16",
+      "value": 52.534934500000006,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_64gpus.5676900.out",
+          "line": 315,
+          "id": "df44179e5527",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        52.534934500000006
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 64,
+      "method": "ring_zfp_online_coll:8",
+      "value": 52.2928325,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_64gpus.5676900.out",
+          "line": 418,
+          "id": "6a7ee8123880",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        52.2928325
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 64,
+      "method": "recursive_doubling",
+      "value": 23.230379,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_64gpus.5676900.out",
+          "line": 521,
+          "id": "2c77d1538d0d",
+          "raw_hook": "recursive_doubling",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        23.230379
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 64,
+      "method": "recursive_doubling_zfp_naive:16",
+      "value": 23.028549500000004,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_64gpus.5676900.out",
+          "line": 622,
+          "id": "b828c85ebfce",
+          "raw_hook": "recursive_doubling_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        23.028549500000004
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 64,
+      "method": "recursive_doubling_zfp_online_coll:16",
+      "value": 23.855544000000002,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_64gpus.5676900.out",
+          "line": 724,
+          "id": "a1a1f9e10c9b",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        23.855544000000002
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 64,
+      "method": "recursive_doubling_zfp_online_coll:8",
+      "value": 21.5806405,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_64gpus.5676900.out",
+          "line": 827,
+          "id": "4d77a94d38c2",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        21.5806405
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 64,
+      "method": "direct_p",
+      "value": 22.022858,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_64gpus.5676900.out",
+          "line": 1341,
+          "id": "d8f7e070140d",
+          "raw_hook": "direct_t64",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        22.022858
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 64,
+      "method": "kring_k8",
+      "value": 20.240518,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_64gpus.5676900.out",
+          "line": 1443,
+          "id": "57c26032581f",
+          "raw_hook": "kring_k8",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        20.240518
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 MPI",
+      "x": 64,
+      "method": "hierarchical_zfp_online_coll:8",
+      "value": 32.283524,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_64gpus.5676900.out",
+          "line": 1564,
+          "id": "7809cf09d34d",
+          "raw_hook": "hierarchical_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        32.283524
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 16,
+      "method": "ring",
+      "value": 76.416725,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_16gpus.5719333.out",
+          "line": 110,
+          "id": "feeb8b103a19",
+          "raw_hook": "ring",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        76.416725
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 16,
+      "method": "ring_zfp_naive:16",
+      "value": 76.290783,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_16gpus.5719333.out",
+          "line": 214,
+          "id": "66fbcc108c1a",
+          "raw_hook": "ring_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        76.290783
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 16,
+      "method": "recursive_doubling",
+      "value": 88.5166195,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_16gpus.5719333.out",
+          "line": 319,
+          "id": "09ae00ff5955",
+          "raw_hook": "recursive_doubling",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        88.5166195
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 16,
+      "method": "recursive_doubling_zfp_naive:16",
+      "value": 99.344732,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_16gpus.5719333.out",
+          "line": 423,
+          "id": "b36e47cee306",
+          "raw_hook": "recursive_doubling_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        99.344732
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 16,
+      "method": "hierarchical_zfp_online_coll:8",
+      "value": 72.856676,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_16gpus.5719333.out",
+          "line": 528,
+          "id": "ee2ac3883d21",
+          "raw_hook": "hierarchical_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        72.856676
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 16,
+      "method": "hierarchical_zfp_online_coll:16",
+      "value": 78.39853400000001,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_16gpus.5719333.out",
+          "line": 634,
+          "id": "50fabd8c79c4",
+          "raw_hook": "hierarchical_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        78.39853400000001
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 16,
+      "method": "direct_p",
+      "value": 76.3544785,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_16gpus.5719333.out",
+          "line": 950,
+          "id": "8d5cadeb0659",
+          "raw_hook": "direct_t16",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        76.3544785
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 16,
+      "method": "kring_k8",
+      "value": 67.3324805,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_16gpus.5719333.out",
+          "line": 1055,
+          "id": "22f0d0d3ebf1",
+          "raw_hook": "kring_k8",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        67.3324805
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 32,
+      "method": "ring",
+      "value": 55.796017500000005,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_32gpus.5717963.out",
+          "line": 114,
+          "id": "e8f88d675f21",
+          "raw_hook": "ring",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        55.796017500000005
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 32,
+      "method": "ring_zfp_naive:16",
+      "value": 70.39596300000001,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_32gpus.5717963.out",
+          "line": 218,
+          "id": "8e52f0f1eb40",
+          "raw_hook": "ring_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        70.39596300000001
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 32,
+      "method": "recursive_doubling",
+      "value": 90.07871,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_32gpus.5717963.out",
+          "line": 323,
+          "id": "6c56c7b696da",
+          "raw_hook": "recursive_doubling",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        90.07871
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 32,
+      "method": "recursive_doubling_zfp_naive:16",
+      "value": 86.876949,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_32gpus.5717963.out",
+          "line": 427,
+          "id": "0fdc697af583",
+          "raw_hook": "recursive_doubling_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        86.876949
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 32,
+      "method": "hierarchical_zfp_online_coll:8",
+      "value": 55.906741499999995,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_32gpus.5717963.out",
+          "line": 532,
+          "id": "156040afe4a8",
+          "raw_hook": "hierarchical_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        55.906741499999995
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 32,
+      "method": "hierarchical_zfp_online_coll:16",
+      "value": 63.3582835,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_32gpus.5717963.out",
+          "line": 638,
+          "id": "0000ce864557",
+          "raw_hook": "hierarchical_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        63.3582835
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 32,
+      "method": "direct_p",
+      "value": 65.470668,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_32gpus.5717963.out",
+          "line": 1059,
+          "id": "8bbeef6c16cc",
+          "raw_hook": "direct_t32",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        65.470668
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 32,
+      "method": "kring_k8",
+      "value": 46.560302,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_32gpus.5717963.out",
+          "line": 1164,
+          "id": "5e35093e4861",
+          "raw_hook": "kring_k8",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        46.560302
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 64,
+      "method": "ring",
+      "value": 49.4030145,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_64gpus.5762402.out",
+          "line": 122,
+          "id": "8f7d0f776150",
+          "raw_hook": "ring",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        49.4030145
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 64,
+      "method": "ring_zfp_naive:16",
+      "value": 85.319155,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_64gpus.5762402.out",
+          "line": 226,
+          "id": "a2ace5d39b20",
+          "raw_hook": "ring_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        85.319155
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 64,
+      "method": "recursive_doubling",
+      "value": 123.02159850000001,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_64gpus.5762402.out",
+          "line": 331,
+          "id": "473df737497c",
+          "raw_hook": "recursive_doubling",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        123.02159850000001
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 64,
+      "method": "recursive_doubling_zfp_naive:16",
+      "value": 93.7672455,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_64gpus.5762402.out",
+          "line": 435,
+          "id": "6deed8cedde6",
+          "raw_hook": "recursive_doubling_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        93.7672455
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 64,
+      "method": "hierarchical_zfp_online_coll:8",
+      "value": 50.077585,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_64gpus.5762402.out",
+          "line": 540,
+          "id": "de031c841f8a",
+          "raw_hook": "hierarchical_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        50.077585
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 64,
+      "method": "hierarchical_zfp_online_coll:16",
+      "value": 57.7081505,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_64gpus.5762402.out",
+          "line": 646,
+          "id": "4845cde54cda",
+          "raw_hook": "hierarchical_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        57.7081505
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 64,
+      "method": "direct_p",
+      "value": 58.460359499999996,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_64gpus.5762402.out",
+          "line": 1172,
+          "id": "2752960fe5b9",
+          "raw_hook": "direct_t64",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        58.460359499999996
+      ]
+    },
+    {
+      "panel": "Frontier \u00b7 RCCL",
+      "x": 64,
+      "method": "kring_k8",
+      "value": 40.6961685,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_64gpus.5762402.out",
+          "line": 1277,
+          "id": "c0f837e7ade0",
+          "raw_hook": "kring_k8",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        40.6961685
+      ]
+    }
+  ],
+  "omitted": [
+    {
+      "id": "e0c3045f658c",
+      "method": "none",
+      "ranks": 16,
+      "reason": "metric not recorded (not zero)",
+      "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_16gpus.5659411.out"
+    },
+    {
+      "id": "6ab8c5582e75",
+      "method": "none",
+      "ranks": 32,
+      "reason": "metric not recorded (not zero)",
+      "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_32gpus.5712239.out"
+    },
+    {
+      "id": "c9686fcdc5b9",
+      "method": "none",
+      "ranks": 64,
+      "reason": "metric not recorded (not zero)",
+      "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier/gpt/strongScaling/ddp_gpt_frontier_64gpus.5676900.out"
+    },
+    {
+      "id": "4293e09cfb13",
+      "method": "none",
+      "ranks": 16,
+      "reason": "metric not recorded (not zero)",
+      "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_16gpus.5719333.out"
+    },
+    {
+      "id": "3acaaa808d8b",
+      "method": "none",
+      "ranks": 32,
+      "reason": "metric not recorded (not zero)",
+      "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_32gpus.5717963.out"
+    },
+    {
+      "id": "0324533f5b15",
+      "method": "none",
+      "ranks": 64,
+      "reason": "metric not recorded (not zero)",
+      "source": "/autofs/nccs-svm1_home1/matilderestelli/ddp-allreduce-eval-framework/experiments_frontier_rccl/gpt/strongScaling/ddp_gpt_frontier_rccl_64gpus.5762402.out"
+    }
+  ],
+  "contrast": [
+    {
+      "method": "ring",
+      "color": "#145C32",
+      "hatch": "",
+      "white_hatch_vs_fill": 8.056284051928243,
+      "line_vs_white": 8.056284051928243,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring_zfp_naive:16",
+      "color": "#2E7846",
+      "hatch": "///",
+      "white_hatch_vs_fill": 5.396798226877005,
+      "line_vs_white": 5.396798226877005,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring_zfp_online_coll:16",
+      "color": "#478B57",
+      "hatch": "\\\\",
+      "white_hatch_vs_fill": 4.118785697075467,
+      "line_vs_white": 4.118785697075467,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring_zfp_online_coll:8",
+      "color": "#61966F",
+      "hatch": "xx",
+      "white_hatch_vs_fill": 3.4424223974973254,
+      "line_vs_white": 3.4424223974973254,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling",
+      "color": "#174F87",
+      "hatch": "..",
+      "white_hatch_vs_fill": 8.384309628216378,
+      "line_vs_white": 8.384309628216378,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling_zfp_naive:16",
+      "color": "#2E6C9E",
+      "hatch": "oo",
+      "white_hatch_vs_fill": 5.592665861106608,
+      "line_vs_white": 5.592665861106608,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling_zfp_online_coll:16",
+      "color": "#4784AD",
+      "hatch": "++",
+      "white_hatch_vs_fill": 4.060442359416939,
+      "line_vs_white": 4.060442359416939,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling_zfp_online_coll:8",
+      "color": "#5C92B6",
+      "hatch": "--",
+      "white_hatch_vs_fill": 3.364254690390986,
+      "line_vs_white": 3.364254690390986,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "hierarchical_zfp_online_coll:16",
+      "color": "#68408C",
+      "hatch": "*",
+      "white_hatch_vs_fill": 7.775878421056213,
+      "line_vs_white": 7.775878421056213,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "hierarchical_zfp_online_coll:8",
+      "color": "#9770AD",
+      "hatch": "||",
+      "white_hatch_vs_fill": 4.009962969714528,
+      "line_vs_white": 4.009962969714528,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "direct_p",
+      "color": "#99530B",
+      "hatch": "OO",
+      "white_hatch_vs_fill": 5.838854445101804,
+      "line_vs_white": 5.838854445101804,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "kring_k8",
+      "color": "#75433E",
+      "hatch": "--/",
+      "white_hatch_vs_fill": 7.988424907380542,
+      "line_vs_white": 7.988424907380542,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    }
+  ],
+  "notes": [
+    "Hook work is cumulative and can overlap; do not stack it as disjoint wall time.",
+    "Tail is the measured exposed tail, not the entire communication cost.",
+    "Duplicate aliases and genuinely repeated measurements retain source provenance.",
+    "Figure design checks do not certify the final thesis PDF/EPUB."
+  ]
+}
