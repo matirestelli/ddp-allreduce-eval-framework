@@ -80,14 +80,12 @@ be interpreted as a literal `BACKEND=rccl` setting in this checkout.
 
 ## Future Work coming very soon
 
-<details>
-<summary><strong>Explore upcoming models, communication hooks, and experiments</strong></summary>
+Explore upcoming models, communication hooks, and experiments</strong></summary>
 
 - **Larger models and new model families:** GPT-2 training with NanoGPT.
 - **More AllReduce hooks:** Direct Sendrecv, generalized k-ring, and hierarchical ZFP-compressed AllReduce for MPI and NCCL/RCCL.
 - **Understanding the built-in MPI baseline:** experiments with instrumented open-source MPICH to track which AllReduce algorithms execute when PyTorch DDP uses the MPI backend, across message sizes and process counts.
 
-</details>
 
 ## Quick Start
 
