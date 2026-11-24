@@ -1,0 +1,237 @@
+[
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_16gpus_8b_32b.5096607.out",
+    "line": 1935,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_16gpus_8b_32b.5096607.out",
+    "line": 3901,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_16gpus_8b_32b.5096607.out",
+    "line": 6302,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_16gpus_8b_32b.5096607.out",
+    "line": 8089,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_16gpus_8b_32b.5096607.out",
+    "line": 8708,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_16gpus_8b_32b.5096607.out",
+    "line": 9368,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_16gpus_8b_32b.5096607.out",
+    "line": 10029,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_16gpus_8b_32b.5096607.out",
+    "line": 10630,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_32gpus_4b_16b.5105464.out",
+    "line": 3152,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_32gpus_4b_16b.5105464.out",
+    "line": 6348,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_32gpus_4b_16b.5105464.out",
+    "line": 10380,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_32gpus_4b_16b.5105464.out",
+    "line": 13396,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_32gpus_4b_16b.5105464.out",
+    "line": 14432,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_32gpus_4b_16b.5105464.out",
+    "line": 15508,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_32gpus_4b_16b.5105464.out",
+    "line": 16585,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/strongScaling/ddp_train_frontier_rccl_32gpus_4b_16b.5105464.out",
+    "line": 17602,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_16gpus_8b_32b_128b.5110292.out",
+    "line": 1834,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_16gpus_8b_32b_128b.5110292.out",
+    "line": 2459,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_16gpus_8b_32b_128b.5110292.out",
+    "line": 4318,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_16gpus_8b_32b_128b.5110292.out",
+    "line": 4943,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_16gpus_8b_32b_128b.5110292.out",
+    "line": 7238,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_16gpus_8b_32b_128b.5110292.out",
+    "line": 7814,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_16gpus_8b_32b_128b.5110292.out",
+    "line": 9527,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_16gpus_8b_32b_128b.5110292.out",
+    "line": 10102,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_16gpus_8b_32b_128b.5110292.out",
+    "line": 12309,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_16gpus_8b_32b_128b.5110292.out",
+    "line": 12879,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_16gpus_8b_32b_128b.5110292.out",
+    "line": 14556,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_16gpus_8b_32b_128b.5110292.out",
+    "line": 15126,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_32gpus_8b_32b_128b.5110295.out",
+    "line": 3113,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_32gpus_8b_32b_128b.5110295.out",
+    "line": 4177,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_32gpus_8b_32b_128b.5110295.out",
+    "line": 7338,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_32gpus_8b_32b_128b.5110295.out",
+    "line": 8403,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_32gpus_8b_32b_128b.5110295.out",
+    "line": 12427,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_32gpus_8b_32b_128b.5110295.out",
+    "line": 13454,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_32gpus_8b_32b_128b.5110295.out",
+    "line": 16485,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_32gpus_8b_32b_128b.5110295.out",
+    "line": 17503,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_32gpus_8b_32b_128b.5110295.out",
+    "line": 21487,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_32gpus_8b_32b_128b.5110295.out",
+    "line": 22506,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_32gpus_8b_32b_128b.5110295.out",
+    "line": 25534,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet/cifar10/weakScaling/ddp_train_frontier_rccl_32gpus_8b_32b_128b.5110295.out",
+    "line": 26554,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet224/strongScaling/ddp_train_frontier_rccl_16gpus_8b.5634114.out",
+    "line": 3426,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet224/strongScaling/ddp_train_frontier_rccl_16gpus_8b.5634114.out",
+    "line": 4307,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet224/strongScaling/ddp_train_frontier_rccl_16gpus_8b.5634114.out",
+    "line": 6938,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet224/strongScaling/ddp_train_frontier_rccl_16gpus_8b.5634114.out",
+    "line": 7820,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet224/strongScaling/ddp_train_frontier_rccl_32gpus_4b.5637871.out",
+    "line": 5040,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet224/strongScaling/ddp_train_frontier_rccl_32gpus_4b.5637871.out",
+    "line": 6338,
+    "warning": "multiple internal hook labels in one block; inspect source"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_frontier_rccl/wideresnet224/strongScaling/ddp_train_frontier_rccl_32gpus_4b.5637871.out",
+    "line": 8895,
+    "warning": "incomplete: 12/20 epochs; done=False; status=not logged"
+  }
+]

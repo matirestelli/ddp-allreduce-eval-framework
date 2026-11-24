@@ -1,0 +1,316 @@
+{
+  "tail_context": false,
+  "training_context_basis": null,
+  "title": "WideResNet 32\u00d732 \u00b7 weak scaling \u00b7 local batch 32",
+  "metric": "time",
+  "unit": "auto",
+  "layout": "hbar",
+  "width_inches": 9,
+  "height_inches": 6.4799999999999995,
+  "min_font_pt": 11,
+  "mode": "weak",
+  "x": "ranks",
+  "normalize": "absolute",
+  "repeats": "median",
+  "points": [
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "none",
+      "value": 120.86500000000001,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/weakScaling/logs/wide_resnet50_2_5_nccl_builtin_ws8_bs32_gb256.log",
+          "line": 1,
+          "id": "17ad9e30fbf1",
+          "raw_hook": "none",
+          "epochs": 5,
+          "observed_epochs": 5,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        120.86500000000001
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "ring",
+      "value": 167.095,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/weakScaling/logs/wide_resnet50_2_5_nccl_ring_ws8_bs32_gb256.log",
+          "line": 1,
+          "id": "3540e3e685b4",
+          "raw_hook": "ring",
+          "epochs": 5,
+          "observed_epochs": 5,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        167.095
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "ring_zfp_naive:16",
+      "value": 132.015,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/weakScaling/logs/wide_resnet50_2_5_nccl_ring_zfp_naive_rate16_ws8_bs32_gb256.log",
+          "line": 1,
+          "id": "5cab4db116f6",
+          "raw_hook": "ring_zfp_naive",
+          "epochs": 5,
+          "observed_epochs": 5,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        132.015
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "hierarchical_zfp_online_coll:16",
+      "value": 134.875,
+      "n_runs": 2,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/weakScaling/logs/wide_resnet50_2_5_nccl_ring_zfp_online_coll_rate16_ws8_bs32_gb256.log",
+          "line": 1,
+          "id": "4001b9ab1068",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 5,
+          "observed_epochs": 5,
+          "complete": true,
+          "warnings": [
+            "multiple internal hook labels in one block; inspect source"
+          ],
+          "native_fallback": false
+        },
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/weakScaling/logs/wide_resnet50_2_5_nccl_recursive_doubling_zfp_online_coll_rate16_ws8_bs32_gb256.log",
+          "line": 1,
+          "id": "869396d5424a",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 5,
+          "observed_epochs": 5,
+          "complete": true,
+          "warnings": [
+            "multiple internal hook labels in one block; inspect source"
+          ],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        134.84,
+        134.91000000000003
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "hierarchical_zfp_online_coll:10",
+      "value": 103.0,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/weakScaling/logs/wide_resnet50_2_5_nccl_ring_zfp_online_coll_rate10_ws8_bs32_gb256.log",
+          "line": 1,
+          "id": "9256126bd00c",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 5,
+          "observed_epochs": 5,
+          "complete": true,
+          "warnings": [
+            "multiple internal hook labels in one block; inspect source"
+          ],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        103.0
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "hierarchical_zfp_online_coll:8",
+      "value": 93.84,
+      "n_runs": 2,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/weakScaling/logs/wide_resnet50_2_5_nccl_ring_zfp_online_coll_rate8_ws8_bs32_gb256.log",
+          "line": 1,
+          "id": "8b751f72b50c",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 5,
+          "observed_epochs": 5,
+          "complete": true,
+          "warnings": [
+            "multiple internal hook labels in one block; inspect source"
+          ],
+          "native_fallback": false
+        },
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/weakScaling/logs/wide_resnet50_2_5_nccl_recursive_doubling_zfp_online_coll_rate8_ws8_bs32_gb256.log",
+          "line": 1,
+          "id": "2e1ab0d742d6",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 5,
+          "observed_epochs": 5,
+          "complete": true,
+          "warnings": [
+            "multiple internal hook labels in one block; inspect source"
+          ],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        93.625,
+        94.055
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "recursive_doubling",
+      "value": 246.965,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/weakScaling/logs/wide_resnet50_2_5_nccl_recursive_doubling_ws8_bs32_gb256.log",
+          "line": 1,
+          "id": "ca9f8c38ecd8",
+          "raw_hook": "recursive_doubling",
+          "epochs": 5,
+          "observed_epochs": 5,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        246.965
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "recursive_doubling_zfp_naive:16",
+      "value": 174.365,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/weakScaling/logs/wide_resnet50_2_5_nccl_recursive_doubling_zfp_naive_rate16_ws8_bs32_gb256.log",
+          "line": 1,
+          "id": "d55499a7587f",
+          "raw_hook": "recursive_doubling_zfp_naive",
+          "epochs": 5,
+          "observed_epochs": 5,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        174.365
+      ]
+    }
+  ],
+  "omitted": [],
+  "contrast": [
+    {
+      "method": "none",
+      "color": "#575757",
+      "hatch": "",
+      "white_hatch_vs_fill": 7.226056749490168,
+      "line_vs_white": 7.226056749490168,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring",
+      "color": "#145C32",
+      "hatch": "",
+      "white_hatch_vs_fill": 8.056284051928243,
+      "line_vs_white": 8.056284051928243,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring_zfp_naive:16",
+      "color": "#2E7846",
+      "hatch": "///",
+      "white_hatch_vs_fill": 5.396798226877005,
+      "line_vs_white": 5.396798226877005,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling",
+      "color": "#174F87",
+      "hatch": "..",
+      "white_hatch_vs_fill": 8.384309628216378,
+      "line_vs_white": 8.384309628216378,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling_zfp_naive:16",
+      "color": "#2E6C9E",
+      "hatch": "oo",
+      "white_hatch_vs_fill": 5.592665861106606,
+      "line_vs_white": 5.592665861106606,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "hierarchical_zfp_online_coll:16",
+      "color": "#68408C",
+      "hatch": "*",
+      "white_hatch_vs_fill": 7.775878421056213,
+      "line_vs_white": 7.775878421056213,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "hierarchical_zfp_online_coll:10",
+      "color": "#9770AD",
+      "hatch": "//..",
+      "white_hatch_vs_fill": 4.009962969714528,
+      "line_vs_white": 4.009962969714528,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "hierarchical_zfp_online_coll:8",
+      "color": "#9770AD",
+      "hatch": "||",
+      "white_hatch_vs_fill": 4.009962969714528,
+      "line_vs_white": 4.009962969714528,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    }
+  ],
+  "notes": [
+    "Hook work is cumulative and can overlap; do not stack it as disjoint wall time.",
+    "Tail is the measured exposed tail, not the entire communication cost.",
+    "Duplicate aliases and genuinely repeated measurements retain source provenance.",
+    "Figure design checks do not certify the final thesis PDF/EPUB."
+  ]
+}

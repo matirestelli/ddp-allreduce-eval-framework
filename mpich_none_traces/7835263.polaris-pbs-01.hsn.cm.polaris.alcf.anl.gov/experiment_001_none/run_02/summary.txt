@@ -1,0 +1,18 @@
+repeat=2 status=0 seed=42 trace_records=233165
+
+Function fields (counts are trace records, not MPI calls):
+  62080 function=MPID_Allreduce
+  62080 function=MPIDI_Allreduce_allcomm_composition_json
+  62080 function=MPIR_Allreduce
+  23472 function=MPIR_Allreduce_allcomm_auto
+  15648 function=MPIR_Allreduce_impl
+     80 function=MPIR_Allreduce_intra_recursive_doubling
+   7760 function=MPIR_Allreduce_intra_reduce_scatter_allgather
+
+Dispatch path fields (counts are trace records):
+  31040 path=MPID_Allreduce
+  31040 path=MPIDI_Allreduce_allcomm_composition_json
+  31040 path=MPIDI_Allreduce_intra_composition_alpha
+   7824 path=MPIR_Allreduce_allcomm_auto
+     64 path=MPIR_Allreduce_intra_recursive_doubling
+   7760 path=MPIR_Allreduce_intra_reduce_scatter_allgather

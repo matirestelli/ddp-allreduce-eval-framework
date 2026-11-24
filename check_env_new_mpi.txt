@@ -1,0 +1,400 @@
+mrest@polaris-login-02:~/mpiAllReduceCompressed> clear
+mrest@polaris-login-02:~/mpiAllReduceCompressed> source envScript3.sh 
+[INFO] conda module: conda/2025-09-28
+[INFO] CUDA 12.9 libs: /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/12.9/targets/x86_64-linux/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/12.9/extras/CUPTI/lib64:/opt/nvidia/hpc_sdk/Linux_x86_64/25.9/math_libs/12.9/targets/x86_64-linux/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/25.9/math_libs/12.9/lib64
+[INFO] CUDA 13.0 runtime (for GTL): /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/13.0/targets/x86_64-linux/lib
+[INFO] MPI_HOME: /opt/cray/pe/mpich/default/ofi/gnu/12.3 -> /opt/cray/pe/mpich/9.1.0/ofi/gnu/12.3
+[INFO] GTL and PyTorch dependencies all resolve.
+[INFO] GTL_LIB=/opt/cray/pe/mpich/default/ofi/gnu/12.3/lib/libmpi_gtl_cuda.so.0 (preloaded only in MPI ranks via gpu_wrapper.sh)
+=============================================
+  Polaris DDP + Eagle PyTorch + Cray MPICH
+=============================================
+Node              : polaris-login-02
+conda module      : conda/2025-09-28
+ZFP_HOME          : /home/mrest/mpiAllReduceCompressed/zfp-install
+MPI_HOME          : /opt/cray/pe/mpich/default/ofi/gnu/12.3
+GTL_LIB           : /opt/cray/pe/mpich/default/ofi/gnu/12.3/lib/libmpi_gtl_cuda.so.0
+
+Python            : /soft/applications/conda/2025-09-28/mconda3/bin/python
+PyTorch version   : 2.8.0a0+gitba56102
+PyTorch location  : /lus/eagle/projects/UIC-HPC/mrest/pytorch_mpi_build/src/pytorch/torch/__init__.py
+CUDA available    : False 0
+CUDA built with   : 12.9
+MPI available     : True
+mpi4py            : MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1)
+=============================================
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> export TORCH_SRC=/lus/eagle/projects/UIC-HPC/mrest/pytorch_mpi_build/src/pytorch
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> module list
+
+Currently Loaded Modules:
+  1) gcc-native/14        5) cray-libsci/26.03.0   9) craype-x86-milan                     13) cuda/12.9                    17) cudnn/9.13.0
+  2) craype/2.7.36        6) cray-pals/1.8.0      10) darshan/3.5.0                        14) cray-mpich/9.1.0             18) conda/2025-09-28
+  3) libfabric/2.3.1      7) cray-libpals/1.8.0   11) xalt/3.2.1-1-g67d304d4-202511121555  15) craype-accel-nvidia80
+  4) craype-network-ofi   8) cray-pmi/6.1.17      12) PrgEnv-gnu/8.7.0                     16) cray-hdf5-parallel/1.14.3.9
+
+ 
+
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> command -v python mpiexec gcc g++ nvcc
+/soft/applications/conda/2025-09-28/mconda3/bin/python
+/opt/cray/pals/1.8/bin/mpiexec
+/opt/cray/pe/gcc-native/14/bin/gcc
+/opt/cray/pe/gcc-native/14/bin/g++
+/soft/compilers/cudatoolkit/cuda-12.9.1/bin/nvcc
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> readlink -f "$(command -v mpiexec)"
+/opt/cray/pals/1.8/bin/mpiexec
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> printf 'CRAY_PMI_PREFIX=%s\n' "${CRAY_PMI_PREFIX:-unset}"
+CRAY_PMI_PREFIX=/opt/cray/pe/pmi/6.1.17
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> printf 'CUDA_HOME=%s\n' "${CUDA_HOME:-unset}"
+CUDA_HOME=/soft/compilers/cudatoolkit/cuda-12.9.1/
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> readelf -d "$TORCH_SRC/torch/lib/libtorch_cpu.so" \
+>            "$TORCH_SRC/torch/lib/libtorch_cuda.so" \
+>     | grep -E 'NEEDED|RPATH|RUNPATH'
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgomp.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcupti.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc10.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcudart.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcuda.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libdarshan.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libz.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libmpi_gnu_123.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libmpi_gtl_cuda.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+ 0x000000000000000f (RPATH)              Library rpath: [$ORIGIN:/soft/perftools/darshan/darshan-3.4.4/lib]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc10_cuda.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcudart.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcusparse.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcufft.so.11]
+ 0x0000000000000001 (NEEDED)             Shared library: [libnccl.so.2]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcurand.so.10]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcublas.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcublasLt.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcudnn.so.9]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc10.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libtorch_cpu.so]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcuda.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libdarshan.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libz.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libmpi_gtl_cuda.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+ 0x000000000000000f (RPATH)              Library rpath: [$ORIGIN:/opt/nvidia/hpc_sdk/Linux_x86_64/25.5/math_libs/12.9/lib64:/soft/libraries/nccl/nccl_2.28.3-1+cuda12.9_x86_64/lib:/soft/libraries/cudnn/cudnn-cuda12-linux-x64-v9.5.1.17/lib:/soft/perftools/darshan/darshan-3.4.4/lib]
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> ldd "$TORCH_SRC/torch/lib/libtorch_cpu.so"
+        linux-vdso.so.1 (0x00007ffe3283b000)
+        /soft/xalt/3.2.1-1-g67d304d4-202511121555/lib64/libxalt_init.so (0x00007f6a76f8e000)
+        libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007f6a76f4e000)
+        libm.so.6 => /lib64/libm.so.6 (0x00007f6a76e64000)
+        libgomp.so.1 => /usr/lib64/libgomp.so.1 (0x00007f6a76e0c000)
+        libcupti.so.12 => /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/12.9/extras/CUPTI/lib64/libcupti.so.12 (0x00007f6a7669d000)
+        libc10.so => /lus/eagle/projects/UIC-HPC/mrest/pytorch_mpi_build/src/pytorch/torch/lib/libc10.so (0x00007f6a76599000)
+        libcudart.so.12 => /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/12.9/targets/x86_64-linux/lib/libcudart.so.12 (0x00007f6a76200000)
+        libcuda.so.1 => /usr/lib64/libcuda.so.1 (0x00007f6a705fd000)
+        libdarshan.so.0 => /soft/perftools/darshan/darshan-3.4.4/lib/libdarshan.so.0 (0x00007f6a7653d000)
+        libz.so.1 => /usr/lib64/libz.so.1 (0x00007f6a76524000)
+        libmpi_gnu_123.so.12 => /home/mrest/.cache/mpich_compat/libmpi_gnu_123.so.12 (0x00007f6a6df1c000)
+        libmpi_gtl_cuda.so.0 => /opt/cray/pe/mpich/default/ofi/gnu/12.3/lib/libmpi_gtl_cuda.so.0 (0x00007f6a764cc000)
+        libstdc++.so.6 => /usr/lib64/libstdc++.so.6 (0x00007f6a6dcb6000)
+        libc.so.6 => /lib64/libc.so.6 (0x00007f6a6daa2000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007f6a83db4000)
+        libdl.so.2 => /lib64/libdl.so.2 (0x00007f6a764c9000)
+        libpthread.so.0 => /lib64/libpthread.so.0 (0x00007f6a764c6000)
+        librt.so.1 => /lib64/librt.so.1 (0x00007f6a764c3000)
+        libutil.so.1 => /lib64/libutil.so.1 (0x00007f6a764be000)
+        libfabric.so.1 => /opt/cray/libfabric/2.3.1/lib64/libfabric.so.1 (0x00007f6a6d946000)
+        libatomic.so.1 => /usr/lib64/libatomic.so.1 (0x00007f6a6d93c000)
+        libpmi.so.0 => /opt/cray/pe/lib64/libpmi.so.0 (0x00007f6a6d919000)
+        libpmi2.so.0 => /opt/cray/pe/lib64/libpmi2.so.0 (0x00007f6a6d8f6000)
+        libcudart.so.13 => /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/13.0/targets/x86_64-linux/lib/libcudart.so.13 (0x00007f6a6d600000)
+        libcxi.so.1 => /usr/lib64/libcxi.so.1 (0x00007f6a6d8d5000)
+        libcurl.so.4 => /usr/lib64/libcurl.so.4 (0x00007f6a6d522000)
+        libjson-c.so.5 => /usr/lib64/libjson-c.so.5 (0x00007f6a6d8bf000)
+        libpals.so.0 => /opt/cray/pals/1.8/lib/libpals.so.0 (0x00007f6a6d8b6000)
+        libnl-3.so.200 => /usr/lib64/libnl-3.so.200 (0x00007f6a6d4ff000)
+        libnghttp2.so.14 => /usr/lib64/libnghttp2.so.14 (0x00007f6a6d4cf000)
+        libidn2.so.0 => /usr/lib64/libidn2.so.0 (0x00007f6a6d200000)
+        libssh.so.4 => /usr/lib64/libssh.so.4 (0x00007f6a6d460000)
+        libpsl.so.5 => /usr/lib64/libpsl.so.5 (0x00007f6a6ce00000)
+        libssl.so.3 => /usr/lib64/libssl.so.3 (0x00007f6a6d0fa000)
+        libcrypto.so.3 => /usr/lib64/libcrypto.so.3 (0x00007f6a6c857000)
+        libgssapi_krb5.so.2 => /usr/lib64/libgssapi_krb5.so.2 (0x00007f6a6d0a8000)
+        libldap_r-2.4.so.2 => /usr/lib64/libldap_r-2.4.so.2 (0x00007f6a6d053000)
+        liblber-2.4.so.2 => /usr/lib64/liblber-2.4.so.2 (0x00007f6a6d450000)
+        libzstd.so.1 => /usr/lib64/libzstd.so.1 (0x00007f6a6c790000)
+        libbrotlidec.so.1 => /usr/lib64/libbrotlidec.so.1 (0x00007f6a6d443000)
+        libunistring.so.2 => /usr/lib64/libunistring.so.2 (0x00007f6a6c400000)
+        libjitterentropy.so.3 => /usr/lib64/libjitterentropy.so.3 (0x00007f6a6d43b000)
+        libkrb5.so.3 => /usr/lib64/libkrb5.so.3 (0x00007f6a6c326000)
+        libk5crypto.so.3 => /usr/lib64/libk5crypto.so.3 (0x00007f6a6d424000)
+        libcom_err.so.2 => /lib64/libcom_err.so.2 (0x00007f6a6d8af000)
+        libkrb5support.so.0 => /usr/lib64/libkrb5support.so.0 (0x00007f6a6d044000)
+        libsasl2.so.3 => /usr/lib64/libsasl2.so.3 (0x00007f6a6d026000)
+        libbrotlicommon.so.1 => /usr/lib64/libbrotlicommon.so.1 (0x00007f6a6c304000)
+        libkeyutils.so.1 => /usr/lib64/libkeyutils.so.1 (0x00007f6a6c000000)
+        libresolv.so.2 => /lib64/libresolv.so.2 (0x00007f6a6d014000)
+        libselinux.so.1 => /usr/lib64/libselinux.so.1 (0x00007f6a6c2d7000)
+        libpcre2-8.so.0 => /usr/lib64/libpcre2-8.so.0 (0x00007f6a6c21b000)
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> ldd "$TORCH_SRC/torch/lib/libtorch_cuda.so"
+        linux-vdso.so.1 (0x00007ffcf71c8000)
+        /soft/xalt/3.2.1-1-g67d304d4-202511121555/lib64/libxalt_init.so (0x00007f630f9ba000)
+        libc10_cuda.so => /lus/eagle/projects/UIC-HPC/mrest/pytorch_mpi_build/src/pytorch/torch/lib/libc10_cuda.so (0x00007f630f91a000)
+        libcudart.so.12 => /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/12.9/targets/x86_64-linux/lib/libcudart.so.12 (0x00007f630f600000)
+        libcusparse.so.12 => /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/math_libs/12.9/targets/x86_64-linux/lib/libcusparse.so.12 (0x00007f62f2400000)
+        libcufft.so.11 => /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/math_libs/12.9/targets/x86_64-linux/lib/libcufft.so.11 (0x00007f62e0600000)
+        libnccl.so.2 => /soft/libraries/nccl/nccl_2.28.3-1+cuda12.9_x86_64/lib/libnccl.so.2 (0x00007f62c9c00000)
+        libcurand.so.10 => /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/math_libs/12.9/targets/x86_64-linux/lib/libcurand.so.10 (0x00007f62bf400000)
+        libcublas.so.12 => /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/math_libs/12.9/targets/x86_64-linux/lib/libcublas.so.12 (0x00007f62b8c00000)
+        libcublasLt.so.12 => /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/math_libs/12.9/targets/x86_64-linux/lib/libcublasLt.so.12 (0x00007f6286800000)
+        libcudnn.so.9 => /soft/libraries/cudnn/cudnn-cuda12-linux-x64-v9.5.1.17/lib/libcudnn.so.9 (0x00007f6286400000)
+        libc10.so => /lus/eagle/projects/UIC-HPC/mrest/pytorch_mpi_build/src/pytorch/torch/lib/libc10.so (0x00007f630f4fe000)
+        libtorch_cpu.so => /lus/eagle/projects/UIC-HPC/mrest/pytorch_mpi_build/src/pytorch/torch/lib/libtorch_cpu.so (0x00007f6279609000)
+        libcuda.so.1 => /usr/lib64/libcuda.so.1 (0x00007f6273a06000)
+        libdarshan.so.0 => /soft/perftools/darshan/darshan-3.4.4/lib/libdarshan.so.0 (0x00007f62f23a4000)
+        libz.so.1 => /usr/lib64/libz.so.1 (0x00007f630f8ea000)
+        libmpi_gtl_cuda.so.0 => /opt/cray/pe/mpich/default/ofi/gnu/12.3/lib/libmpi_gtl_cuda.so.0 (0x00007f62f234e000)
+        libm.so.6 => /lib64/libm.so.6 (0x00007f62f2264000)
+        libstdc++.so.6 => /usr/lib64/libstdc++.so.6 (0x00007f62737a0000)
+        libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007f630f8bb000)
+        libc.so.6 => /lib64/libc.so.6 (0x00007f627358c000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007f63192d5000)
+        libdl.so.2 => /lib64/libdl.so.2 (0x00007f630f8b8000)
+        libpthread.so.0 => /lib64/libpthread.so.0 (0x00007f630f4fb000)
+        librt.so.1 => /lib64/librt.so.1 (0x00007f62f2261000)
+        libnvJitLink.so.12 => /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/12.9/targets/x86_64-linux/lib/libnvJitLink.so.12 (0x00007f626d906000)
+        libgomp.so.1 => /usr/lib64/libgomp.so.1 (0x00007f62e05a8000)
+        libcupti.so.12 => /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/12.9/extras/CUPTI/lib64/libcupti.so.12 (0x00007f626d197000)
+        libmpi_gnu_123.so.12 => /home/mrest/.cache/mpich_compat/libmpi_gnu_123.so.12 (0x00007f626aab6000)
+        libcudart.so.13 => /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/13.0/targets/x86_64-linux/lib/libcudart.so.13 (0x00007f626a800000)
+        libutil.so.1 => /lib64/libutil.so.1 (0x00007f62f225c000)
+        libfabric.so.1 => /opt/cray/libfabric/2.3.1/lib64/libfabric.so.1 (0x00007f62bf2a4000)
+        libatomic.so.1 => /usr/lib64/libatomic.so.1 (0x00007f62f2252000)
+        libpmi.so.0 => /opt/cray/pe/lib64/libpmi.so.0 (0x00007f62f222f000)
+        libpmi2.so.0 => /opt/cray/pe/lib64/libpmi2.so.0 (0x00007f62e0585000)
+        libcxi.so.1 => /usr/lib64/libcxi.so.1 (0x00007f62e0564000)
+        libcurl.so.4 => /usr/lib64/libcurl.so.4 (0x00007f62b8b22000)
+        libjson-c.so.5 => /usr/lib64/libjson-c.so.5 (0x00007f62e054e000)
+        libpals.so.0 => /opt/cray/pals/1.8/lib/libpals.so.0 (0x00007f62e0545000)
+        libnl-3.so.200 => /usr/lib64/libnl-3.so.200 (0x00007f62c9bdd000)
+        libnghttp2.so.14 => /usr/lib64/libnghttp2.so.14 (0x00007f62c9bad000)
+        libidn2.so.0 => /usr/lib64/libidn2.so.0 (0x00007f626a400000)
+        libssh.so.4 => /usr/lib64/libssh.so.4 (0x00007f62b8ab3000)
+        libpsl.so.5 => /usr/lib64/libpsl.so.5 (0x00007f626a000000)
+        libssl.so.3 => /usr/lib64/libssl.so.3 (0x00007f62866fa000)
+        libcrypto.so.3 => /usr/lib64/libcrypto.so.3 (0x00007f6269a57000)
+        libgssapi_krb5.so.2 => /usr/lib64/libgssapi_krb5.so.2 (0x00007f62bf252000)
+        libldap_r-2.4.so.2 => /usr/lib64/libldap_r-2.4.so.2 (0x00007f62866a5000)
+        liblber-2.4.so.2 => /usr/lib64/liblber-2.4.so.2 (0x00007f62c9b9d000)
+        libzstd.so.1 => /usr/lib64/libzstd.so.1 (0x00007f626a739000)
+        libbrotlidec.so.1 => /usr/lib64/libbrotlidec.so.1 (0x00007f62c9b90000)
+        libunistring.so.2 => /usr/lib64/libunistring.so.2 (0x00007f6269600000)
+        libjitterentropy.so.3 => /usr/lib64/libjitterentropy.so.3 (0x00007f62c9b88000)
+        libkrb5.so.3 => /usr/lib64/libkrb5.so.3 (0x00007f626a65f000)
+        libk5crypto.so.3 => /usr/lib64/libk5crypto.so.3 (0x00007f62b8a9c000)
+        libcom_err.so.2 => /lib64/libcom_err.so.2 (0x00007f62c9b83000)
+        libkrb5support.so.0 => /usr/lib64/libkrb5support.so.0 (0x00007f62c9b74000)
+        libsasl2.so.3 => /usr/lib64/libsasl2.so.3 (0x00007f6286687000)
+        libbrotlicommon.so.1 => /usr/lib64/libbrotlicommon.so.1 (0x00007f6286665000)
+        libkeyutils.so.1 => /usr/lib64/libkeyutils.so.1 (0x00007f6269200000)
+        libresolv.so.2 => /lib64/libresolv.so.2 (0x00007f62b8a8a000)
+        libselinux.so.1 => /usr/lib64/libselinux.so.1 (0x00007f6286638000)
+        libpcre2-8.so.0 => /usr/lib64/libpcre2-8.so.0 (0x00007f626a344000)
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> 
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> grep -n -A35 -B5 'cudaAwareMpiCheck' \
+>     "$TORCH_SRC/torch/csrc/distributed/c10d/ProcessGroupMPI.cpp"
+46-    {at::kShort, MPI_SHORT},
+47-};
+48-
+49-// Checking CUDA-aware MPI support, currently we only support CUDA aware
+50-// MPI ops through Open MPI
+51:bool cudaAwareMpiCheck() {
+52-// Run time check for OpenMPI
+53-#if defined(MPIX_CUDA_AWARE_SUPPORT)
+54-  if (MPIX_Query_cuda_support() == 1) {
+55-    return true;
+56-  } else {
+57-    return true;
+58-  }
+59-#elif defined(MPIX_GPU_SUPPORT_CUDA)
+60-  const char* cray_gpu_support = std::getenv("MPICH_GPU_SUPPORT_ENABLED");
+61-  if (cray_gpu_support != nullptr && std::string(cray_gpu_support) == "1") {
+62-    // Polaris Cray MPICH is CUDA-aware via MPICH_GPU_SUPPORT_ENABLED
+63-    return true;
+64-  } else {
+65-    return false;
+66-  }
+67-#else // !defined(MPIX_CUDA_AWARE_SUPPORT) && !defined(MPIX_GPU_SUPPORT_CUDA)
+68-  return false;
+69-#endif
+70-}
+71-
+72-// Checking the input tensor's validity
+73-void checkSingleTensorHelper(const at::Tensor& tensor) {
+74-  if (!tensor.is_contiguous()) {
+75-    TORCH_CHECK(false, "input tensor has to be contiguous");
+76-  }
+77-  if (tensor.is_sparse()) {
+78-    TORCH_CHECK(false, "input tensor has to be dense");
+79-  }
+80:  if (tensor.is_cuda() && !cudaAwareMpiCheck()) {
+81-    TORCH_CHECK(
+82-        false,
+83-        "CUDA tensor detected and the MPI used doesn't "
+84-        "have CUDA-aware MPI support");
+85-  }
+86-}
+87-
+88-void checkSingleTensor(const std::vector<at::Tensor>& tensors) {
+89-  if (tensors.size() != 1) {
+90-    TORCH_CHECK(
+91-        false, "MPI process group does not support multi-GPU collectives");
+92-  }
+93-  checkSingleTensorHelper(tensors[0]);
+94-}
+95-
+96-void checkSameSizeAndType(
+97-    const at::Tensor& t_in,
+98-    const std::vector<at::Tensor>& tensors) {
+99-  for (const auto& tensor : tensors) {
+100-    if ((tensor.numel() != t_in.numel()) ||
+101-        (tensor.scalar_type() != t_in.scalar_type())) {
+102-      TORCH_CHECK(false, "Tensors are not equal in size or data type");
+103-    }
+104-    checkSingleTensorHelper(tensor);
+105-  }
+106-}
+107-
+108-} // namespace
+109-
+110-std::vector<at::Tensor> ProcessGroupMPI::WorkMPI::result() {
+111-  return outputTensors_;
+112-}
+113-
+114-c10::intrusive_ptr<c10::ivalue::Future> ProcessGroupMPI::WorkMPI::getFuture() {
+115-  return future_;
+
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> export TORCH_SRC=/lus/eagle/projects/UIC-HPC/mrest/pytorch_mpi_build/src/pytorch
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> export CRAY_GTL="$MPI_HOME/lib/libmpi_gtl_cuda.so.0"
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> export DARSHAN_LIB=/soft/perftools/darshan/darshan-3.4.4/lib/libdarshan.so.0
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> for lib in "$CRAY_GTL" "$DARSHAN_LIB"; do
+>     printf '\n=== Dependencies: %s ===\n' "$lib"
+>     readelf -d "$lib" | grep -E 'NEEDED|RPATH|RUNPATH'
+> done
+
+=== Dependencies: /opt/cray/pe/mpich/default/ofi/gnu/12.3/lib/libmpi_gtl_cuda.so.0 ===
+ 0x0000000000000001 (NEEDED)             Shared library: [libcudart.so.13]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcuda.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+
+=== Dependencies: /soft/perftools/darshan/darshan-3.4.4/lib/libdarshan.so.0 ===
+ 0x0000000000000001 (NEEDED)             Shared library: [libpthread.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [librt.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libdl.so.2]
+ 0x0000000000000001 (NEEDED)             Shared library: [libz.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libmpi_gnu_123.so.12]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> for lib in \
+>     "$TORCH_SRC/torch/lib/libtorch_cpu.so" \
+>     "$TORCH_SRC/torch/lib/libtorch_cuda.so"; do
+>     printf '\n=== Imports: %s ===\n' "$lib"
+>     nm -D --undefined-only "$lib" \
+>         | grep -Ei 'mpi|gtl|darshan'
+> done
+
+=== Imports: /lus/eagle/projects/UIC-HPC/mrest/pytorch_mpi_build/src/pytorch/torch/lib/libtorch_cpu.so ===
+                 U MPI_Abort
+                 U MPI_Allgather
+                 U MPI_Allreduce
+                 U MPI_Alltoall
+                 U MPI_Alltoallv
+                 U MPI_Barrier
+                 U MPI_Bcast
+                 U MPI_Comm_create
+                 U MPI_Comm_group
+                 U MPI_Comm_rank
+                 U MPI_Comm_size
+                 U MPI_Error_string
+                 U MPI_Finalize
+                 U MPI_Gather
+                 U MPI_Group_free
+                 U MPI_Group_incl
+                 U MPI_Initialized
+                 U MPI_Init_thread
+                 U MPI_Irecv
+                 U MPI_Isend
+                 U MPI_Reduce
+                 U MPI_Reduce_scatter_block
+                 U MPI_Scatter
+                 U MPI_Test
+                 U MPI_Wait
+                 U _ZN3c107WarningC1ESt7variantIJNS0_11UserWarningENS0_18DeprecationWarningEEENS_14SourceLocationENS_6detail22CompileTimeEmptyStringEb
+
+=== Imports: /lus/eagle/projects/UIC-HPC/mrest/pytorch_mpi_build/src/pytorch/torch/lib/libtorch_cuda.so ===
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> printf '\n=== GTL exports ===\n'
+
+=== GTL exports ===
+(2025-09-28/base) mrest@polaris-login-02:~/mpiAllReduceCompressed> nm -D --defined-only "$CRAY_GTL"
+0000000000054748 B gtlt_cuda_is_stream_created
+0000000000054740 B gtlt_cuda_stream
+0000000000011632 T gtlti_cuda_reduce_execute
+00000000000119d2 T gtlti_cuda_reduce_prepare
+0000000000011a1a T gtlti_cuda_reduce_trigger
+0000000000003d00 T mpix_gtl_check_peer_access
+0000000000003760 T mpix_gtl_close_mem_handle
+0000000000003d20 T mpix_gtl_enable_peer_access
+0000000000003f20 T mpix_gtl_finalize
+0000000000003840 T mpix_gtl_free
+0000000000003880 T mpix_gtl_free_host
+0000000000003ce0 T mpix_gtl_get_ctx
+00000000000038a0 T mpix_gtl_get_memcpy_kind
+0000000000003720 T mpix_gtl_get_mem_handle
+0000000000003f00 T mpix_gtl_get_my_numa_node
+0000000000003ec0 T mpix_gtl_gpu_arch_query
+0000000000003780 T mpix_gtl_gpu_mem_allow_access
+0000000000003ee0 T mpix_gtl_gpu_model_query
+0000000000003c00 T mpix_gtl_host_register
+0000000000003c20 T mpix_gtl_host_unregister
+0000000000003d40 T mpix_gtl_init
+00000000000037c0 T mpix_gtl_kt_get_work
+00000000000037e0 T mpix_gtl_kt_signal_complete
+00000000000037a0 T mpix_gtl_kt_wq_alloc
+0000000000003800 T mpix_gtl_kt_wq_free
+0000000000003820 T mpix_gtl_malloc
+0000000000003860 T mpix_gtl_malloc_host
+00000000000039a0 T mpix_gtl_map_gpu_buf
+0000000000003920 T mpix_gtl_memcpy_async
+0000000000003950 T mpix_gtl_memcpy_blk
+0000000000003c80 T mpix_gtl_mem_host_get_device_pointer
+0000000000003c40 T mpix_gtl_mem_host_register
+0000000000003c60 T mpix_gtl_mem_host_unregister
+00000000000039c0 T mpix_gtl_nt_memcpy
+0000000000003740 T mpix_gtl_open_mem_handle
+0000000000003ca0 T mpix_gtl_pointer_type
+0000000000003980 T mpix_gtl_query_request
+00000000000042d0 T mpix_gtl_reduce_execute
+00000000000042b0 T mpix_gtl_reduce_prepare
+00000000000042f0 T mpix_gtl_reduce_trigger
+0000000000003fd0 T mpix_gtl_stream_alloc_buffer
+0000000000004290 T mpix_gtl_stream_fence
+0000000000003ff0 T mpix_gtl_stream_free_buffer
+0000000000004120 T mpix_gtl_stream_grp_memcpy_async
+0000000000004100 T mpix_gtl_stream_memcpy_async
+0000000000004050 T mpix_gtl_stream_shader_write64
+0000000000004310 T mpix_gtl_stream_synchronize
+0000000000004030 T mpix_gtl_stream_wait32
+00000000000040c0 T mpix_gtl_stream_wait64
+00000000000040e0 T mpix_gtl_stream_waitlist64
+0000000000004010 T mpix_gtl_stream_write32
+0000000000004070 T mpix_gtl_stream_write64
+0000000000004090 T mpix_gtl_stream_write_local
+0000000000003cc0 T mpix_gtl_verify_driver_version
+000000000001df8a W _ZN4dim3C1Ejjj
+000000000001df8a W _ZN4dim3C2Ejjj

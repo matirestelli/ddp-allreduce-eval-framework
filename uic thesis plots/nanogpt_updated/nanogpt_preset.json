@@ -1,0 +1,35 @@
+{
+  "model_family": "gpt",
+  "included_families": [
+    "baseline",
+    "ring",
+    "recursive doubling",
+    "hierarchical"
+  ],
+  "excluded": [
+    "Direct",
+    "k-ring",
+    "DDP diagnostics",
+    "MPI Hierarchical",
+    "Other"
+  ],
+  "systems": [
+    "polaris"
+  ],
+  "argv": [
+    "experiments_polaris",
+    "experiments_polaris_nccl",
+    "--system",
+    "polaris",
+    "--mode",
+    "strong",
+    "--global-batch",
+    "768",
+    "--combine-simulated",
+    "--output-root",
+    "uic thesis plots/nanogpt_updated"
+  ],
+  "manifests": [
+    "uic thesis plots/nanogpt_updated/polaris/manifest.json"
+  ]
+}

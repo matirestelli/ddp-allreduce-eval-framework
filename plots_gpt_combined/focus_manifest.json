@@ -1,0 +1,295 @@
+{
+  "inputs": [
+    "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_16gpu.out",
+    "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+    "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_64gpu.out"
+  ],
+  "zoom_gpus": 32,
+  "combine_simulated": true,
+  "figures": [
+    {
+      "system": "polaris",
+      "view": "selected_scaling",
+      "stem": "plots_gpt_combined/polaris/gpt/strongScaling/backend_comparison/lines/GB768_selected_hooks",
+      "layout": "lines",
+      "simulated_gpu_counts": [
+        64
+      ],
+      "source_configurations": [
+        {
+          "id": "cd45f2c09a9d",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_16gpu.out",
+          "line": 35,
+          "gpus": 16,
+          "method": "none",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "a448b90d3056",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_16gpu.out",
+          "line": 438,
+          "gpus": 16,
+          "method": "hierarchical_zfp_online_coll:8",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "462f692b2eec",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_16gpu.out",
+          "line": 955,
+          "gpus": 16,
+          "method": "kring_k4",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "2cf258d54246",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 35,
+          "gpus": 32,
+          "method": "none",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "5e8cbd27bd55",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 440,
+          "gpus": 32,
+          "method": "hierarchical_zfp_online_coll:8",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "5635e0717999",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 1267,
+          "gpus": 32,
+          "method": "kring_k4",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "133396153c60",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_64gpu.out",
+          "line": 1,
+          "gpus": 64,
+          "method": "none",
+          "kind": "simulated",
+          "original_model": "gpt2_12x12x768_simulated",
+          "original_dataset": "simulated_tinystories"
+        },
+        {
+          "id": "f120dcddef0d",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_64gpu.out",
+          "line": 728,
+          "gpus": 64,
+          "method": "hierarchical_zfp_online_coll:8",
+          "kind": "simulated",
+          "original_model": "gpt2_12x12x768_simulated",
+          "original_dataset": "simulated_tinystories"
+        },
+        {
+          "id": "bad9c635bc21",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_64gpu.out",
+          "line": 940,
+          "gpus": 64,
+          "method": "kring_k4",
+          "kind": "simulated",
+          "original_model": "gpt2_12x12x768_simulated",
+          "original_dataset": "simulated_tinystories"
+        }
+      ],
+      "backends": [
+        "nccl"
+      ],
+      "notice": "Only one backend is available in this selection.",
+      "missing_requested_points": [],
+      "status": "written",
+      "points": 9,
+      "methods": [
+        "hierarchical_zfp_online_coll:8",
+        "kring_k4",
+        "none"
+      ]
+    },
+    {
+      "system": "polaris",
+      "view": "all_algorithms_zoom",
+      "stem": "plots_gpt_combined/polaris/gpt/strongScaling/backend_comparison/normal/GB768_gpu32_all_algorithms",
+      "layout": "bars",
+      "source_configurations": [
+        {
+          "id": "2cf258d54246",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 35,
+          "gpus": 32,
+          "method": "none",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "5db65c3cba5a",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 128,
+          "gpus": 32,
+          "method": "ring",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "bb153b4e4abc",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 230,
+          "gpus": 32,
+          "method": "ring_zfp_naive:16",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "7cb2bd058707",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 336,
+          "gpus": 32,
+          "method": "hierarchical_zfp_online_coll:16",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "5e8cbd27bd55",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 440,
+          "gpus": 32,
+          "method": "hierarchical_zfp_online_coll:8",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "d65aff39225a",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 544,
+          "gpus": 32,
+          "method": "recursive_doubling",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "b51ba02fcd87",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 646,
+          "gpus": 32,
+          "method": "recursive_doubling_zfp_naive:16",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "d8d0ddc8a9a5",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 752,
+          "gpus": 32,
+          "method": "direct_t4",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "864d691a5396",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 855,
+          "gpus": 32,
+          "method": "direct_t8",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "60dffdc5abee",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 958,
+          "gpus": 32,
+          "method": "direct_t16",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "9399a894cab8",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 1061,
+          "gpus": 32,
+          "method": "direct_t32",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "9727190719dd",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 1164,
+          "gpus": 32,
+          "method": "kring_k1",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        },
+        {
+          "id": "5635e0717999",
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 1267,
+          "gpus": 32,
+          "method": "kring_k4",
+          "kind": "logged",
+          "original_model": "gpt2_12x12x768",
+          "original_dataset": "tinystories"
+        }
+      ],
+      "backends": [
+        "nccl"
+      ],
+      "notice": "Only one backend is available in this selection.",
+      "status": "written",
+      "points": 13,
+      "methods": [
+        "direct_t16",
+        "direct_t32",
+        "direct_t4",
+        "direct_t8",
+        "hierarchical_zfp_online_coll:16",
+        "hierarchical_zfp_online_coll:8",
+        "kring_k1",
+        "kring_k4",
+        "none",
+        "recursive_doubling",
+        "recursive_doubling_zfp_naive:16",
+        "ring",
+        "ring_zfp_naive:16"
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+      "line": 336,
+      "warning": "multiple internal hook labels in one block; inspect source"
+    },
+    {
+      "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+      "line": 440,
+      "warning": "multiple internal hook labels in one block; inspect source"
+    }
+  ]
+}

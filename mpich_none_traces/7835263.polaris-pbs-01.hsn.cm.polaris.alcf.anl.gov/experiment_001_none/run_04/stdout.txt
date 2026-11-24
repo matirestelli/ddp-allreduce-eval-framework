@@ -1,0 +1,91 @@
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768 (from scratch)
+  Dataset:    tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  built-in (no hook)
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768 on TINYSTORIES
+Backend: MPI, Algorithm: built-in (no hook)
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 192
+LR: 0.0006, Device: cuda:0
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] No hook — using DDP built-in MPI allreduce
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: 6.5030, Acc: 11.97%, lr: 0.000532
+[Epoch 1] Train Loss: 6.5030, Acc: 11.97%  |  Val Loss: 4.9380, Acc: 17.81%  |  Time: 277.3s
+[Epoch 1] t_iter median: 5508.41 ms  (fwd 723.60 | bwd+comm 4781.55 | opt 4.79 | data 0.35)  |  train-only epoch: 275.8s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 5508.41 ms
+[Epoch 1] peak GPU mem: 24.17 GiB allocated, 26.61 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+[HOOK_TIMING_SUMMARY] epoch=1 no hook timing samples
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: 4.3677, Acc: 22.60%, lr: 0.000234
+[Epoch 2] Train Loss: 4.3677, Acc: 22.60%  |  Val Loss: 4.1515, Acc: 23.28%  |  Time: 277.0s
+[Epoch 2] t_iter median: 5508.29 ms  (fwd 722.62 | bwd+comm 4780.47 | opt 4.79 | data 0.29)  |  train-only epoch: 275.6s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 5508.29 ms
+[Epoch 2] peak GPU mem: 24.17 GiB allocated, 26.61 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+[HOOK_TIMING_SUMMARY] epoch=2 no hook timing samples
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: 4.0208, Acc: 25.32%, lr: 0.000060
+[Epoch 3] Train Loss: 4.0208, Acc: 25.32%  |  Val Loss: 3.8316, Acc: 27.28%  |  Time: 275.9s
+[Epoch 3] t_iter median: 5477.26 ms  (fwd 722.98 | bwd+comm 4748.99 | opt 4.76 | data 0.27)  |  train-only epoch: 274.4s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 5477.26 ms
+[Epoch 3] peak GPU mem: 24.17 GiB allocated, 26.61 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+[HOOK_TIMING_SUMMARY] epoch=3 no hook timing samples
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 830.1s | Best val acc: 0.00%
+Epoch times (train+val): mean=276.7s  min=275.9s  max=277.3s
+Train-only epoch time (epochs 2..N): median=274.99s  min=274.43s  max=275.55s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================

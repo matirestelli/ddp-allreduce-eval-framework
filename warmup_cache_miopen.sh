@@ -1,15 +1,15 @@
 #!/bin/bash -l
 #SBATCH -A gen243
 #SBATCH -p extended
-#SBATCH -J miopen_warmup_cifar          
+#SBATCH -J miopen_warmup_cifar_224          
 #SBATCH -N 1  
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-node=1
 #SBATCH --cpus-per-task=8                  
 #SBATCH -t 12:00:00   
 #SBATCH -C nvme  
-#SBATCH -o miopen_warmup_cifar.%j.out
-#SBATCH -e miopen_warmup_cifar.%j.err
+#SBATCH -o miopen_warmup_cifar_224.%j.out
+#SBATCH -e miopen_warmup_cifar_224.%j.err
 
 set -euo pipefail
 cd "${SLURM_SUBMIT_DIR}"
@@ -77,7 +77,7 @@ echo "MIOPEN_FIND_MODE=${MIOPEN_FIND_MODE} MIOPEN_FIND_ENFORCE=${MIOPEN_FIND_ENF
 MODELS=("wide_resnet50_2")
 DATASETS=("cifar10")
 NUM_CLASSES_LIST=("10")
-IMAGE_SIZES=("32")
+IMAGE_SIZES=("224")
 NUM_EPOCHS_LIST=("1")
 BATCH_SIZES=("8" "16" "32" "64")   # put all per-GPU batch sizes you will use, otherwise warmup will miss them and recompile/tune during real runs
 LEARNING_RATES=("0.001")
@@ -85,7 +85,7 @@ SCHEDULERS=("cosine")
 WARMUP_EPOCHS_LIST=("0")
 GRAD_CLIPS=("none")
 PRETRAINED_VALUES=("false")
-CIFAR_STEM_VALUES=("true")
+CIFAR_STEM_VALUES=("false")
 DROP_LAST_VALUES=("true")
 BACKENDS=("mpi")
 EXPERIMENTS=("none:")

@@ -61,7 +61,8 @@ export CMAKE_PREFIX_PATH="$ZFP_HOME:${CMAKE_PREFIX_PATH:-}"
 # ---------------------------------------------------------------------
 
 # 1. Persistent baseline MIOpen cache directory (Lustre)
-export MIOPEN_BASE=/lustre/orion/gen243/proj-shared/matilderestelli/miopen_cache_baseline
+# export MIOPEN_BASE=/lustre/orion/gen243/proj-shared/matilderestelli/miopen_cache_baseline
+export MIOPEN_BASE=/lustre/orion/gen243/proj-shared/matilderestelli/miopen_cache_baseline_224
 
 # 2. Node-local cache directory (NVMe, per job)
 : "${SLURM_JOB_ID:?This script should be sourced/run inside a Slurm job allocation}"

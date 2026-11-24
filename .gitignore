@@ -109,3 +109,5 @@ pytorch/
 
 # Local data symlink
 data
+
+miopen_warmup_cifar_224.5530170.err

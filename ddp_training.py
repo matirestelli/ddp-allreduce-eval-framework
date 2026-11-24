@@ -7,6 +7,7 @@ Supports both NCCL and MPI backends with custom AllReduce hooks.
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
@@ -19,11 +20,13 @@ import json
 import statistics
 import socket
 from datetime import datetime
+from contextlib import nullcontext
 
-from config import TrainingConfig, create_model, get_data_loaders
+from config import TrainingConfig, create_model_from_config, get_data_loaders
 from communication_strategy import (
     get_comm_hook,
     open_first_bucket_compute_range,
+    pop_last_bucket_ready_event,
     reset_bucket_compute_markers,
     set_profiling_step,
     summarize_hook_timing,
@@ -105,6 +108,59 @@ def build_param_groups(model, weight_decay: float, wd_on_bn_bias: bool):
     ]
 
 
+def make_batch_transform(config):
+    """
+    Return a per-batch, on-GPU preprocessing function, or None.
+
+    All task-specific input handling lives HERE, not in the training loop.
+    train_epoch() and validate() only know "apply this if it exists", so the
+    loop itself stays agnostic about whether it is training on images, tokens,
+    or anything else.
+
+    Contract for the returned callable:
+        fn(inputs, targets) -> (inputs, targets)
+        - runs on GPU tensors, after .to(device)
+        - MUST be deterministic: the same function is applied at validation
+          time. Random augmentation belongs in the DataLoader transforms.
+
+    Current policy:
+        CIFAR is stored at 32x32 and the DataLoader keeps it there. If the
+        config asks for a larger image, upscale on the GPU. Doing this on the
+        CPU instead would send ~50x more bytes over PCIe per batch and turn
+        data loading into the bottleneck.
+
+        Every other case returns None, so nothing runs at all.
+    """
+    if config.dataset.startswith("cifar") and config.image_size != 32:
+        size = int(config.image_size)
+
+        def _upscale(inputs, targets):
+            if inputs.shape[-1] != size:
+                inputs = F.interpolate(
+                    inputs,
+                    size=(size, size),
+                    mode="bilinear",
+                    align_corners=False,
+                )
+            return inputs, targets
+
+        _upscale.description = f"gpu_upscale 32 -> {size}"
+        return _upscale
+
+    return None
+
+def _forward_loss(model, criterion, inputs, targets, batch_transform, is_lm):
+    """One forward pass. Returns (outputs, loss, targets)."""
+    if batch_transform is not None:
+        inputs, targets = batch_transform(inputs, targets)
+    if is_lm:
+        # nanoGPT GPT.forward(idx, targets) -> (logits [B,T,V], mean CE loss)
+        outputs, loss = model(inputs, targets)
+    else:
+        outputs = model(inputs)
+        loss = criterion(outputs, targets)
+    return outputs, loss, targets
+
 def train_epoch(
     model: DDP,
     train_loader,
@@ -117,6 +173,11 @@ def train_epoch(
     verify_last_batch: bool = False,
     grad_clip=None,
     iter_log_path=None,             # FIX 3
+    batch_transform=None,           # task-specific GPU preprocessing, or None
+    accum_steps: int = 1,           # micro-batches per optimizer step on this rank
+    max_iters=None,                 # cap optimizer steps in this epoch
+    is_lm: bool = False,
+    autocast_ctx=None,              # torch.autocast(...) or None
 ) -> tuple:
     """Train for one epoch. Returns (avg_loss, accuracy, iter_stats).
 
@@ -143,11 +204,20 @@ def train_epoch(
 
     t_data_start = time.perf_counter()
 
-    for batch_idx, (inputs, targets) in enumerate(train_loader):
+    if autocast_ctx is None:
+        autocast_ctx = nullcontext()
+    n_iters = len(train_loader) // accum_steps
+    if max_iters is not None:
+        n_iters = min(n_iters, max_iters)
+    loader_it = iter(train_loader)
+
+    for batch_idx in range(n_iters):
+        micro = [next(loader_it) for _ in range(accum_steps)]
         data_ms.append((time.perf_counter() - t_data_start) * 1e3)
 
-        inputs, targets = inputs.to(device), targets.to(device)
+        micro = [(x.to(device), y.to(device)) for x, y in micro]
         optimizer.zero_grad()
+        
         set_profiling_step(epoch, batch_idx)
 
         e_start = torch.cuda.Event(enable_timing=True)
@@ -161,10 +231,25 @@ def train_epoch(
         try:
             e_start.record()
 
+            loss_acc = torch.zeros((), device=device)
+            correct_acc = torch.zeros((), device=device, dtype=torch.long)
+            for k in range(accum_steps - 1):
+                x_k, y_k = micro[k]
+                with model.no_sync():
+                    with autocast_ctx:
+                        out_k, loss_k, y_k = _forward_loss(
+                            model, criterion, x_k, y_k, batch_transform, is_lm)
+                    (loss_k / accum_steps).backward()
+                loss_acc += loss_k.detach()
+                correct_acc += out_k.argmax(-1).eq(y_k).sum()
+                del out_k, loss_k   # free [B,T,V] logits before the next micro-step
+
+            inputs, targets = micro[-1]
             _nvtx_range_push(f"forward epoch={epoch} batch={batch_idx}")
             try:
-                outputs = model(inputs)
-                loss = criterion(outputs, targets)
+                with autocast_ctx:
+                    outputs, loss, targets = _forward_loss(
+                        model, criterion, inputs, targets, batch_transform, is_lm)
             finally:
                 _nvtx_range_pop()
 
@@ -181,7 +266,25 @@ def train_epoch(
             try:
                 reset_bucket_compute_markers()
                 open_first_bucket_compute_range()
-                loss.backward()
+                (loss / accum_steps).backward()
+                
+                # GPU marker left by the last bucket's hook. None for hook=none:
+                # the built-in path never calls our hook, so both metrics are NaN.
+                e_ready = pop_last_bucket_ready_event()
+                
+                # temporary debugging: print gradient norms and rank spread
+                #torch.cuda.synchronize()
+                #gs = [p.grad.detach().double() for p in model.parameters() if p.grad is not None]
+                #t = torch.tensor([sum(g.sum() for g in gs).item(),
+                 #               torch.stack([g.norm() for g in gs]).norm().item()],
+                 #               dtype=torch.float64)                      # CPU tensor, so GTL isn't involved
+                #out = [torch.zeros(2, dtype=torch.float64) for _ in range(dist.get_world_size())]
+                #dist.all_gather(out, t)
+                #if rank == 0:
+                #    s = [o[0].item() for o in out]
+                #    print(f"[GRADCHK] it={batch_idx} loss={loss.item():.4f} "
+                #        f"gnorm={out[0][1].item():.4e} rank_spread={max(s)-min(s):.3e}", flush=True)
+                    
             finally:
                 reset_bucket_compute_markers()
                 _nvtx_range_pop()
@@ -212,18 +315,19 @@ def train_epoch(
         finally:
             _nvtx_range_pop()
 
-        ev_buf.append((e_start, e_fwd, e_bar0, e_bar1, e_bwd, e_opt))
+        ev_buf.append((e_start, e_fwd, e_bar0, e_bar1, e_bwd, e_opt, e_ready))
 
-        total_loss += loss.item()
-        _, predicted = outputs.max(1)
-        total += targets.size(0)
-        correct += predicted.eq(targets).sum().item()
+        loss_acc += loss.detach()
+        correct_acc += outputs.argmax(-1).eq(targets).sum()
+        total_loss += loss_acc.item() / accum_steps     # mean over micro-batches
+        total += targets.numel() * accum_steps          # samples or tokens
+        correct += correct_acc.item()
 
         if rank == 0 and (batch_idx + 1) % 50 == 0:
             accuracy = 100.0 * correct / total
             avg_loss = total_loss / (batch_idx + 1)
             cur_lr = optimizer.param_groups[0]['lr']
-            print(f"  Batch [{batch_idx+1}/{len(train_loader)}] "
+            print(f"  Batch [{batch_idx+1}/{n_iters}] "
                   f"Loss: {avg_loss:.4f}, Acc: {accuracy:.2f}%, lr: {cur_lr:.6f}")
 
         t_data_start = time.perf_counter()
@@ -232,18 +336,27 @@ def train_epoch(
     torch.cuda.synchronize()
 
     records = []
-    for i, (e_start, e_fwd, e_bar0, e_bar1, e_bwd, e_opt) in enumerate(ev_buf):
+    for i, (e_start, e_fwd, e_bar0, e_bar1, e_bwd, e_opt, e_ready) in enumerate(ev_buf):
         t_fwd = e_start.elapsed_time(e_fwd)
         t_bar = e_bar0.elapsed_time(e_bar1)
         t_bwd = e_bar1.elapsed_time(e_bwd)      # compute + exposed allreduce
         t_opt = e_bwd.elapsed_time(e_opt)
         t_gpu = e_start.elapsed_time(e_opt)
+        if e_ready is not None:
+            # Same GPU clock as the rest: compute, then the comm the backward
+            # pass could not hide. t_compute + t_exposed == t_fwd + t_bar + t_bwd.
+            t_compute = e_start.elapsed_time(e_ready)
+            t_exposed = e_ready.elapsed_time(e_bwd)
+        else:
+            t_compute = t_exposed = float("nan")
         records.append({
             "epoch": epoch, "iter": i, "rank": rank,
             "t_data_ms":    round(data_ms[i], 4),
             "t_fwd_ms":     round(t_fwd, 4),
             "t_barrier_ms": round(t_bar, 4),
             "t_bwd_ms":     round(t_bwd, 4),
+            "t_compute_ms": round(t_compute, 4),
+            "t_exposed_ms": round(t_exposed, 4),
             "t_opt_ms":     round(t_opt, 4),
             "t_gpu_ms":     round(t_gpu, 4),
             "t_iter_ms":    round(t_gpu + data_ms[i], 4),
@@ -255,12 +368,15 @@ def train_epoch(
                 f.write(json.dumps(r) + "\n")
 
     def _med(key):
-        return statistics.median([r[key] for r in records]) if records else 0.0
+        vals = [r[key] for r in records if r[key] == r[key]]   # x != x filters NaN
+        return statistics.median(vals) if vals else float("nan")
 
     iter_stats = {
         "t_iter_median_ms":    _med("t_iter_ms"),
         "t_fwd_median_ms":     _med("t_fwd_ms"),
         "t_bwd_median_ms":     _med("t_bwd_ms"),
+        "t_compute_median_ms": _med("t_compute_ms"),
+        "t_exposed_median_ms": _med("t_exposed_ms"),
         "t_opt_median_ms":     _med("t_opt_ms"),
         "t_data_median_ms":    _med("t_data_ms"),
         "t_barrier_median_ms": _med("t_barrier_ms"),
@@ -269,25 +385,41 @@ def train_epoch(
         "num_iters":           len(records),
     }
 
-    return total_loss / len(train_loader), 100.0 * correct / total, iter_stats
+    return total_loss / n_iters, 100.0 * correct / total, iter_stats
 
 
-def validate(model, val_loader, criterion, device):
-    """Validate on the FULL unsharded test set. Contains NO collective."""
+def validate(model, val_loader, criterion, device, batch_transform=None,
+             is_lm=False, max_batches=None, autocast_ctx=None):
+    """Validate on the FULL unsharded test set. Contains NO collective.
+
+    batch_transform must be the SAME one used in training — if training sees
+    224x224 and validation sees 32x32, the accuracy numbers are meaningless.
+    """
     model.eval()
     total_loss = 0.0
     correct = 0
     total = 0
 
     with torch.no_grad():
-        for inputs, targets in val_loader:
+        for i, (inputs, targets) in enumerate(val_loader):
+            if max_batches is not None and i >= max_batches:
+                break
             inputs, targets = inputs.to(device), targets.to(device)
-            outputs = model(inputs)
-            # weight by sample count so the final divide is exact
-            total_loss += criterion(outputs, targets).item() * targets.size(0)
-            _, predicted = outputs.max(1)
-            total += targets.size(0)
-            correct += predicted.eq(targets).sum().item()
+            
+            if batch_transform is not None:
+                inputs, targets = batch_transform(inputs, targets)
+                
+            with (autocast_ctx or nullcontext()):
+                if is_lm:
+                    outputs, loss = model(inputs, targets)
+                else:
+                    outputs = model(inputs)
+                    loss = criterion(outputs, targets)
+            # weight by element count (samples or tokens) so the divide is exact
+            n = targets.numel()
+            total_loss += loss.item() * n
+            total += n
+            correct += outputs.argmax(-1).eq(targets).sum().item()
 
     return total_loss / total, 100.0 * correct / total
 
@@ -410,6 +542,10 @@ def train(config: TrainingConfig) -> None:
                 device_id=torch.device(f"cuda:{_local_rank}"),
             )
     else:
+        # MPI backend new ersion so this workaround for no errors in logs
+        n = torch.cuda.device_count()
+        lr = os.environ.get("SLURM_LOCALID") or os.environ.get("PMI_LOCAL_RANK") or "0"
+        torch.cuda.set_device(int(lr) % n)
         dist.init_process_group(backend=config.backend)
 
 
@@ -477,6 +613,7 @@ def train(config: TrainingConfig) -> None:
             'batch_size', 'global_batch_size', 'num_epochs',
             # FIX 1: record the ablation setting in the results
             'wd_on_bn_bias', 'nesterov',
+            't_compute_median_ms', 't_exposed_median_ms',
         ])
 
     # Seed for reproducible model init (DDP broadcasts rank 0's params anyway)
@@ -491,6 +628,7 @@ def train(config: TrainingConfig) -> None:
             torch.backends.cudnn.benchmark = False
         else:
             torch.backends.cudnn.benchmark = True
+        torch.backends.cuda.matmul.allow_tf32 = bool(config.allow_tf32)
 
     if rank == 0:
         print("\n" + "=" * 80)
@@ -519,13 +657,7 @@ def train(config: TrainingConfig) -> None:
     if config.pretrained and rank != 0:
         dist.barrier()
 
-    model = create_model(
-        config.model_name,
-        config.num_classes,
-        cifar_stem=config.cifar_stem,
-        pretrained=config.pretrained,
-        init_cifar_stem_from_pretrained_center=config.init_cifar_stem_from_pretrained_center,
-    ).to(device)
+    model = create_model_from_config(config).to(device)
 
     if config.pretrained and rank == 0:
         dist.barrier()
@@ -542,6 +674,25 @@ def train(config: TrainingConfig) -> None:
 
     if rank == 0:
         print(f"[Setup] Model on {device}, wrapped in DDP (static_graph=True)")
+        
+    
+    # Synced warm-up backward: needed for static_graph=True + no_sync().
+    # Always run it (before the hook is registered): the first static_graph
+    # backward launches an MPI_Allreduce of local_used_map on the PG thread that
+    # deadlocks against custom P2P hooks on pgGlobalMutex_ (seen at 64 GPUs,
+    # where micro-steps/rank=1 used to skip this warm-up).
+    if True:
+        if config.is_lm:
+            _x = torch.randint(0, config.vocab_size, (config.batch_size, config.block_size), device=device)
+            _out, _loss = model(_x, _x)
+        else:
+            _x = torch.randn(config.batch_size, 3, config.image_size, config.image_size, device=device)
+            _loss = model(_x).float().mean()
+        _loss.backward()
+        model.zero_grad(set_to_none=True)
+        del _x, _loss
+        if rank == 0:
+            print("[Setup] Synced warm-up backward done (static_graph + no_sync)")
 
     # ── Communication hook ───────────────────────────────────────────────
     # get_comm_hook returns (hook, state) or None.
@@ -576,7 +727,12 @@ def train(config: TrainingConfig) -> None:
 
     param_groups = build_param_groups(model, config.weight_decay, wd_on_bn_bias)
 
-    if optimizer_name == "adamw":
+    if config.is_lm:
+        optimizer = model.module.configure_optimizers(
+            config.weight_decay, config.learning_rate,
+            (config.adam_beta1, config.adam_beta2), "cuda",
+        )
+    elif optimizer_name == "adamw":
         optimizer = optim.AdamW(
             param_groups,
             lr=config.learning_rate,
@@ -610,12 +766,39 @@ def train(config: TrainingConfig) -> None:
         print(f"[Data] Train batches: {len(train_loader)}, "
               f"Val batches: {len(val_loader)}\n")
 
+    # Task-specific input preprocessing. None for every configuration that
+    # needs no on-GPU work, which includes the original 32x32 CIFAR runs.
+    batch_transform = make_batch_transform(config)
+    if rank == 0:
+        print(f"[Data] Batch transform: "
+              f"{getattr(batch_transform, 'description', 'none')}\n")
+
     # ── FIX 2: per-ITERATION scheduler ───────────────────────────────────
     # Built after the loader so steps_per_epoch is known. drop_last=True makes
     # len(train_loader) identical on every rank, so the schedule stays in sync.
-    steps_per_epoch = len(train_loader)
+    if config.grad_accum_global is None:
+        accum_steps = 1
+    else:
+        assert config.grad_accum_global % world_size == 0, (
+            f"grad_accum_global={config.grad_accum_global} not divisible by "
+            f"world_size={world_size} (same assert as nanoGPT train.py)"
+        )
+        accum_steps = config.grad_accum_global // world_size
+
+    steps_per_epoch = len(train_loader) // accum_steps
+    if config.iters_per_epoch is not None:
+        steps_per_epoch = min(steps_per_epoch, config.iters_per_epoch)
     total_steps     = steps_per_epoch * config.num_epochs
-    warmup_steps    = steps_per_epoch * config.warmup_epochs
+    warmup_steps    = (config.warmup_iters if config.warmup_iters > 0
+                       else steps_per_epoch * config.warmup_epochs)
+
+    autocast_ctx = (torch.autocast(device_type="cuda", dtype=torch.bfloat16)
+                    if config.amp == "bf16" else nullcontext())
+    if rank == 0:
+        tok = (f", tokens/iter={accum_steps * world_size * config.batch_size * config.block_size:,}"
+               if config.is_lm else "")
+        print(f"[Accum] micro-steps/rank={accum_steps}, "
+              f"global micro-batches={accum_steps * world_size}{tok}, amp={config.amp}")
 
     if config.scheduler == "constant":
         scheduler = optim.lr_scheduler.LambdaLR(optimizer, lambda s: 1.0)
@@ -627,7 +810,8 @@ def train(config: TrainingConfig) -> None:
 
             progress = (step - warmup_steps) / max(total_steps - warmup_steps, 1)
             progress = min(max(progress, 0.0), 1.0)   # land exactly on 0 at the end
-            return 0.5 * (1.0 + math.cos(math.pi * progress))
+            cos = 0.5 * (1.0 + math.cos(math.pi * progress))
+            return config.min_lr_ratio + (1.0 - config.min_lr_ratio) * cos
 
         scheduler = optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
 
@@ -662,6 +846,11 @@ def train(config: TrainingConfig) -> None:
                 verify_last_batch=(epoch == config.num_epochs),
                 grad_clip=config.grad_clip,
                 iter_log_path=iter_log_path,
+                batch_transform=batch_transform,
+                accum_steps=accum_steps,
+                max_iters=steps_per_epoch,
+                is_lm=config.is_lm,
+                autocast_ctx=autocast_ctx,
             )
         finally:
             _nvtx_range_pop()
@@ -679,7 +868,13 @@ def train(config: TrainingConfig) -> None:
         # phantom straggler in iteration 0 of the next epoch (which would
         # silently inflate t_bwd on every other rank).
         if rank == 0:
-            val_loss, val_acc = validate(model, val_loader, criterion, device)
+            val_loss, val_acc = validate(
+                model, val_loader, criterion, device,
+                batch_transform=batch_transform,
+                is_lm=config.is_lm,
+                max_batches=config.val_max_batches,
+                autocast_ctx=autocast_ctx,
+            )
         else:
             val_loss, val_acc = float('nan'), float('nan')
         dist.barrier()
@@ -704,6 +899,26 @@ def train(config: TrainingConfig) -> None:
                   f"opt {iter_stats['t_opt_median_ms']:.2f} | "
                   f"data {iter_stats['t_data_median_ms']:.2f})  |  "
                   f"train-only epoch: {iter_stats['t_epoch_train_s']:.1f}s")
+            # GPU-clock split of the iteration: compute (forward + backward,
+            # including any comm the backward hid) and the comm it could not hide.
+            # NaN for hook=none, which never calls our hook. The sum check should
+            # land within ~1 ms of t_iter; data loading accounts for the rest.
+            print(f"[Epoch {epoch}] compute {iter_stats['t_compute_median_ms']:.2f} ms  |  "
+                  f"exposed comm {iter_stats['t_exposed_median_ms']:.2f} ms  |  "
+                  f"sum check "
+                  f"{iter_stats['t_compute_median_ms'] + iter_stats['t_exposed_median_ms'] + iter_stats['t_opt_median_ms']:.2f}"
+                  f" vs t_iter {iter_stats['t_iter_median_ms']:.2f} ms")
+            # Allocator high-water mark. Free to read, no sync, outside the
+            # timed region. If this stays far below the card's capacity, the
+            # local batch size can be raised - a cheaper way to add compute
+            # than a bigger image. Note it excludes NCCL/ZFP/context memory,
+            # so real usage is higher; nvidia-smi is the ground truth.
+            print(f"[Epoch {epoch}] peak GPU mem: "
+                  f"{torch.cuda.max_memory_allocated(device) / 1024**3:.2f} GiB "
+                  f"allocated, "
+                  f"{torch.cuda.max_memory_reserved(device) / 1024**3:.2f} GiB "
+                  f"reserved"
+                  f" | wd_on_bn_bias: {wd_on_bn_bias}, nesterov: {nesterov}")
 
             csv_writer.writerow([
                 epoch, f"{epoch_lr:.8f}",
@@ -724,6 +939,8 @@ def train(config: TrainingConfig) -> None:
                 config.batch_size * world_size,
                 config.num_epochs,
                 wd_on_bn_bias, nesterov,
+                f"{iter_stats['t_compute_median_ms']:.4f}",
+                f"{iter_stats['t_exposed_median_ms']:.4f}",
             ])
             csv_file.flush()
 
@@ -733,7 +950,7 @@ def train(config: TrainingConfig) -> None:
                       f"possible gradient explosion from hook bug. "
                       f"Check that hook divides by world_size exactly once.")
 
-            if val_acc > best_val_acc:
+            if val_acc > best_val_acc and os.getenv("SAVE_CHECKPOINT", "1") == "1":
                 best_val_acc = val_acc
                 os.makedirs(config.checkpoint_dir, exist_ok=True)
                 path = os.path.join(

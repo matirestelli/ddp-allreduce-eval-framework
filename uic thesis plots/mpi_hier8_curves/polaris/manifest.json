@@ -1,0 +1,34 @@
+{
+  "system": "polaris",
+  "inputs": [
+    "/home/mrest/mpiAllReduceCompressed/experiments_polaris"
+  ],
+  "completed_runs": 29,
+  "all_runs": 294,
+  "planned": 1,
+  "truncated": false,
+  "dry_run": false,
+  "plots": [
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "lines",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/mpi_hier8_curves/polaris/gpt/strongScaling/mpi/lines/GB768_all_lines_time_absolute",
+      "status": "written",
+      "points": 29,
+      "omitted": 0
+    }
+  ],
+  "nanogpt_preset": {
+    "excluded": [
+      "Direct",
+      "k-ring",
+      "DDP diagnostics",
+      "MPI Hierarchical"
+    ],
+    "combine_simulated": true,
+    "horizontal_time_hook_bars": false
+  }
+}

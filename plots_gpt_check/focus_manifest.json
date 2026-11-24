@@ -1,0 +1,60 @@
+{
+  "inputs": [
+    "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_16gpu.%j.out",
+    "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_32gpu.%j.out",
+    "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_64gpu.%j.out"
+  ],
+  "zoom_gpus": 32,
+  "figures": [
+    {
+      "system": "polaris",
+      "view": "selected_scaling",
+      "stem": "plots_gpt_check/polaris/gpt/strongScaling/backend_comparison/lines/GB768_selected_hooks",
+      "layout": "lines",
+      "backends": [
+        "mpi"
+      ],
+      "notice": "Only one backend is available in this selection.",
+      "missing_requested_points": [],
+      "status": "written",
+      "points": 12,
+      "methods": [
+        "kring_k4",
+        "none",
+        "recursive_doubling_zfp_online_coll:8",
+        "ring_zfp_online_coll:8"
+      ]
+    },
+    {
+      "system": "polaris",
+      "view": "all_algorithms_zoom",
+      "stem": "plots_gpt_check/polaris/gpt/strongScaling/backend_comparison/normal/GB768_gpu32_all_algorithms",
+      "layout": "bars",
+      "backends": [
+        "mpi"
+      ],
+      "notice": "Only one backend is available in this selection.",
+      "status": "written",
+      "points": 16,
+      "methods": [
+        "direct_t16",
+        "direct_t32",
+        "direct_t4",
+        "direct_t64",
+        "direct_t8",
+        "hierarchical_zfp_online_coll:8",
+        "kring_k4",
+        "none",
+        "recursive_doubling",
+        "recursive_doubling_zfp_naive:16",
+        "recursive_doubling_zfp_online_coll:16",
+        "recursive_doubling_zfp_online_coll:8",
+        "ring",
+        "ring_zfp_naive:16",
+        "ring_zfp_online_coll:16",
+        "ring_zfp_online_coll:8"
+      ]
+    }
+  ],
+  "issues": []
+}

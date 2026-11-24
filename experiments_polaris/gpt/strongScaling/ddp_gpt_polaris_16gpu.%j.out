@@ -1,0 +1,1912 @@
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=none, zfp_rate=none, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  built-in (no hook)
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: built-in (no hook)
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] No hook — using DDP built-in MPI allreduce
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 43.3s
+[Epoch 1] t_iter median: 866.74 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 43.3s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 866.74 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+[HOOK_TIMING_SUMMARY] epoch=1 no hook timing samples
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 41.5s
+[Epoch 2] t_iter median: 829.23 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 41.5s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 829.23 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+[HOOK_TIMING_SUMMARY] epoch=2 no hook timing samples
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 41.9s
+[Epoch 3] t_iter median: 837.57 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 41.9s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 837.57 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+[HOOK_TIMING_SUMMARY] epoch=3 no hook timing samples
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 126.7s | Best val acc: nan%
+Epoch times (train+val): mean=42.2s  min=41.5s  max=43.3s
+Train-only epoch time (epochs 2..N): median=41.67s  min=41.46s  max=41.88s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=none, zfp_rate=none, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=direct_t16 zfp_rate=none
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=direct_t16, zfp_rate=none, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  direct_t16
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: direct_t16
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/direct_t16
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 51.9s
+[Epoch 1] t_iter median: 1037.61 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 51.9s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1037.61 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:direct_t16 calls=2600 work_total_ms=23324.022 work_mean_ms=8.971 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t16 steps=50 tail_total_ms=17668.439 tail_mean_ms=353.369 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 49.6s
+[Epoch 2] t_iter median: 992.71 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 49.6s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 992.71 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:direct_t16 calls=2600 work_total_ms=22314.809 work_mean_ms=8.583 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t16 steps=50 tail_total_ms=16903.939 tail_mean_ms=338.079 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 50.1s
+[Epoch 3] t_iter median: 1002.69 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 50.1s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1002.69 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:direct_t16 calls=2600 work_total_ms=22539.079 work_mean_ms=8.669 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t16 steps=50 tail_total_ms=17073.828 tail_mean_ms=341.477 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 151.7s | Best val acc: nan%
+Epoch times (train+val): mean=50.6s  min=49.6s  max=51.9s
+Train-only epoch time (epochs 2..N): median=49.88s  min=49.64s  max=50.13s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=direct_t16, zfp_rate=none, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=direct_t32 zfp_rate=none
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=direct_t32, zfp_rate=none, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  direct_t32
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: direct_t32
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/direct_t32
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 51.9s
+[Epoch 1] t_iter median: 1037.71 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 51.9s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1037.71 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:direct_t32 calls=2600 work_total_ms=23341.764 work_mean_ms=8.978 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t32 steps=50 tail_total_ms=17687.094 tail_mean_ms=353.742 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 49.6s
+[Epoch 2] t_iter median: 992.81 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 49.6s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 992.81 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:direct_t32 calls=2600 work_total_ms=22331.784 work_mean_ms=8.589 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t32 steps=50 tail_total_ms=16921.787 tail_mean_ms=338.436 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 50.1s
+[Epoch 3] t_iter median: 1002.79 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 50.1s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1002.79 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:direct_t32 calls=2600 work_total_ms=22556.224 work_mean_ms=8.675 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t32 steps=50 tail_total_ms=17091.856 tail_mean_ms=341.837 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 151.7s | Best val acc: nan%
+Epoch times (train+val): mean=50.6s  min=49.6s  max=51.9s
+Train-only epoch time (epochs 2..N): median=49.89s  min=49.64s  max=50.14s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=direct_t32, zfp_rate=none, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=direct_t4 zfp_rate=none
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=direct_t4, zfp_rate=none, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  direct_t4
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: direct_t4
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/direct_t4
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 50.6s
+[Epoch 1] t_iter median: 1011.92 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 50.6s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1011.92 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:direct_t4 calls=2600 work_total_ms=22042.712 work_mean_ms=8.478 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t4 steps=50 tail_total_ms=16390.601 tail_mean_ms=327.812 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 48.4s
+[Epoch 2] t_iter median: 968.13 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 48.4s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 968.13 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:direct_t4 calls=2600 work_total_ms=21088.941 work_mean_ms=8.111 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t4 steps=50 tail_total_ms=15681.393 tail_mean_ms=313.628 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 48.9s
+[Epoch 3] t_iter median: 977.87 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 48.9s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 977.87 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:direct_t4 calls=2600 work_total_ms=21300.890 work_mean_ms=8.193 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t4 steps=50 tail_total_ms=15838.995 tail_mean_ms=316.780 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 147.9s | Best val acc: nan%
+Epoch times (train+val): mean=49.3s  min=48.4s  max=50.6s
+Train-only epoch time (epochs 2..N): median=48.65s  min=48.41s  max=48.89s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=direct_t4, zfp_rate=none, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=direct_t64 zfp_rate=none
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=direct_t64, zfp_rate=none, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  direct_t64
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: direct_t64
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/direct_t64
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 51.9s
+[Epoch 1] t_iter median: 1038.34 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 51.9s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1038.34 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:direct_t64 calls=2600 work_total_ms=23375.207 work_mean_ms=8.990 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t64 steps=50 tail_total_ms=17720.789 tail_mean_ms=354.416 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 49.7s
+[Epoch 2] t_iter median: 993.41 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 49.7s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 993.41 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:direct_t64 calls=2600 work_total_ms=22363.780 work_mean_ms=8.601 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t64 steps=50 tail_total_ms=16954.024 tail_mean_ms=339.080 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 50.2s
+[Epoch 3] t_iter median: 1003.39 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 50.2s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1003.39 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:direct_t64 calls=2600 work_total_ms=22588.541 work_mean_ms=8.688 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t64 steps=50 tail_total_ms=17124.416 tail_mean_ms=342.488 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 151.8s | Best val acc: nan%
+Epoch times (train+val): mean=50.6s  min=49.7s  max=51.9s
+Train-only epoch time (epochs 2..N): median=49.92s  min=49.67s  max=50.17s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=direct_t64, zfp_rate=none, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=direct_t8 zfp_rate=none
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=direct_t8, zfp_rate=none, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  direct_t8
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: direct_t8
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/direct_t8
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 50.8s
+[Epoch 1] t_iter median: 1016.39 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 50.8s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1016.39 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:direct_t8 calls=2600 work_total_ms=22276.468 work_mean_ms=8.568 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t8 steps=50 tail_total_ms=16622.956 tail_mean_ms=332.459 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 48.6s
+[Epoch 2] t_iter median: 972.41 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 48.6s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 972.41 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:direct_t8 calls=2600 work_total_ms=21312.583 work_mean_ms=8.197 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t8 steps=50 tail_total_ms=15903.693 tail_mean_ms=318.074 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 49.1s
+[Epoch 3] t_iter median: 982.19 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 49.1s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 982.19 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:direct_t8 calls=2600 work_total_ms=21526.780 work_mean_ms=8.280 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:direct_t8 steps=50 tail_total_ms=16063.529 tail_mean_ms=321.271 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 148.5s | Best val acc: nan%
+Epoch times (train+val): mean=49.5s  min=48.6s  max=50.8s
+Train-only epoch time (epochs 2..N): median=48.87s  min=48.62s  max=49.11s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=direct_t8, zfp_rate=none, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=hierarchical_zfp_online_coll zfp_rate=8
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=hierarchical_zfp_online_coll, zfp_rate=8, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  hierarchical_zfp_online_coll
+  ZFP rate:   8
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: hierarchical_zfp_online_coll
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/hierarchical_zfp_online_coll
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 45.7s
+[Epoch 1] t_iter median: 914.58 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 45.7s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 914.58 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:hierarchical_zfp_online_coll:rate8 calls=2600 work_total_ms=17187.812 work_mean_ms=6.611 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:hierarchical_zfp_online_coll:rate8 steps=50 tail_total_ms=11540.358 tail_mean_ms=230.807 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 43.8s
+[Epoch 2] t_iter median: 875.00 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 43.8s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 875.00 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:hierarchical_zfp_online_coll:rate8 calls=2600 work_total_ms=16444.108 work_mean_ms=6.325 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:hierarchical_zfp_online_coll:rate8 steps=50 tail_total_ms=11041.016 tail_mean_ms=220.820 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 44.2s
+[Epoch 3] t_iter median: 883.80 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 44.2s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 883.80 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:hierarchical_zfp_online_coll:rate8 calls=2600 work_total_ms=16609.376 work_mean_ms=6.388 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:hierarchical_zfp_online_coll:rate8 steps=50 tail_total_ms=11151.981 tail_mean_ms=223.040 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 133.7s | Best val acc: nan%
+Epoch times (train+val): mean=44.6s  min=43.8s  max=45.7s
+Train-only epoch time (epochs 2..N): median=43.97s  min=43.75s  max=44.19s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=hierarchical_zfp_online_coll, zfp_rate=8, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=kring_k4 zfp_rate=none
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=kring_k4, zfp_rate=none, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  kring_k4
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: kring_k4
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/kring_k4
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 46.2s
+[Epoch 1] t_iter median: 924.14 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 46.2s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 924.14 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:kring_k4 calls=2600 work_total_ms=17654.091 work_mean_ms=6.790 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:kring_k4 steps=50 tail_total_ms=12001.921 tail_mean_ms=240.038 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 44.2s
+[Epoch 2] t_iter median: 884.16 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 44.2s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 884.16 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:kring_k4 calls=2600 work_total_ms=16890.212 work_mean_ms=6.496 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:kring_k4 steps=50 tail_total_ms=11482.607 tail_mean_ms=229.652 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 44.7s
+[Epoch 3] t_iter median: 893.04 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 44.7s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 893.04 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:kring_k4 calls=2600 work_total_ms=17059.963 work_mean_ms=6.562 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:kring_k4 steps=50 tail_total_ms=11598.011 tail_mean_ms=231.960 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 135.1s | Best val acc: nan%
+Epoch times (train+val): mean=45.0s  min=44.2s  max=46.2s
+Train-only epoch time (epochs 2..N): median=44.43s  min=44.21s  max=44.65s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=kring_k4, zfp_rate=none, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=recursive_doubling zfp_rate=none
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=recursive_doubling, zfp_rate=none, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  recursive_doubling
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: recursive_doubling
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/recursive_doubling
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 52.4s
+[Epoch 1] t_iter median: 1048.94 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 52.4s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1048.94 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling calls=2600 work_total_ms=23909.475 work_mean_ms=9.196 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling steps=50 tail_total_ms=18254.270 tail_mean_ms=365.085 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 50.2s
+[Epoch 2] t_iter median: 1003.56 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 50.2s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1003.56 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling calls=2600 work_total_ms=22874.930 work_mean_ms=8.798 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling steps=50 tail_total_ms=17464.422 tail_mean_ms=349.288 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 50.7s
+[Epoch 3] t_iter median: 1013.64 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 50.7s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1013.64 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling calls=2600 work_total_ms=23104.829 work_mean_ms=8.886 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling steps=50 tail_total_ms=17639.943 tail_mean_ms=352.799 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 153.3s | Best val acc: nan%
+Epoch times (train+val): mean=51.1s  min=50.2s  max=52.4s
+Train-only epoch time (epochs 2..N): median=50.43s  min=50.18s  max=50.68s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=recursive_doubling, zfp_rate=none, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=recursive_doubling_zfp_naive zfp_rate=16
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=recursive_doubling_zfp_naive, zfp_rate=16, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  recursive_doubling_zfp_naive
+  ZFP rate:   16
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: recursive_doubling_zfp_naive
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/recursive_doubling_zfp_naive
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 50.7s
+[Epoch 1] t_iter median: 1014.42 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 50.7s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1014.42 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling_zfp_naive:rate16 calls=2600 work_total_ms=22186.388 work_mean_ms=8.533 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling_zfp_naive:rate16 steps=50 tail_total_ms=16460.629 tail_mean_ms=329.213 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 48.5s
+[Epoch 2] t_iter median: 970.52 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 48.5s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 970.52 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling_zfp_naive:rate16 calls=2600 work_total_ms=21226.400 work_mean_ms=8.164 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling_zfp_naive:rate16 steps=50 tail_total_ms=15748.390 tail_mean_ms=314.968 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 49.0s
+[Epoch 3] t_iter median: 980.28 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 49.0s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 980.28 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling_zfp_naive:rate16 calls=2600 work_total_ms=21439.730 work_mean_ms=8.246 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling_zfp_naive:rate16 steps=50 tail_total_ms=15906.665 tail_mean_ms=318.133 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 148.3s | Best val acc: nan%
+Epoch times (train+val): mean=49.4s  min=48.5s  max=50.7s
+Train-only epoch time (epochs 2..N): median=48.77s  min=48.53s  max=49.01s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=recursive_doubling_zfp_naive, zfp_rate=16, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=recursive_doubling_zfp_online_coll zfp_rate=16
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=recursive_doubling_zfp_online_coll, zfp_rate=16, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  recursive_doubling_zfp_online_coll
+  ZFP rate:   16
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: recursive_doubling_zfp_online_coll
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/recursive_doubling_zfp_online_coll
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 49.3s
+[Epoch 1] t_iter median: 985.30 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 49.3s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 985.30 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling_zfp_online_coll:rate16 calls=2600 work_total_ms=20708.491 work_mean_ms=7.965 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling_zfp_online_coll:rate16 steps=50 tail_total_ms=15050.623 tail_mean_ms=301.012 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 47.1s
+[Epoch 2] t_iter median: 942.66 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 47.1s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 942.66 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling_zfp_online_coll:rate16 calls=2600 work_total_ms=19812.451 work_mean_ms=7.620 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling_zfp_online_coll:rate16 steps=50 tail_total_ms=14399.394 tail_mean_ms=287.988 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 47.6s
+[Epoch 3] t_iter median: 952.14 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 47.6s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 952.14 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling_zfp_online_coll:rate16 calls=2600 work_total_ms=20011.571 work_mean_ms=7.697 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling_zfp_online_coll:rate16 steps=50 tail_total_ms=14544.111 tail_mean_ms=290.882 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 144.0s | Best val acc: nan%
+Epoch times (train+val): mean=48.0s  min=47.1s  max=49.3s
+Train-only epoch time (epochs 2..N): median=47.37s  min=47.13s  max=47.61s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=recursive_doubling_zfp_online_coll, zfp_rate=16, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=recursive_doubling_zfp_online_coll zfp_rate=8
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=recursive_doubling_zfp_online_coll, zfp_rate=8, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  recursive_doubling_zfp_online_coll
+  ZFP rate:   8
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: recursive_doubling_zfp_online_coll
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/recursive_doubling_zfp_online_coll
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 46.5s
+[Epoch 1] t_iter median: 929.55 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 46.5s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 929.55 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling_zfp_online_coll:rate8 calls=2600 work_total_ms=17924.856 work_mean_ms=6.894 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling_zfp_online_coll:rate8 steps=50 tail_total_ms=12263.944 tail_mean_ms=245.279 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 44.5s
+[Epoch 2] t_iter median: 889.33 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 44.5s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 889.33 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling_zfp_online_coll:rate8 calls=2600 work_total_ms=17149.261 work_mean_ms=6.596 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling_zfp_online_coll:rate8 steps=50 tail_total_ms=11733.293 tail_mean_ms=234.666 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 44.9s
+[Epoch 3] t_iter median: 898.27 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 44.9s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 898.27 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling_zfp_online_coll:rate8 calls=2600 work_total_ms=17321.616 work_mean_ms=6.662 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling_zfp_online_coll:rate8 steps=50 tail_total_ms=11851.215 tail_mean_ms=237.024 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 135.9s | Best val acc: nan%
+Epoch times (train+val): mean=45.3s  min=44.5s  max=46.5s
+Train-only epoch time (epochs 2..N): median=44.69s  min=44.47s  max=44.91s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=recursive_doubling_zfp_online_coll, zfp_rate=8, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=ring zfp_rate=none
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=ring, zfp_rate=none, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  ring
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: ring
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/ring
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 46.6s
+[Epoch 1] t_iter median: 931.42 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 46.6s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 931.42 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:ring calls=2600 work_total_ms=18019.468 work_mean_ms=6.931 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:ring steps=50 tail_total_ms=12363.589 tail_mean_ms=247.272 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 44.6s
+[Epoch 2] t_iter median: 891.12 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 44.6s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 891.12 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:ring calls=2600 work_total_ms=17239.780 work_mean_ms=6.631 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:ring steps=50 tail_total_ms=11828.626 tail_mean_ms=236.573 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 45.0s
+[Epoch 3] t_iter median: 900.08 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 45.0s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 900.08 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:ring calls=2600 work_total_ms=17413.044 work_mean_ms=6.697 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:ring steps=50 tail_total_ms=11947.507 tail_mean_ms=238.950 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 136.1s | Best val acc: nan%
+Epoch times (train+val): mean=45.4s  min=44.6s  max=46.6s
+Train-only epoch time (epochs 2..N): median=44.78s  min=44.56s  max=45.00s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=ring, zfp_rate=none, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=ring_zfp_naive zfp_rate=16
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=ring_zfp_naive, zfp_rate=16, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  ring_zfp_naive
+  ZFP rate:   16
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: ring_zfp_naive
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/ring_zfp_naive
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 53.6s
+[Epoch 1] t_iter median: 1072.24 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 53.6s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1072.24 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:ring_zfp_naive:rate16 calls=2600 work_total_ms=25079.585 work_mean_ms=9.646 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:ring_zfp_naive:rate16 steps=50 tail_total_ms=19351.456 tail_mean_ms=387.029 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 51.3s
+[Epoch 2] t_iter median: 1025.85 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 51.3s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1025.85 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:ring_zfp_naive:rate16 calls=2600 work_total_ms=23994.411 work_mean_ms=9.229 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:ring_zfp_naive:rate16 steps=50 tail_total_ms=18514.133 tail_mean_ms=370.283 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 51.8s
+[Epoch 3] t_iter median: 1036.15 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 51.8s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1036.15 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:ring_zfp_naive:rate16 calls=2600 work_total_ms=24235.561 work_mean_ms=9.321 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:ring_zfp_naive:rate16 steps=50 tail_total_ms=18700.205 tail_mean_ms=374.004 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 156.7s | Best val acc: nan%
+Epoch times (train+val): mean=52.2s  min=51.3s  max=53.6s
+Train-only epoch time (epochs 2..N): median=51.55s  min=51.29s  max=51.81s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=ring_zfp_naive, zfp_rate=16, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=ring_zfp_online_coll zfp_rate=16
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=ring_zfp_online_coll, zfp_rate=16, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  ring_zfp_online_coll
+  ZFP rate:   16
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: ring_zfp_online_coll
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/ring_zfp_online_coll
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 52.4s
+[Epoch 1] t_iter median: 1047.07 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 52.4s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1047.07 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:ring_zfp_online_coll:rate16 calls=2600 work_total_ms=23818.874 work_mean_ms=9.161 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:ring_zfp_online_coll:rate16 steps=50 tail_total_ms=18165.657 tail_mean_ms=363.313 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 50.1s
+[Epoch 2] t_iter median: 1001.77 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 50.1s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1001.77 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:ring_zfp_online_coll:rate16 calls=2600 work_total_ms=22788.250 work_mean_ms=8.765 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:ring_zfp_online_coll:rate16 steps=50 tail_total_ms=17379.643 tail_mean_ms=347.593 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 50.6s
+[Epoch 3] t_iter median: 1011.83 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 50.6s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 1011.83 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:ring_zfp_online_coll:rate16 calls=2600 work_total_ms=23017.277 work_mean_ms=8.853 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:ring_zfp_online_coll:rate16 steps=50 tail_total_ms=17554.313 tail_mean_ms=351.086 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 153.0s | Best val acc: nan%
+Epoch times (train+val): mean=51.0s  min=50.1s  max=52.4s
+Train-only epoch time (epochs 2..N): median=50.34s  min=50.09s  max=50.59s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=ring_zfp_online_coll, zfp_rate=16, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+# RESULT_KIND=SIMULATED backend=mpi hook=ring_zfp_online_coll zfp_rate=8
+=== Starting training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=ring_zfp_online_coll, zfp_rate=8, procs=16, accum=64, block=1024, amp=bf16 at SIMULATED (no execution timestamp) ===
+
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768_simulated (from scratch)
+  Dataset:    simulated_tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  ring_zfp_online_coll
+  ZFP rate:   8
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768_SIMULATED on SIMULATED_TINYSTORIES
+Backend: MPI, Algorithm: ring_zfp_online_coll
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 768
+LR: 0.0006, Device: simulated
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/ring_zfp_online_coll
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000532
+[Epoch 1] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 49.8s
+[Epoch 1] t_iter median: 996.11 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 49.8s
+[Epoch 1] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 996.11 ms
+[Epoch 1] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:ring_zfp_online_coll:rate8 calls=2600 work_total_ms=21256.024 work_mean_ms=8.175 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:ring_zfp_online_coll:rate8 steps=50 tail_total_ms=15603.333 tail_mean_ms=312.067 tail_min_ms=nan tail_max_ms=nan
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000234
+[Epoch 2] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 47.7s
+[Epoch 2] t_iter median: 953.01 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 47.7s
+[Epoch 2] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 953.01 ms
+[Epoch 2] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:ring_zfp_online_coll:rate8 calls=2600 work_total_ms=20336.292 work_mean_ms=7.822 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:ring_zfp_online_coll:rate8 steps=50 tail_total_ms=14928.188 tail_mean_ms=298.564 tail_min_ms=nan tail_max_ms=nan
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: nan, Acc: nan%, lr: 0.000060
+[Epoch 3] Train Loss: nan, Acc: nan%  |  Val Loss: nan, Acc: nan%  |  Time: 48.1s
+[Epoch 3] t_iter median: 962.59 ms  (fwd nan | bwd+comm nan | opt nan | data nan)  |  train-only epoch: 48.1s
+[Epoch 3] compute nan ms  |  exposed comm nan ms  |  sum check nan vs t_iter 962.59 ms
+[Epoch 3] peak GPU mem: nan GiB allocated, nan GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:ring_zfp_online_coll:rate8 calls=2600 work_total_ms=20540.677 work_mean_ms=7.900 work_min_ms=nan work_max_ms=nan
+[HOOK_TAIL_SUMMARY] label=mpi:ring_zfp_online_coll:rate8 steps=50 tail_total_ms=15078.221 tail_mean_ms=301.564 tail_min_ms=nan tail_max_ms=nan
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 145.6s | Best val acc: nan%
+Epoch times (train+val): mean=48.5s  min=47.7s  max=49.8s
+Train-only epoch time (epochs 2..N): median=47.89s  min=47.65s  max=48.13s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768_simulated, dataset=simulated_tinystories, batch=12, lr=6e-4, scheduler=cosine, backend=mpi, hook=ring_zfp_online_coll, zfp_rate=8, procs=16, accum=64, status=SIMULATED at SIMULATED (no execution timestamp) ===
+
+
+=== Job started: Wed Nov 11 07:20:44 AM UTC 2026 ===
+=== Node: x3202c0s1b0n0 ===
+[INFO] conda module: conda/2025-09-28
+[INFO] CUDA 12.9 libs: /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/12.9/targets/x86_64-linux/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/12.9/extras/CUPTI/lib64:/opt/nvidia/hpc_sdk/Linux_x86_64/25.9/math_libs/12.9/targets/x86_64-linux/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/25.9/math_libs/12.9/lib64
+[INFO] CUDA 13.0 runtime (for GTL): /opt/nvidia/hpc_sdk/Linux_x86_64/25.9/cuda/13.0/targets/x86_64-linux/lib
+[INFO] MPI_HOME: /opt/cray/pe/mpich/default/ofi/gnu/12.3 -> /opt/cray/pe/mpich/9.1.0/ofi/gnu/12.3
+[INFO] GTL and PyTorch dependencies all resolve.
+[INFO] GTL_LIB=/opt/cray/pe/mpich/default/ofi/gnu/12.3/lib/libmpi_gtl_cuda.so.0 (preloaded only in MPI ranks via gpu_wrapper.sh)
+=============================================
+  Polaris DDP + Eagle PyTorch + Cray MPICH
+=============================================
+Node              : x3202c0s1b0n0
+conda module      : conda/2025-09-28
+ZFP_HOME          : /home/mrest/mpiAllReduceCompressed/zfp-install
+MPI_HOME          : /opt/cray/pe/mpich/default/ofi/gnu/12.3
+GTL_LIB           : /opt/cray/pe/mpich/default/ofi/gnu/12.3/lib/libmpi_gtl_cuda.so.0
+
+Python            : /soft/applications/conda/2025-09-28/mconda3/bin/python
+PyTorch version   : 2.8.0a0+gitba56102
+PyTorch location  : /lus/eagle/projects/UIC-HPC/mrest/pytorch_mpi_build/src/pytorch/torch/__init__.py
+CUDA available    : True 4
+CUDA built with   : 12.9
+MPI available     : True
+mpi4py            : MPI VERSION    : CRAY MPICH version 9.1.0.794 (ANL base 4.3.0a1)
+=============================================
+MASTER_ADDR=x3202c0s1b0n0.hsn.cm.polaris.alcf.anl.gov
+MASTER_PORT=29500
+=== Starting training: model=gpt2_12x12x768, dataset=tinystories, procs=16, batch=12, accum=64, block=1024, lr=6e-4, amp=bf16, backend=mpi, hook=ring_zfp_naive, zfp_rate=8 at Wed Nov 11 07:21:16 AM UTC 2026 ===
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768 (from scratch)
+  Dataset:    tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  ring_zfp_naive
+  ZFP rate:   8
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768 on TINYSTORIES
+Backend: MPI, Algorithm: ring_zfp_naive
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 192
+LR: 0.0006, Device: cuda:0
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/ring_zfp_naive
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: 6.0043, Acc: 15.95%, lr: 0.000532
+[Epoch 1] Train Loss: 6.0043, Acc: 15.95%  |  Val Loss: 4.1248, Acc: 24.78%  |  Time: 52.8s
+[Epoch 1] t_iter median: 997.06 ms  (fwd 712.73 | bwd+comm 279.35 | opt 4.58 | data 0.28)  |  train-only epoch: 51.5s
+[Epoch 1] compute 822.65 ms  |  exposed comm 169.46 ms  |  sum check 996.69 vs t_iter 997.06 ms
+[Epoch 1] peak GPU mem: 25.46 GiB allocated, 26.88 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:ring_zfp_naive:rate8 calls=638 work_total_ms=23174.887 work_mean_ms=36.324 work_min_ms=11.537 work_max_ms=475.618
+[HOOK_TAIL_SUMMARY] label=mpi:ring_zfp_naive:rate8 steps=51 tail_total_ms=18240.179 tail_mean_ms=357.651 tail_min_ms=295.953 tail_max_ms=649.092
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: 3.9038, Acc: 26.34%, lr: 0.000234
+[Epoch 2] Train Loss: 3.9038, Acc: 26.34%  |  Val Loss: 3.6321, Acc: 29.14%  |  Time: 51.4s
+[Epoch 2] t_iter median: 997.11 ms  (fwd 712.77 | bwd+comm 279.43 | opt 4.64 | data 0.33)  |  train-only epoch: 50.1s
+[Epoch 2] compute 822.69 ms  |  exposed comm 169.51 ms  |  sum check 996.84 vs t_iter 997.11 ms
+[Epoch 2] peak GPU mem: 25.46 GiB allocated, 26.88 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:ring_zfp_naive:rate8 calls=650 work_total_ms=22672.688 work_mean_ms=34.881 work_min_ms=11.502 work_max_ms=327.691
+[HOOK_TAIL_SUMMARY] label=mpi:ring_zfp_naive:rate8 steps=50 tail_total_ms=17242.406 tail_mean_ms=344.848 tail_min_ms=342.767 tail_max_ms=376.249
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: 3.6260, Acc: 29.11%, lr: 0.000060
+[Epoch 3] Train Loss: 3.6260, Acc: 29.11%  |  Val Loss: 3.4499, Acc: 31.69%  |  Time: 51.4s
+[Epoch 3] t_iter median: 997.36 ms  (fwd 712.76 | bwd+comm 279.61 | opt 4.57 | data 0.36)  |  train-only epoch: 50.1s
+[Epoch 3] compute 822.68 ms  |  exposed comm 169.71 ms  |  sum check 996.97 vs t_iter 997.36 ms
+[Epoch 3] peak GPU mem: 25.46 GiB allocated, 26.88 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:ring_zfp_naive:rate8 calls=650 work_total_ms=22671.938 work_mean_ms=34.880 work_min_ms=11.538 work_max_ms=308.898
+[HOOK_TAIL_SUMMARY] label=mpi:ring_zfp_naive:rate8 steps=50 tail_total_ms=17239.427 tail_mean_ms=344.789 tail_min_ms=342.486 tail_max_ms=358.688
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 155.7s | Best val acc: 0.00%
+Epoch times (train+val): mean=51.9s  min=51.4s  max=52.8s
+Train-only epoch time (epochs 2..N): median=50.11s  min=50.11s  max=50.11s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768, dataset=tinystories, procs=16, batch=12, accum=64, lr=6e-4, backend=mpi, hook=ring_zfp_naive, zfp_rate=8, status=0 at Wed Nov 11 07:24:13 AM UTC 2026 ===
+=== Starting training: model=gpt2_12x12x768, dataset=tinystories, procs=16, batch=12, accum=64, block=1024, lr=6e-4, amp=bf16, backend=mpi, hook=recursive_doubling_zfp_naive, zfp_rate=8 at Wed Nov 11 07:24:13 AM UTC 2026 ===
+
+================================================================================
+DISTRIBUTED TRAINING LAUNCHER
+================================================================================
+  Model:      gpt2_12x12x768 (from scratch)
+  Dataset:    tinystories (10 classes)
+  Image size: 32
+  LR:         0.0006
+  Momentum:   0.9 (nesterov=True)
+  Optimizer:  adamw
+  Weight dec: 0.1 (on BN/bias=False)
+  Backend:    mpi
+  Algorithm:  recursive_doubling_zfp_naive
+  ZFP rate:   8
+  Epochs:     3
+  Batch/rank: 12
+  GPT:        block=1024 vocab=50304 bias=False dropout=0.0
+  AdamW:      betas=(0.9, 0.95)
+  Accum:      global=64  amp=bf16  tf32=True
+  Iters/ep:   50  warmup_iters=20  min_lr_ratio=0.1  val_max_batches=10
+  LR:         0.0006
+  Scheduler:  cosine
+  Warmup:     0
+  Grad clip:  1.0
+  Drop last:  True
+  Data dir:   /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data
+================================================================================
+
+
+================================================================================
+Distributed Training: GPT2_12X12X768 on TINYSTORIES
+Backend: MPI, Algorithm: recursive_doubling_zfp_naive
+================================================================================
+Ranks: 16, Epochs: 3, Batch/rank: 12, Effective batch: 192
+LR: 0.0006, Device: cuda:0
+
+[Cache] Pretrained weights cache (TORCH_HOME) = /lus/eagle/projects/UIC-HPC/mrest/mpiAllReduceCompressed/data/pretrained_weights_cache
+number of parameters: 123.59M
+[Setup] Model on cuda:0, wrapped in DDP (static_graph=True)
+[Setup] Synced warm-up backward done (static_graph + no_sync)
+[Setup] Hook registered: mpi/recursive_doubling_zfp_naive
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 25, with 19,200 parameters
+using fused AdamW: True
+[Optim] ADAMW: lr=0.0006 momentum=0.9 nesterov=True wd=0.1 wd_on_bn_bias=False
+[Optim]   group 0: 124,354,560 params, wd=0.1
+[Optim]   group 1: 19,200 params, wd=0.0
+[Data] Train batches: 2410, Val batches: 388
+
+[Data] Batch transform: none
+
+[Accum] micro-steps/rank=4, global micro-batches=64, tokens/iter=786,432, amp=bf16
+[Sched] cosine: steps/epoch=50, total_steps=150, warmup_steps=20 (0 epochs)
+
+
+[Epoch 1] Training... (lr at epoch start=0.000030)
+  Batch [50/50] Loss: 6.0013, Acc: 15.49%, lr: 0.000532
+[Epoch 1] Train Loss: 6.0013, Acc: 15.49%  |  Val Loss: 4.1556, Acc: 24.58%  |  Time: 47.7s
+[Epoch 1] t_iter median: 923.02 ms  (fwd 712.99 | bwd+comm 205.15 | opt 4.69 | data 0.28)  |  train-only epoch: 46.4s
+[Epoch 1] compute 823.09 ms  |  exposed comm 95.08 ms  |  sum check 922.87 vs t_iter 923.02 ms
+[Epoch 1] peak GPU mem: 25.33 GiB allocated, 26.61 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 1] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=1
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling_zfp_naive:rate8 calls=638 work_total_ms=18587.948 work_mean_ms=29.135 work_min_ms=5.123 work_max_ms=292.224
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling_zfp_naive:rate8 steps=51 tail_total_ms=13652.352 tail_mean_ms=267.693 tail_min_ms=260.833 tail_max_ms=315.462
+[Epoch 1] Hook timing summary done
+
+[Epoch 2] Training... (lr at epoch start=0.000532)
+  Batch [50/50] Loss: 3.9212, Acc: 26.18%, lr: 0.000234
+[Epoch 2] Train Loss: 3.9212, Acc: 26.18%  |  Val Loss: 3.6473, Acc: 28.99%  |  Time: 47.6s
+[Epoch 2] t_iter median: 923.30 ms  (fwd 713.03 | bwd+comm 205.28 | opt 4.70 | data 0.32)  |  train-only epoch: 46.3s
+[Epoch 2] compute 823.11 ms  |  exposed comm 95.21 ms  |  sum check 923.03 vs t_iter 923.30 ms
+[Epoch 2] peak GPU mem: 25.33 GiB allocated, 26.61 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 2] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=2
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling_zfp_naive:rate8 calls=650 work_total_ms=18882.098 work_mean_ms=29.049 work_min_ms=4.722 work_max_ms=304.221
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling_zfp_naive:rate8 steps=50 tail_total_ms=13373.270 tail_mean_ms=267.465 tail_min_ms=261.098 tail_max_ms=286.600
+[Epoch 2] Hook timing summary done
+
+[Epoch 3] Training... (lr at epoch start=0.000234)
+  Batch [50/50] Loss: 3.6560, Acc: 28.64%, lr: 0.000060
+[Epoch 3] Train Loss: 3.6560, Acc: 28.64%  |  Val Loss: 3.4990, Acc: 30.87%  |  Time: 47.7s
+[Epoch 3] t_iter median: 923.96 ms  (fwd 712.99 | bwd+comm 205.98 | opt 4.56 | data 0.33)  |  train-only epoch: 46.4s
+[Epoch 3] compute 823.06 ms  |  exposed comm 95.88 ms  |  sum check 923.50 vs t_iter 923.96 ms
+[Epoch 3] peak GPU mem: 25.33 GiB allocated, 26.61 GiB reserved | wd_on_bn_bias: False, nesterov: True
+[Epoch 3] Summarizing hook timing...
+
+[HOOK_TIMING_SUMMARY] epoch=3
+[HOOK_WORK_SUMMARY] label=mpi:recursive_doubling_zfp_naive:rate8 calls=650 work_total_ms=18926.662 work_mean_ms=29.118 work_min_ms=5.127 work_max_ms=302.643
+[HOOK_TAIL_SUMMARY] label=mpi:recursive_doubling_zfp_naive:rate8 steps=50 tail_total_ms=13419.749 tail_mean_ms=268.395 tail_min_ms=261.586 tail_max_ms=287.946
+[Epoch 3] Hook timing summary done
+
+================================================================================
+Done in 143.0s | Best val acc: 0.00%
+Epoch times (train+val): mean=47.7s  min=47.6s  max=47.7s
+Train-only epoch time (epochs 2..N): median=46.33s  min=46.31s  max=46.35s
+  -> use this for STRONG scaling (fixed global batch)
+  -> use t_iter_median_ms from the CSV for WEAK scaling (fixed local batch)
+================================================================================
+=== Finished training: model=gpt2_12x12x768, dataset=tinystories, procs=16, batch=12, accum=64, lr=6e-4, backend=mpi, hook=recursive_doubling_zfp_naive, zfp_rate=8, status=0 at Wed Nov 11 07:26:46 AM UTC 2026 ===
+=== Job finished: Wed Nov 11 07:26:46 AM UTC 2026 ===

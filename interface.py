@@ -117,9 +117,29 @@ def apply_job_overrides(config):
     _set_if_present(config, "data_dir", _read_optional_env("DATA_DIR"))
     _set_if_present(config, "checkpoint_dir", _read_optional_env("CHECKPOINT_DIR"))
     _set_if_present(config, "seed", _read_int_env("SEED"))
+    
+    
+    # ── nanoGPT ──────────────────────────────────────────────────────────
+    _set_if_present(config, "block_size", _read_int_env("BLOCK_SIZE"))
+    _set_if_present(config, "vocab_size", _read_int_env("VOCAB_SIZE"))
+    _set_if_present(config, "gpt_bias", _read_bool_env("GPT_BIAS"))
+    _set_if_present(config, "dropout", _read_float_env("DROPOUT"))
+    _set_if_present(config, "adam_beta1", _read_float_env("ADAM_BETA1"))
+    _set_if_present(config, "adam_beta2", _read_float_env("ADAM_BETA2"))
+    _set_if_present(config, "grad_accum_global", _read_int_env("GRAD_ACCUM_GLOBAL"))
+    _set_if_present(config, "amp", _read_optional_env("AMP"))
+    _set_if_present(config, "allow_tf32", _read_bool_env("ALLOW_TF32"))
+    _set_if_present(config, "warmup_iters", _read_int_env("WARMUP_ITERS"))
+    _set_if_present(config, "min_lr_ratio", _read_float_env("MIN_LR_RATIO"))
+    _set_if_present(config, "iters_per_epoch", _read_int_env("ITERS_PER_EPOCH"))
+    _set_if_present(config, "val_max_batches", _read_int_env("VAL_MAX_BATCHES"))
 
 
 if __name__ == "__main__":
+    
+    import sys
+    if int(os.environ.get("PMI_RANK", os.environ.get("PALS_RANKID", "0"))) != 0:
+        sys.stdout = open(os.devnull, "w")   # only rank 0 prints
 
     config = TrainingConfig(
         # Model
@@ -200,6 +220,14 @@ if __name__ == "__main__":
         print(f"  ZFP rate:   {config.zfp_rate:g}")
     print(f"  Epochs:     {config.num_epochs}")
     print(f"  Batch/rank: {config.batch_size}")
+    if config.is_lm:
+        print(f"  GPT:        block={config.block_size} vocab={config.vocab_size} "
+              f"bias={config.gpt_bias} dropout={config.dropout}")
+        print(f"  AdamW:      betas=({config.adam_beta1}, {config.adam_beta2})")
+    print(f"  Accum:      global={config.grad_accum_global}  amp={config.amp}  "
+          f"tf32={config.allow_tf32}")
+    print(f"  Iters/ep:   {config.iters_per_epoch}  warmup_iters={config.warmup_iters}  "
+          f"min_lr_ratio={config.min_lr_ratio}  val_max_batches={config.val_max_batches}")
     print(f"  LR:         {config.learning_rate}")
     print(f"  Scheduler:  {config.scheduler}")
     print(f"  Warmup:     {config.warmup_epochs}")
