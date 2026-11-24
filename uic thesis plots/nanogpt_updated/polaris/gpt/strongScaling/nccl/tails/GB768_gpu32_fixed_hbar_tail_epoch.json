@@ -1,0 +1,254 @@
+{
+  "tail_context": true,
+  "training_context_basis": "matched post-warmup epochs; mean time per measured optimizer step for iter units",
+  "title": "GPT \u00b7 strong scaling \u00b7 effective global batch 768",
+  "metric": "tail",
+  "unit": "auto",
+  "layout": "hbar",
+  "width_inches": 9,
+  "height_inches": 5.61,
+  "min_font_pt": 11,
+  "mode": "strong",
+  "x": "ranks",
+  "normalize": "absolute",
+  "repeats": "median",
+  "points": [
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 32,
+      "method": "ring",
+      "value": 22.656494000000002,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 128,
+          "id": "5db65c3cba5a",
+          "raw_hook": "ring",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        22.656494000000002
+      ],
+      "training_value": 26.05,
+      "training_run_values": [
+        26.05
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 32,
+      "method": "ring_zfp_naive:16",
+      "value": 27.249904,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 230,
+          "id": "bb153b4e4abc",
+          "raw_hook": "ring_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        27.249904
+      ],
+      "training_value": 30.6,
+      "training_run_values": [
+        30.6
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 32,
+      "method": "hierarchical_zfp_online_coll:16",
+      "value": 18.9060045,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 336,
+          "id": "7cb2bd058707",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [
+            "multiple internal hook labels in one block; inspect source"
+          ],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        18.9060045
+      ],
+      "training_value": 22.35,
+      "training_run_values": [
+        22.35
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 32,
+      "method": "hierarchical_zfp_online_coll:8",
+      "value": 12.1064215,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 440,
+          "id": "5e8cbd27bd55",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [
+            "multiple internal hook labels in one block; inspect source"
+          ],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        12.1064215
+      ],
+      "training_value": 15.5,
+      "training_run_values": [
+        15.5
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 32,
+      "method": "recursive_doubling",
+      "value": 70.71273250000002,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 544,
+          "id": "d65aff39225a",
+          "raw_hook": "recursive_doubling",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        70.71273250000002
+      ],
+      "training_value": 74.05,
+      "training_run_values": [
+        74.05
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 32,
+      "method": "recursive_doubling_zfp_naive:16",
+      "value": 41.761199000000005,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+          "line": 646,
+          "id": "b51ba02fcd87",
+          "raw_hook": "recursive_doubling_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        41.761199000000005
+      ],
+      "training_value": 45.15,
+      "training_run_values": [
+        45.15
+      ]
+    }
+  ],
+  "omitted": [
+    {
+      "id": "2cf258d54246",
+      "method": "none",
+      "ranks": 32,
+      "reason": "matched train-only time and tail not recorded (not zero)",
+      "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out"
+    }
+  ],
+  "contrast": [
+    {
+      "method": "ring",
+      "color": "#145C32",
+      "hatch": "",
+      "white_hatch_vs_fill": 8.056284051928243,
+      "line_vs_white": 8.056284051928243,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring_zfp_naive:16",
+      "color": "#2E7846",
+      "hatch": "///",
+      "white_hatch_vs_fill": 5.396798226877005,
+      "line_vs_white": 5.396798226877005,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling",
+      "color": "#174F87",
+      "hatch": "..",
+      "white_hatch_vs_fill": 8.384309628216378,
+      "line_vs_white": 8.384309628216378,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling_zfp_naive:16",
+      "color": "#2E6C9E",
+      "hatch": "oo",
+      "white_hatch_vs_fill": 5.592665861106606,
+      "line_vs_white": 5.592665861106606,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "hierarchical_zfp_online_coll:16",
+      "color": "#68408C",
+      "hatch": "*",
+      "white_hatch_vs_fill": 7.775878421056213,
+      "line_vs_white": 7.775878421056213,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "hierarchical_zfp_online_coll:8",
+      "color": "#9770AD",
+      "hatch": "||",
+      "white_hatch_vs_fill": 4.009962969714528,
+      "line_vs_white": 4.009962969714528,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    }
+  ],
+  "notes": [
+    "Hook work is cumulative and can overlap; do not stack it as disjoint wall time.",
+    "Tail is the measured exposed tail, not the entire communication cost.",
+    "Duplicate aliases and genuinely repeated measurements retain source provenance.",
+    "Figure design checks do not certify the final thesis PDF/EPUB."
+  ]
+}

@@ -69,8 +69,11 @@ def aggregate(runs,metric,unit,x,repeat):
         key=(panel_key(r),xvalue(r,x),r['method']);grouped.setdefault(key,[]).append((r,v))
     points=[]
     for (panel,xx,m),rv in grouped.items():
+        # Do not average predictions with a measured result for the same point.
+        measured=[(r,v) for r,v in rv if r.get('result_kind','measured')!='predicted']
+        if measured:rv=measured
         if repeat=='latest':rv=[max(rv,key=lambda t:(Path(t[0]['source']).stat().st_mtime if Path(t[0]['source']).exists() else 0,t[0]['source'],t[0]['source_line']))]
-        points.append(dict(panel=panel,x=xx,method=m,value=statistics.median(v for r,v in rv),n_runs=len(rv),sources=[dict(source=r['source'],line=r['source_line'],id=r['id'],raw_hook=r['raw_hook'],epochs=r['epochs'],observed_epochs=r['observed_epochs'],complete=r['complete'],warnings=r.get('warnings',[]),native_fallback=r['native_fallback']) for r,v in rv],run_values=[v for r,v in rv]))
+        points.append(dict(result_kind='predicted' if all(r.get('result_kind')=='predicted' for r,v in rv) else 'measured',panel=panel,x=xx,method=m,value=statistics.median(v for r,v in rv),n_runs=len(rv),sources=[dict(result_kind=r.get('result_kind','measured'),source=r['source'],line=r['source_line'],id=r['id'],raw_hook=r['raw_hook'],epochs=r['epochs'],observed_epochs=r['observed_epochs'],complete=r['complete'],warnings=r.get('warnings',[]),native_fallback=r['native_fallback']) for r,v in rv],run_values=[v for r,v in rv]))
     return points,omitted
 
 def tail_pair_values(r,unit='auto'):
@@ -110,6 +113,25 @@ def aggregate_tail_pairs(runs,unit,x,repeat):
         p['training_run_values']=[r['_training_value'] for r in rv]
     return points,omitted
 
+def wrap_figure_text(text,width_inches,font_size,bold=False):
+    """Wrap by measured font width; preserve physical font size and canvas."""
+    from matplotlib.backends.backend_agg import RendererAgg
+    from matplotlib.font_manager import FontProperties
+    renderer=RendererAgg(1,1,72)
+    font=FontProperties(family='DejaVu Sans',size=font_size,weight='bold' if bold else 'normal')
+    limit=max(1,(width_inches*.98-.9)*72)
+    lines=[]
+    for paragraph in str(text).split('\n'):
+        current=''
+        for word in paragraph.split():
+            trial=(current+' '+word).strip()
+            if current and renderer.get_text_width_height_descent(trial,font,False)[0]>limit:
+                lines.append(current);current=word
+            else:current=trial
+        lines.append(current)
+    return '\n'.join(lines)
+
+
 def create(runs,args,output):
     if not runs:raise NoData('No matching completed runs')
     signatures={workload(r,args.x) for r in runs}
@@ -127,6 +149,7 @@ def create(runs,args,output):
     else:points,omitted=aggregate(runs,metric,unit,args.x,args.repeats)
     if not points:raise NoData(f'No recorded {metric} measurements after epoch 1')
     panels=sorted({p['panel'] for p in points});methods=sorted({p['method'] for p in points},key=st.sort_key);xs=sorted({p['x'] for p in points});lookup={(p['panel'],p['x'],p['method']):p['value'] for p in points}
+    predicted_keys={(p['panel'],p['x'],p['method']) for p in points if p.get('result_kind')=='predicted'}
     layout=args.layout
     if layout=='hbar' and len(xs)!=1:raise ValueError('Horizontal method comparison needs one x value: specify --gpus (or one batch for batch x)')
     if layout=='lines' and args.normalize in ('speedup','efficiency') and (mode!='strong' or args.x!='ranks'):raise ValueError('Scaling speedup/efficiency require strong mode and ranks on x')
@@ -145,26 +168,36 @@ def create(runs,args,output):
         ylabel=f'{"Parallel efficiency" if args.normalize=="efficiency" else "Speedup"} relative to {ref} GPUs'
     lookup={(p['panel'],p['x'],p['method']):p['value'] for p in points}
     plt.rcParams.update({'font.family':'DejaVu Sans','font.size':args.font_size,'axes.labelsize':args.font_size,'axes.titlesize':args.font_size+1,'axes.spines.top':False,'axes.spines.right':False,'hatch.linewidth':.85,'svg.fonttype':'none','pdf.fonttype':42})
+    font_scale=max(1.0,args.font_size/11.0)
     cols=min(len(panels),args.columns);rows=math.ceil(len(panels)/cols)
     width=args.width;panel_width=(width-.8)/cols
+    desc=workload(runs[0],args.x);fixed=desc[4]
+    workload_text=('effective global batch' if mode=='strong' else 'local batch')+f' {fixed}' if fixed is not None else f'fixed GPU count {runs[0]["ranks"]}'
+    display_family={'wideresnet32':'WideResNet 32×32','wideresnet224':'WideResNet 224×224','gpt':'GPT'}.get(runs[0]['family'],runs[0]['family'])
+    title=args.title or f'{display_family} · {mode} scaling · {workload_text}'
+    wrapped_title=wrap_figure_text(title,width,args.font_size+3,True)
+    subtitle='Lower is better' if args.normalize not in ('speedup','efficiency') else 'Higher is better'
+    wrapped_subtitle=wrap_figure_text(subtitle,width,args.font_size)
+    title_extra=wrapped_title.count('\n')*.25*font_scale
+    subtitle_extra=wrapped_subtitle.count('\n')*.21*font_scale
+    header_inches=1.10*font_scale+title_extra+subtitle_extra
     if panel_width<4.6:raise ValueError('Panels too narrow for readable text: reduce --columns or increase --width')
     families=[f for f in st.ORDER if any(st.family(m)==f for m in methods)]
-    legend_cols = min(len(families), max(1, int((width - 1) / 2.4)))
-    legend_rows = 0 if paired else math.ceil(len(families) / legend_cols)
-    legend_inches=.55 if paired else 0
+    legend_cols=min(len(families),max(1,int((width-1)/(2.4*font_scale))));legend_rows=0 if paired else math.ceil(len(families)/legend_cols)
+    legend_inches=.55*font_scale if paired else 0
     for row in range(legend_rows):
         fs=families[row*legend_cols:(row+1)*legend_cols]
-        legend_inches+=.35+max(sum(st.family(m)==f for m in methods) for f in fs)*.22
-    panel_height=max(2.8,(.53 if paired else .26)*len(methods)) if layout=='hbar' else 3.0
-    xlabel_inches=(1.05 if args.family_labels and layout=='bars' else .58)
-    height=args.height or (.85+rows*panel_height+(rows-1)*1.1+xlabel_inches+legend_inches+.45)
-    bottom=(legend_inches+.45+xlabel_inches)/height;top=1-.85/height
+        legend_inches+=(.35+max(sum(st.family(m)==f for m in methods) for f in fs)*.22)*font_scale
+    panel_height=(max(2.8,(.53 if paired else .26)*len(methods)) if layout=='hbar' else 3.0)*font_scale
+    xlabel_inches=(1.05 if args.family_labels and layout=='bars' else .58)*font_scale
+    height=args.height or (header_inches+rows*panel_height+(rows-1)*1.1*font_scale+xlabel_inches+legend_inches+.45*font_scale)
+    bottom=(legend_inches+.45*font_scale+xlabel_inches)/height;top=1-header_inches/height
     fig,axs=plt.subplots(rows,cols,figsize=(width,height),squeeze=False)
-    fig.subplots_adjust(left=(.43 if layout=='hbar' else .9/width),right=.98,top=top,bottom=bottom,hspace=.72,wspace=.28)
+    fig.subplots_adjust(left=(.43 if layout=='hbar' else .9*font_scale/width),right=.98,top=top,bottom=bottom,hspace=.72,wspace=.18)
     xlab={'ranks':'GPU count (ranks)','global_batch':'Effective global batch','batch_per_rank':'Batch / rank'}[args.x]
     for ai,ax in enumerate(axs.flat):
         if ai>=len(panels):ax.set_visible(False);continue
-        if layout == 'hbar':
+        if layout=='hbar':
             row,col=divmod(ai,cols);cell_width=width/cols
             if cell_width<8:raise ValueError('Paired tail panels need at least 8 physical inches each; increase --width or reduce --columns')
             available=top-bottom;cell_height=(available-(rows-1)*1.1/height)/rows
@@ -173,7 +206,15 @@ def create(runs,args,output):
         if layout=='lines':
             for i,m in enumerate(present):
                 s=st.style(m,args.palette=='shades');ys=[lookup.get((panel,x,m),float('nan')) for x in xs]
-                ax.plot(xs,ys,color=s['color'],marker=s['marker'],ls=s['linestyle'],lw=2.7 if m=='none' else 1.8,ms=6,label=st.full_label(m))
+                if not any((panel,x,m) in predicted_keys for x in xs):
+                    ax.plot(xs,ys,color=s['color'],marker=s['marker'],ls=s['linestyle'],lw=2.7 if m=='none' else 1.8,ms=6,label=st.full_label(m))
+                else:
+                    for j in range(len(xs)-1):
+                        estimate=any((panel,x,m) in predicted_keys for x in xs[j:j+2])
+                        ax.plot(xs[j:j+2],ys[j:j+2],color=s['color'],ls='--' if estimate else s['linestyle'],lw=1.8)
+                    for x,y in zip(xs,ys):
+                        estimate=(panel,x,m) in predicted_keys
+                        ax.plot([x],[y],color=s['color'],marker=s['marker'],mfc='white' if estimate else s['color'],mec=s['color'],mew=1.5,ls='none',ms=7)
             ax.set_xticks(xs);ax.set_xlabel(xlab);ax.set_ylabel(ylabel);ax.grid(axis='y',color='#d0d0d0',lw=.6)
             if args.xscale=='log2':ax.set_xscale('log',base=2);ax.set_xticks(xs,labels=[str(x) for x in xs])
         elif layout=='hbar':
@@ -187,7 +228,7 @@ def create(runs,args,output):
                     yy_tail=cursor+.21 if paired else cursor
                     hh=.38 if paired else .75
                     ax.barh(yy_tail,v,color=s['color'],edgecolor='white',hatch=s['hatch'],lw=0,height=hh);ax.barh(yy_tail,v,facecolor='none',edgecolor='black',lw=.7,height=hh)
-                    yy.append(cursor);texts.append(st.full_label(m));cursor+=1
+                    yy.append(cursor);texts.append(st.full_label(m)+(' [predicted]' if (panel,xs[0],m) in predicted_keys else ''));cursor+=1
                 cursor+=.4
             ax.set_yticks(yy,texts);ax.invert_yaxis();ax.set_xlabel(ylabel);ax.grid(axis='x',color='#d0d0d0',lw=.6)
         else:
@@ -199,10 +240,12 @@ def create(runs,args,output):
                     for j,x in enumerate(xs):
                         v=lookup.get((panel,x,m))
                         if v is None:continue
-                        ax.bar(j+off,v,width=w*.94,color=s['color'],edgecolor='white',hatch=s['hatch'],lw=0,zorder=3);ax.bar(j+off,v,width=w*.94,facecolor='none',edgecolor='black',lw=.7,zorder=4)
+                        estimated=(panel,x,m) in predicted_keys
+                        ax.bar(j+off,v,width=w*.94,color=s['color'],edgecolor='white',hatch=s['hatch'],lw=0,zorder=3)
+                        ax.bar(j+off,v,width=w*.94,facecolor='none',edgecolor='black',lw=.7,ls='-',zorder=4)
                 center=((start+cursor)/2)*w
                 if args.family_labels:
-                    for j in range(len(xs)):ax.text(j+center,-.075,st.abbreviation(f),transform=ax.get_xaxis_transform(),ha='center',va='top',fontsize=args.font_size)
+                    for j in range(len(xs)):ax.text(j+center,-.075/font_scale,st.abbreviation(f),transform=ax.get_xaxis_transform(),ha='center',va='top',fontsize=args.font_size)
                 cursor+=.8
             ax.set_xticks(range(len(xs)),xs);ax.tick_params(axis='x',pad=40 if args.family_labels else 6);ax.set_xlabel(xlab,labelpad=8);ax.set_ylabel(ylabel);ax.grid(axis='y',color='#d0d0d0',lw=.6);ax.set_xlim(-.55,len(xs)-.45)
         ax.set_axisbelow(True);ax.set_title(panel+(f' · {xlab} {xs[0]}' if layout=='hbar' else ''),pad=10)
@@ -213,7 +256,7 @@ def create(runs,args,output):
         if args.ymax:
             if layout=='hbar':ax.set_xlim(0,args.ymax)
             else:ax.set_ylim(0,args.ymax)
-    if layout == 'hbar' and args.share_y:
+    if layout=='hbar' and args.share_y:
         upper=max(ax.get_xlim()[1] for ax in axs.flat if ax.get_visible())
         for ax in axs.flat:
             if ax.get_visible():ax.set_xlim(0,upper)
@@ -221,18 +264,14 @@ def create(runs,args,output):
         upper=max(ax.get_ylim()[1] for ax in axs.flat if ax.get_visible())
         for ax in axs.flat:
             if ax.get_visible():ax.set_ylim(0,upper)
-    desc=workload(runs[0],args.x);fixed=desc[4]
-    workload_text=('effective global batch' if mode=='strong' else 'local batch')+f' {fixed}' if fixed is not None else f'fixed GPU count {runs[0]["ranks"]}'
-    display_family={'wideresnet32':'WideResNet 32×32','wideresnet224':'WideResNet 224×224','gpt':'GPT'}.get(runs[0]['family'],runs[0]['family'])
-    title=args.title or f'{display_family} · {mode} scaling · {workload_text}'
-    fig.text(.9/width,1-.13/height,title,fontsize=args.font_size+3,fontweight='bold',va='top')
-    fig.text(.9/width,1-.47/height,'Lower is better' if args.normalize not in ('speedup','efficiency') else 'Higher is better',fontsize=args.font_size,va='top')
+    fig.text(.9/width,1-.13*font_scale/height,wrapped_title,fontsize=args.font_size+3,fontweight='bold',va='top')
+    fig.text(.9/width,1-(.47*font_scale+title_extra)/height,wrapped_subtitle,fontsize=args.font_size,va='top')
     if paired:
-        fig.legend([Patch(facecolor='#D9D9D9',edgecolor='black',hatch='..'),Patch(facecolor='#145C32',edgecolor='white',hatch='///')],['Train-only time','Exposed tail (family color and pattern)'],loc='lower center',bbox_to_anchor=(.5,.39/height),ncol=1,frameon=False,fontsize=args.font_size)
+        fig.legend([Patch(facecolor='#D9D9D9',edgecolor='black',hatch='..'),Patch(facecolor='#145C32',edgecolor='white',hatch='///')],['Train-only time','Exposed tail (family color and pattern)'],loc='lower center',bbox_to_anchor=(.5,.39*font_scale/height),ncol=1,frameon=False,fontsize=args.font_size)
     # Legends use explicit family headings and carry the same patterns as bars.
-    y=(legend_inches+.36)/height
+    y=(legend_inches+.36*font_scale)/height
     for row in range(legend_rows):
-        fs=families[row*legend_cols:(row+1)*legend_cols];rowheight=.35+max(sum(st.family(m)==f for m in methods) for f in fs)*.22
+        fs=families[row*legend_cols:(row+1)*legend_cols];rowheight=(.35+max(sum(st.family(m)==f for m in methods) for f in fs)*.22)*font_scale
         for col,f in enumerate(fs):
             ms=[m for m in methods if st.family(m)==f];handles=[]
             for m in ms:
@@ -243,7 +282,7 @@ def create(runs,args,output):
                 else:handles.append(Patch(facecolor=s['color'],edgecolor='white',hatch=s['hatch']))
             leg=fig.legend(handles,[st.label(m) for m in ms],title=f,loc='upper left',bbox_to_anchor=(.9/width+col*(width-1)/legend_cols/width,y),frameon=False,fontsize=args.font_size,title_fontsize=args.font_size,handlelength=2.4,borderaxespad=0,labelspacing=.45);leg.get_title().set_fontweight('bold')
         y-=rowheight/height
-    fig.text(.9/width,.13/height,'Epoch 1 excluded · missing metrics are not zero · r = ZFP rate',fontsize=args.font_size,va='bottom')
+    fig.text(.9/width,.13*font_scale/height,'Epoch 1 excluded · missing metrics are not zero · r = ZFP rate',fontsize=args.font_size,va='bottom')
     output=Path(output);output.parent.mkdir(parents=True,exist_ok=True)
     for fmt in args.formats:fig.savefig(output.with_suffix('.'+fmt),dpi=args.dpi)
     plt.close(fig)
@@ -251,21 +290,26 @@ def create(runs,args,output):
     provenance=dict(tail_context=paired,training_context_basis='matched post-warmup epochs; mean time per measured optimizer step for iter units' if paired else None,title=title,metric=metric,unit=unit,layout=layout,width_inches=width,height_inches=height,min_font_pt=args.font_size,mode=mode,x=args.x,normalize=args.normalize,repeats=args.repeats,points=points,omitted=omitted,contrast=contrast,notes=['Hook work is cumulative and can overlap; do not stack it as disjoint wall time.','Tail is the measured exposed tail, not the entire communication cost.','Duplicate aliases and genuinely repeated measurements retain source provenance.','Figure design checks do not certify the final thesis PDF/EPUB.'])
     output.with_suffix('.json').write_text(json.dumps(provenance,indent=2))
     with output.with_suffix('.csv').open('w',newline='') as f:
-        w=csv.DictWriter(f,fieldnames=['panel','x','method','value','n_runs']+(['training_value'] if paired else []));w.writeheader();w.writerows({k:p[k] for k in w.fieldnames} for p in points)
+        w=csv.DictWriter(f,fieldnames=['panel','x','method','value','n_runs','result_kind']+(['training_value'] if paired else []));w.writeheader();w.writerows({k:p[k] for k in w.fieldnames} for p in points)
     trend=[]
     for panel in panels:
         for x in xs:
-            pp=[p for p in points if p['panel']==panel and p['x']==x];best=min(pp,key=lambda p:p['value']) if args.normalize not in ('speedup','efficiency') else max(pp,key=lambda p:p['value'])
+            pp=[p for p in points if p['panel']==panel and p['x']==x]
+            if not pp:
+                trend.append(f'{panel}, {xlab} {x}: no recorded values are available; this configuration is omitted, not set to zero.')
+                continue
+            best=min(pp,key=lambda p:p['value']) if args.normalize not in ('speedup','efficiency') else max(pp,key=lambda p:p['value'])
             trend.append(f'{panel}, {xlab} {x}: '+st.full_label(best['method'])+f' has the {"lowest" if args.normalize not in ("speedup","efficiency") else "highest"} plotted value, {best["value"]:.3f}.')
     alt=f'{title}. {ylabel} is compared across {xlab.lower()} values '+', '.join(map(str,xs))+'. '+('Panels compare '+', '.join(panels)+'. ' if len(panels)>1 else panels[0]+'. ')+ 'A detailed description and all plotted values follow.'
     long=f'The figure uses {layout}. '+('Families and methods are identified by text and patterns in addition to color. ' if layout!='lines' else 'Methods use colors, line styles and markers. ')+f'The metric is {ylabel}. '+ ' '.join(trend)+' Epoch 1 is excluded. Values are medians; when repeated runs are available the selected repeat policy is '+args.repeats+'. These are not confidence intervals across repeated jobs. Missing or unrecorded metrics are omitted, not set to zero. '+('Hook work is cumulative instrumented work; it can overlap and is not an additive wall-time partition. ' if metric=='hook' else '')+('Exposed tail is the instrumented tail, not total communication time. ' if metric.startswith('tail') else '')
+    if predicted_keys:long+=' Explicit predictions are included as estimates, not experimental measurements. Open markers and dashed connecting segments identify predictions in line plots; Bars use normal solid outlines; the figure note and data table disclose estimated values without letter annotations. The data table labels every point as measured or predicted.'
     if paired:
         long+=' Each method has two separate horizontal bars starting at zero: a light gray dotted bar for train-only time and a family-colored patterned bar for exposed tail. They are not stacked. Both bars use the same post-warmup epochs and repeat selection. In iteration units, both are means per measured optimizer step, not median iteration latency. Shared horizontal limits support comparison across panels. The baseline is omitted when tail instrumentation is unavailable.'
     output.with_suffix('.description.md').write_text(f'# {title}\n\n## Short alternative\n\n{alt}\n\n## Detailed description\n\n{long}\n')
-    table_keys=['panel','x','method','value','n_runs']+(['training_value'] if paired else [])
+    table_keys=['panel','x','method','value','n_runs','result_kind']+(['training_value'] if paired else [])
     training_header='<th scope="col">Train-only time</th>' if paired else ''
     trs=''.join('<tr>'+''.join(f'<td>{html.escape(str(p[k]))}</td>' for k in table_keys)+'</tr>' for p in points)
     img=output.name+'.png' if 'png' in args.formats else output.name+'.svg' if 'svg' in args.formats else None
     graphic=f'<figure><img src="{img}" alt="{html.escape(alt,quote=True)}"><figcaption>{html.escape(title)}. <a href="#description">Detailed description and data</a>.</figcaption></figure>' if img else ''
-    output.with_suffix('.html').write_text(f'<!doctype html><html lang="en"><meta charset="utf-8"><title>{html.escape(title)}</title><style>body{{font:18px/1.5 Arial;max-width:65rem;margin:2rem auto;padding:1rem;background:white;color:#111}}img{{max-width:100%}}a{{color:#0645ad}}table{{border-collapse:collapse}}td,th{{border:1px solid #333;padding:.4rem;text-align:left}}</style><h1>{html.escape(title)}</h1>{graphic}<h2 id="description">Detailed description</h2><p>{html.escape(long)}</p><table><caption>All plotted values; {html.escape(ylabel)}</caption><thead><tr><th scope="col">Panel</th><th scope="col">{html.escape(xlab)}</th><th scope="col">Method</th><th scope="col">Value</th><th scope="col">Runs</th>{training_header}</tr></thead><tbody>{trs}</tbody></table></html>')
+    output.with_suffix('.html').write_text(f'<!doctype html><html lang="en"><meta charset="utf-8"><title>{html.escape(title)}</title><style>body{{font:18px/1.5 Arial;max-width:65rem;margin:2rem auto;padding:1rem;background:white;color:#111}}img{{max-width:100%}}a{{color:#0645ad}}table{{border-collapse:collapse}}td,th{{border:1px solid #333;padding:.4rem;text-align:left}}</style><h1>{html.escape(title)}</h1>{graphic}<h2 id="description">Detailed description</h2><p>{html.escape(long)}</p><table><caption>All plotted values; {html.escape(ylabel)}</caption><thead><tr><th scope="col">Panel</th><th scope="col">{html.escape(xlab)}</th><th scope="col">Method</th><th scope="col">Value</th><th scope="col">Runs</th><th scope="col">Measured or predicted</th>{training_header}</tr></thead><tbody>{trs}</tbody></table></html>')
     return provenance

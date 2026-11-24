@@ -1,0 +1,43 @@
+{
+  "model_family": "gpt",
+  "included_families": [
+    "baseline",
+    "ring",
+    "recursive doubling",
+    "hierarchical"
+  ],
+  "excluded": [
+    "Direct",
+    "k-ring",
+    "DDP diagnostics",
+    "MPI Hierarchical",
+    "Other"
+  ],
+  "systems": [
+    "polaris"
+  ],
+  "argv": [
+    "experiments_polaris",
+    "experiments_polaris_nccl",
+    "--system",
+    "polaris",
+    "--mode",
+    "strong",
+    "--global-batch",
+    "768",
+    "--combine-simulated",
+    "--scopes",
+    "all",
+    "--metrics",
+    "time",
+    "--layouts",
+    "lines",
+    "--title",
+    "NanoGPT strong scaling - global batch 768",
+    "--output-root",
+    "uic thesis plots/scaling_check"
+  ],
+  "manifests": [
+    "uic thesis plots/scaling_check/polaris/manifest.json"
+  ]
+}

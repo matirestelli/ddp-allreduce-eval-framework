@@ -1,0 +1,57 @@
+{
+  "system": "polaris",
+  "inputs": [
+    "/home/mrest/mpiAllReduceCompressed/experiments_polaris",
+    "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl"
+  ],
+  "completed_runs": 47,
+  "all_runs": 506,
+  "planned": 3,
+  "truncated": false,
+  "dry_run": false,
+  "plots": [
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "lines",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/scaling_check/polaris/gpt/strongScaling/mpi/lines/GB768_all_lines_time_absolute",
+      "status": "written",
+      "points": 27,
+      "omitted": 0
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "lines",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/scaling_check/polaris/gpt/strongScaling/nccl/lines/GB768_all_lines_time_absolute",
+      "status": "written",
+      "points": 20,
+      "omitted": 0
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "lines",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/scaling_check/polaris/gpt/strongScaling/backend_comparison/lines/GB768_all_lines_time_absolute",
+      "status": "written",
+      "points": 47,
+      "omitted": 0
+    }
+  ],
+  "nanogpt_preset": {
+    "excluded": [
+      "Direct",
+      "k-ring",
+      "DDP diagnostics",
+      "MPI Hierarchical"
+    ],
+    "combine_simulated": true,
+    "horizontal_time_hook_bars": false
+  }
+}

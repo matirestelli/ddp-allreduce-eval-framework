@@ -150,7 +150,7 @@ EXPERIMENTS=(
     #"default_clone:"
     #"default_cpu_stage:"
     #"default:"
-    "ring:"
+    #"ring:"
     "ring_zfp_naive:16"
     "ring_zfp_online_coll:16"
     "ring_zfp_online_coll:8"
@@ -169,6 +169,8 @@ EXPERIMENTS=(
     "direct_t64:"
     #"kring_k1:"                        # k-ring with k=1 = plain ring (sanity check)
     "kring_k4:"                        # k = ranks per node on Polaris
+
+    "ring:"
 )
 
 for MODEL_NAME in "${MODELS[@]}"; do
@@ -200,7 +202,7 @@ for BACKEND in "${BACKENDS[@]}"; do
             -env MASTER_ADDR="${MASTER_ADDR}"
             -env MASTER_PORT="${MASTER_PORT}"
             -env MPICH_GPU_SUPPORT_ENABLED=1
-            -env LD_PRELOAD="${LD_PRELOAD}"
+            -env LD_PRELOAD="${GTL_LIB}"
             -env LD_LIBRARY_PATH="${LD_LIBRARY_PATH}"
             -env PYTHONPATH="${PYTHONPATH}"
             -env MODEL_NAME="${MODEL_NAME}"

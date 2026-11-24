@@ -1,0 +1,601 @@
+{
+  "tail_context": false,
+  "training_context_basis": null,
+  "title": "WideResNet 32\u00d732 \u00b7 strong scaling \u00b7 effective global batch 512",
+  "metric": "time",
+  "unit": "auto",
+  "layout": "hbar",
+  "width_inches": 18,
+  "height_inches": 6.71,
+  "min_font_pt": 11,
+  "mode": "strong",
+  "x": "ranks",
+  "normalize": "absolute",
+  "repeats": "median",
+  "points": [
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 8,
+      "method": "none",
+      "value": 4.96,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_20_mpi_builtin_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "0317f14c56eb",
+          "raw_hook": "none",
+          "epochs": 20,
+          "observed_epochs": 20,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        4.96
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 8,
+      "method": "ring",
+      "value": 8.55,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_20_mpi_ring_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "f1a741d04fd0",
+          "raw_hook": "ring",
+          "epochs": 20,
+          "observed_epochs": 20,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        8.55
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 8,
+      "method": "ring_zfp_naive:16",
+      "value": 9.94,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_20_mpi_ring_zfp_naive_rate16_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "51ad0f8d2f93",
+          "raw_hook": "ring_zfp_naive",
+          "epochs": 20,
+          "observed_epochs": 20,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        9.94
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 8,
+      "method": "ring_zfp_online_coll:16",
+      "value": 8.82,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_20_mpi_ring_zfp_online_coll_rate16_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "e65f98684118",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 20,
+          "observed_epochs": 20,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        8.82
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 8,
+      "method": "default",
+      "value": 4.54,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_20_mpi_default_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "6cd71d63dec6",
+          "raw_hook": "default",
+          "epochs": 20,
+          "observed_epochs": 20,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        4.54
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 8,
+      "method": "ring_zfp_online_coll:10",
+      "value": 7.72,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_20_mpi_ring_zfp_online_coll_rate10_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "9095672f2f5b",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 20,
+          "observed_epochs": 20,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        7.72
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 8,
+      "method": "recursive_doubling",
+      "value": 10.02,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_20_mpi_recursive_doubling_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "68d3da72838a",
+          "raw_hook": "recursive_doubling",
+          "epochs": 20,
+          "observed_epochs": 20,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        10.02
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 8,
+      "method": "recursive_doubling_zfp_naive:16",
+      "value": 9.28,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_20_mpi_recursive_doubling_zfp_naive_rate16_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "86e1c545ab57",
+          "raw_hook": "recursive_doubling_zfp_naive",
+          "epochs": 20,
+          "observed_epochs": 20,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        9.28
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 8,
+      "method": "recursive_doubling_zfp_online_coll:16",
+      "value": 8.71,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_20_mpi_recursive_doubling_zfp_online_coll_rate16_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "5b5c884497d3",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 20,
+          "observed_epochs": 20,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        8.71
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 8,
+      "method": "recursive_doubling_zfp_online_coll:8",
+      "value": 7.279999999999999,
+      "n_runs": 2,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/strongScaling/ddp_train_polaris_8gpu_64b.%j.out",
+          "line": 4093,
+          "id": "a014c6efd338",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 20,
+          "observed_epochs": 20,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        },
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_20_mpi_recursive_doubling_zfp_online_coll_rate8_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "b6a9d80b5ab3",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 20,
+          "observed_epochs": 20,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        7.29,
+        7.27
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 8,
+      "method": "ring_zfp_online_coll:8",
+      "value": 9.26,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_20_mpi_ring_zfp_online_coll_rate8_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "5c9cf29c7d4d",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 20,
+          "observed_epochs": 20,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        9.26
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "none",
+      "value": 14.19,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_10_nccl_builtin_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "d77965195709",
+          "raw_hook": "none",
+          "epochs": 10,
+          "observed_epochs": 10,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        14.19
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "ring",
+      "value": 15.66,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_10_nccl_ring_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "5a649df9d1ce",
+          "raw_hook": "ring",
+          "epochs": 10,
+          "observed_epochs": 10,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        15.66
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "ring_zfp_naive:16",
+      "value": 13.66,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_10_nccl_ring_zfp_naive_rate16_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "730cff570d56",
+          "raw_hook": "ring_zfp_naive",
+          "epochs": 10,
+          "observed_epochs": 10,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        13.66
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "hierarchical_zfp_online_coll:16",
+      "value": 14.3,
+      "n_runs": 2,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_10_nccl_ring_zfp_online_coll_rate16_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "1d316437b8f3",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 10,
+          "observed_epochs": 10,
+          "complete": true,
+          "warnings": [
+            "multiple internal hook labels in one block; inspect source"
+          ],
+          "native_fallback": false
+        },
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_10_nccl_recursive_doubling_zfp_online_coll_rate16_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "3800dff79030",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 10,
+          "observed_epochs": 10,
+          "complete": true,
+          "warnings": [
+            "multiple internal hook labels in one block; inspect source"
+          ],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        14.28,
+        14.32
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "hierarchical_zfp_online_coll:8",
+      "value": 10.485,
+      "n_runs": 2,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_10_nccl_ring_zfp_online_coll_rate8_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "6286aa2a6995",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 10,
+          "observed_epochs": 10,
+          "complete": true,
+          "warnings": [
+            "multiple internal hook labels in one block; inspect source"
+          ],
+          "native_fallback": false
+        },
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_10_nccl_recursive_doubling_zfp_online_coll_rate8_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "963af1a4aa42",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 10,
+          "observed_epochs": 10,
+          "complete": true,
+          "warnings": [
+            "multiple internal hook labels in one block; inspect source"
+          ],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        10.4,
+        10.57
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "recursive_doubling",
+      "value": 24.14,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_10_nccl_recursive_doubling_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "9c3255b3189d",
+          "raw_hook": "recursive_doubling",
+          "epochs": 10,
+          "observed_epochs": 10,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        24.14
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 8,
+      "method": "recursive_doubling_zfp_naive:16",
+      "value": 19.25,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_10_nccl_recursive_doubling_zfp_naive_rate16_ws8_bs64_gb512.log",
+          "line": 1,
+          "id": "7f609405ff35",
+          "raw_hook": "recursive_doubling_zfp_naive",
+          "epochs": 10,
+          "observed_epochs": 10,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        19.25
+      ]
+    }
+  ],
+  "omitted": [],
+  "contrast": [
+    {
+      "method": "none",
+      "color": "#575757",
+      "hatch": "",
+      "white_hatch_vs_fill": 7.226056749490168,
+      "line_vs_white": 7.226056749490168,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "default",
+      "color": "#626262",
+      "hatch": "//",
+      "white_hatch_vs_fill": 6.09972980752698,
+      "line_vs_white": 6.09972980752698,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring",
+      "color": "#145C32",
+      "hatch": "",
+      "white_hatch_vs_fill": 8.056284051928243,
+      "line_vs_white": 8.056284051928243,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring_zfp_naive:16",
+      "color": "#2E7846",
+      "hatch": "///",
+      "white_hatch_vs_fill": 5.396798226877005,
+      "line_vs_white": 5.396798226877005,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring_zfp_online_coll:16",
+      "color": "#478B57",
+      "hatch": "\\\\",
+      "white_hatch_vs_fill": 4.118785697075467,
+      "line_vs_white": 4.118785697075467,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring_zfp_online_coll:10",
+      "color": "#61966F",
+      "hatch": "//..",
+      "white_hatch_vs_fill": 3.4424223974973254,
+      "line_vs_white": 3.4424223974973254,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring_zfp_online_coll:8",
+      "color": "#61966F",
+      "hatch": "xx",
+      "white_hatch_vs_fill": 3.4424223974973254,
+      "line_vs_white": 3.4424223974973254,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling",
+      "color": "#174F87",
+      "hatch": "..",
+      "white_hatch_vs_fill": 8.384309628216378,
+      "line_vs_white": 8.384309628216378,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling_zfp_naive:16",
+      "color": "#2E6C9E",
+      "hatch": "oo",
+      "white_hatch_vs_fill": 5.592665861106606,
+      "line_vs_white": 5.592665861106606,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling_zfp_online_coll:16",
+      "color": "#4784AD",
+      "hatch": "++",
+      "white_hatch_vs_fill": 4.060442359416939,
+      "line_vs_white": 4.060442359416939,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling_zfp_online_coll:8",
+      "color": "#5C92B6",
+      "hatch": "--",
+      "white_hatch_vs_fill": 3.3642546903909865,
+      "line_vs_white": 3.3642546903909865,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "hierarchical_zfp_online_coll:16",
+      "color": "#68408C",
+      "hatch": "*",
+      "white_hatch_vs_fill": 7.775878421056213,
+      "line_vs_white": 7.775878421056213,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "hierarchical_zfp_online_coll:8",
+      "color": "#9770AD",
+      "hatch": "||",
+      "white_hatch_vs_fill": 4.009962969714528,
+      "line_vs_white": 4.009962969714528,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    }
+  ],
+  "notes": [
+    "Hook work is cumulative and can overlap; do not stack it as disjoint wall time.",
+    "Tail is the measured exposed tail, not the entire communication cost.",
+    "Duplicate aliases and genuinely repeated measurements retain source provenance.",
+    "Figure design checks do not certify the final thesis PDF/EPUB."
+  ]
+}

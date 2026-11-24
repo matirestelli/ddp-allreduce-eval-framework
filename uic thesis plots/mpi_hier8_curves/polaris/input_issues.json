@@ -1,0 +1,37 @@
+[
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/strongScaling/logs/wide_resnet50_2_20_mpi_builtin_ws8_bs32_gb256.log",
+    "line": 1,
+    "warning": "incomplete: 0/20 epochs; done=False; status=not logged"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/weakScaling/ddp_train_polaris_8gpus_8b_32b_128b.%j.out",
+    "line": 15467,
+    "warning": "incomplete: 4/5 epochs; done=True; status=not logged"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/weakScaling/logs/wide_resnet50_2_5_mpi_recursive_doubling_zfp_online_coll_rate16_ws8_bs128_gb1024.log",
+    "line": 1,
+    "warning": "incomplete: 4/5 epochs; done=False; status=not logged"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet/cifar10/weakScaling/logs/wide_resnet50_2_8_mpi_default_ws16_bs8_gb128.log",
+    "line": 1,
+    "warning": "incomplete: 6/8 epochs; done=False; status=not logged"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet224/strongScaling/ddp_train_polaris_16gpu_8b.%j.out",
+    "line": 4010,
+    "warning": "incomplete: 19/20 epochs; done=False; status=0"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet224/strongScaling/ddp_train_polaris_32gpu_4b.%j.out",
+    "line": 7106,
+    "warning": "incomplete: 19/20 epochs; done=False; status=not logged"
+  },
+  {
+    "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/wideresnet224/weakScaling/ddp_train_polaris_8gpus_8b_32b_128b.%j.out",
+    "line": 8021,
+    "warning": "incomplete: 0/5 epochs; done=False; status=143"
+  }
+]

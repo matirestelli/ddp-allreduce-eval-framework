@@ -1,0 +1,453 @@
+{
+  "system": "polaris",
+  "inputs": [
+    "/home/mrest/mpiAllReduceCompressed/experiments_polaris",
+    "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl"
+  ],
+  "completed_runs": 48,
+  "all_runs": 507,
+  "planned": 39,
+  "truncated": false,
+  "dry_run": false,
+  "plots": [
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/mpi/normal/GB768_all_bars_time_absolute",
+      "status": "written",
+      "points": 27,
+      "omitted": 0
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "lines",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/mpi/lines/GB768_all_lines_time_absolute",
+      "status": "written",
+      "points": 27,
+      "omitted": 0
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/mpi/hooks/GB768_all_bars_hook_epoch",
+      "status": "written",
+      "points": 24,
+      "omitted": 3
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "lines",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/mpi/hooks/GB768_all_lines_hook_epoch",
+      "status": "written",
+      "points": 24,
+      "omitted": 3
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/mpi/normal/GB768_gpu16_fixed_bars_time_absolute",
+      "status": "written",
+      "points": 9,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/mpi/hooks/GB768_gpu16_fixed_bars_hook_epoch",
+      "status": "written",
+      "points": 8,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "tail",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/mpi/tails/GB768_gpu16_fixed_hbar_tail_epoch",
+      "status": "written",
+      "points": 8,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/mpi/normal/GB768_gpu32_fixed_bars_time_absolute",
+      "status": "written",
+      "points": 9,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/mpi/hooks/GB768_gpu32_fixed_bars_hook_epoch",
+      "status": "written",
+      "points": 8,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "tail",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/mpi/tails/GB768_gpu32_fixed_hbar_tail_epoch",
+      "status": "written",
+      "points": 8,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/mpi/normal/GB768_gpu64_fixed_bars_time_absolute",
+      "status": "written",
+      "points": 9,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/mpi/hooks/GB768_gpu64_fixed_bars_hook_epoch",
+      "status": "written",
+      "points": 8,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "tail",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/mpi/tails/GB768_gpu64_fixed_hbar_tail_epoch",
+      "status": "written",
+      "points": 8,
+      "omitted": 1
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/nccl/normal/GB768_all_bars_time_absolute",
+      "status": "written",
+      "points": 21,
+      "omitted": 0
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "lines",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/nccl/lines/GB768_all_lines_time_absolute",
+      "status": "written",
+      "points": 21,
+      "omitted": 0
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/nccl/hooks/GB768_all_bars_hook_epoch",
+      "status": "written",
+      "points": 18,
+      "omitted": 3
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "lines",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/nccl/hooks/GB768_all_lines_hook_epoch",
+      "status": "written",
+      "points": 18,
+      "omitted": 3
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/nccl/normal/GB768_gpu16_fixed_bars_time_absolute",
+      "status": "written",
+      "points": 7,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/nccl/hooks/GB768_gpu16_fixed_bars_hook_epoch",
+      "status": "written",
+      "points": 6,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "tail",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/nccl/tails/GB768_gpu16_fixed_hbar_tail_epoch",
+      "status": "written",
+      "points": 6,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/nccl/normal/GB768_gpu32_fixed_bars_time_absolute",
+      "status": "written",
+      "points": 7,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/nccl/hooks/GB768_gpu32_fixed_bars_hook_epoch",
+      "status": "written",
+      "points": 6,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "tail",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/nccl/tails/GB768_gpu32_fixed_hbar_tail_epoch",
+      "status": "written",
+      "points": 6,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/nccl/normal/GB768_gpu64_fixed_bars_time_absolute",
+      "status": "written",
+      "points": 7,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/nccl/hooks/GB768_gpu64_fixed_bars_hook_epoch",
+      "status": "written",
+      "points": 6,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "tail",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/nccl/tails/GB768_gpu64_fixed_hbar_tail_epoch",
+      "status": "written",
+      "points": 6,
+      "omitted": 1
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/backend_comparison/normal/GB768_all_bars_time_absolute",
+      "status": "written",
+      "points": 48,
+      "omitted": 0
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "lines",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/backend_comparison/lines/GB768_all_lines_time_absolute",
+      "status": "written",
+      "points": 48,
+      "omitted": 0
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/backend_comparison/hooks/GB768_all_bars_hook_epoch",
+      "status": "written",
+      "points": 42,
+      "omitted": 6
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "lines",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/backend_comparison/hooks/GB768_all_lines_hook_epoch",
+      "status": "written",
+      "points": 42,
+      "omitted": 6
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/backend_comparison/normal/GB768_gpu16_fixed_bars_time_absolute",
+      "status": "written",
+      "points": 16,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/backend_comparison/hooks/GB768_gpu16_fixed_bars_hook_epoch",
+      "status": "written",
+      "points": 14,
+      "omitted": 2
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "tail",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/backend_comparison/tails/GB768_gpu16_fixed_hbar_tail_epoch",
+      "status": "written",
+      "points": 14,
+      "omitted": 2
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/backend_comparison/normal/GB768_gpu32_fixed_bars_time_absolute",
+      "status": "written",
+      "points": 16,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/backend_comparison/hooks/GB768_gpu32_fixed_bars_hook_epoch",
+      "status": "written",
+      "points": 14,
+      "omitted": 2
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "tail",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/backend_comparison/tails/GB768_gpu32_fixed_hbar_tail_epoch",
+      "status": "written",
+      "points": 14,
+      "omitted": 2
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/backend_comparison/normal/GB768_gpu64_fixed_bars_time_absolute",
+      "status": "written",
+      "points": 16,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/backend_comparison/hooks/GB768_gpu64_fixed_bars_hook_epoch",
+      "status": "written",
+      "points": 14,
+      "omitted": 2
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "tail",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "uic thesis plots/nanogpt_fixed/polaris/gpt/strongScaling/backend_comparison/tails/GB768_gpu64_fixed_hbar_tail_epoch",
+      "status": "written",
+      "points": 14,
+      "omitted": 2
+    }
+  ],
+  "nanogpt_preset": {
+    "excluded": [
+      "Direct",
+      "k-ring",
+      "DDP diagnostics",
+      "MPI Hierarchical"
+    ],
+    "combine_simulated": true,
+    "horizontal_time_hook_bars": false
+  }
+}

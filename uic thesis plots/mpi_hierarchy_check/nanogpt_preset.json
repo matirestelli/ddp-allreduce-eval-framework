@@ -1,0 +1,43 @@
+{
+  "model_family": "gpt",
+  "included_families": [
+    "baseline",
+    "ring",
+    "recursive doubling",
+    "hierarchical"
+  ],
+  "excluded": [
+    "Direct",
+    "k-ring",
+    "DDP diagnostics",
+    "MPI Hierarchical rates other than8",
+    "Other"
+  ],
+  "systems": [
+    "polaris"
+  ],
+  "argv": [
+    "experiments_polaris",
+    "--system",
+    "polaris",
+    "--backend",
+    "mpi",
+    "--mode",
+    "strong",
+    "--global-batch",
+    "768",
+    "--combine-simulated",
+    "--include-predicted",
+    "--scopes",
+    "all",
+    "--metrics",
+    "time",
+    "--layouts",
+    "lines",
+    "--output-root",
+    "uic thesis plots/mpi_hierarchy_check"
+  ],
+  "manifests": [
+    "uic thesis plots/mpi_hierarchy_check/polaris/manifest.json"
+  ]
+}

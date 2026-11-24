@@ -1,12 +1,12 @@
 #!/bin/bash -l
-#PBS -l select=8:system=polaris
+#PBS -l select=4:system=polaris
 #PBS -l walltime=01:00:00
 #PBS -l filesystems=home:eagle
 #PBS -q debug-scaling
 #PBS -A UIC-HPC
-#PBS -o ddp_gpt_polaris_nccl_32gpu.out
-#PBS -e ddp_gpt_polaris_nccl_32gpu.err
-#PBS -N ddp-gpt_polaris_nccl_32gpu
+#PBS -o ddp_gpt_polaris_nccl_16gpu_noTCP.out
+#PBS -e ddp_gpt_polaris_nccl_16gpu_noTCP.err
+#PBS -N ddp-gpt_polaris_nccl_16gpu
 
 # GPT (nanoGPT) DDP runs on Polaris with the NCCL backend.
 # Same experiment grid as trainJobPolaris_gpt.sh (MPI), but:
@@ -19,13 +19,23 @@ cd ${PBS_O_WORKDIR}
 
 # PBS does NOT substitute %j in #PBS -o. Use the runtime job id instead.
 # Keep "gpt", "polaris" and the GPU count in the name: plot_gpt.py uses them.
-LOG="ddp_gpt_polaris_nccl_64gpu.${PBS_JOBID%%.*}.out"
+LOG="ddp_gpt_polaris_nccl_16gpu.${PBS_JOBID%%.*}.out"
 exec > >(tee -a "${LOG}") 2>&1
 
 echo "=== Job started: $(date) ==="
 echo "=== Node: $(hostname) ==="
 
 source ${PBS_O_WORKDIR}/envScript_nccl.sh
+export NCCL_DEBUG=INFO
+export NCCL_DEBUG_SUBSYS=INIT,NET
+
+# --- NCCL transport diagnostic ---
+export NCCL_DEBUG=INFO
+export NCCL_DEBUG_SUBSYS=INIT,NET,ENV
+echo "=== NCCL / libfabric env ==="
+env | grep -E '^(NCCL_|FI_)' | sort
+echo "LD_LIBRARY_PATH has aws-ofi: $(echo $LD_LIBRARY_PATH | tr ':' '\n' | grep -i ofi || echo NONE)"
+python -c "import torch; print('torch NCCL version:', torch.cuda.nccl.version())"
 
 # For enabling profiling time for communication hooks.
 export DDP_HOOK_TIMING=1
@@ -48,7 +58,7 @@ echo "MASTER_PORT=${MASTER_PORT}"
 #   16 GPUs -> select=4  (debug-scaling) -> 4 micro-steps per rank
 #   32 GPUs -> select=8  (debug-scaling) -> 2 micro-steps per rank
 #   64 GPUs -> select=16 (prod queue)    -> 1 micro-step  per rank
-NUM_PROCS=32
+NUM_PROCS=16
 PPN=4
 # processes per node
 
@@ -186,15 +196,19 @@ EXPERIMENTS=(
     #"default:"
     "ring:"
     "ring_zfp_naive:16"
-    "ring_zfp_online_coll:16"          # = hierarchical leader ZFP hook on nccl
-    "ring_zfp_online_coll:8"           # = hierarchical leader ZFP hook on nccl
+    #"ring_zfp_online_coll:16"          # = hierarchical leader ZFP hook on nccl
+    #"ring_zfp_online_coll:8"           # = hierarchical leader ZFP hook on nccl
     "recursive_doubling:"
-    "recursive_doubling_zfp_naive:16"
+    #"recursive_doubling_zfp_naive:16"
+
+    "hierarchical_zfp_online_coll:8"
+    "hierarchical_zfp_online_coll:16"
+
     "direct_t4:"
     "direct_t8:"
     "direct_t16:"
     "direct_t32:"
-    #"direct_t64:"                      # = all peers at once on 64 GPUs
+    "direct_t64:"                      # = all peers at once on 64 GPUs
     #"kring_k1:"                        # k-ring with k=1 = plain ring (sanity check)
     "kring_k4:"                        # k = ranks per node on Polaris
     #"kring_k2:"
@@ -271,6 +285,13 @@ for BACKEND in "${BACKENDS[@]}"; do
             -env SEED="42"
             -env BACKEND="${BACKEND}"
             -env COMM_ALGORITHM="${COMM_ALGORITHM}"
+            -env NCCL_DEBUG="${NCCL_DEBUG}"
+            -env NCCL_DEBUG_SUBSYS="${NCCL_DEBUG_SUBSYS}"
+            -env NCCL_NET="${NCCL_NET}"
+            -env NCCL_CROSS_NIC="${NCCL_CROSS_NIC}"
+            -env NCCL_COLLNET_ENABLE="${NCCL_COLLNET_ENABLE}"
+            -env FI_CXI_DISABLE_HOST_REGISTER="${FI_CXI_DISABLE_HOST_REGISTER}"
+            -env FI_MR_CACHE_MONITOR="${FI_MR_CACHE_MONITOR}"
         )
 
         # Only forward LD_PRELOAD if the NCCL env script set one.

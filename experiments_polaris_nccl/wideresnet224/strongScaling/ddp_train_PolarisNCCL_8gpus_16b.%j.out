@@ -1,3 +1,6 @@
+# DERIVED PLOTTING COPY — NOT AN UNMODIFIED RAW LOG
+# Original configured run length was 20 epochs. Two naive runs are presented as available-epoch subsets, documented inline.
+# No measurements for missing epochs have been invented. Original source file is unchanged.
 === Job started: Tue Sep 22 02:47:35 AM UTC 2026 ===
 === Node: x3104c0s1b0n0 ===
 Lmod has detected the following error: The following module(s) are unknown:
@@ -1158,6 +1161,7 @@ Train-only epoch time (epochs 2..N): median=60.92s  min=57.59s  max=68.21s
 ================================================================================
 === Finished training: model=wide_resnet50_2, dataset=cifar10, batch=16, lr=0.1, scheduler=cosine, backend=nccl, hook=ring, zfp_rate=none, status=0 at Tue Sep 22 03:30:40 AM UTC 2026 ===
 === Starting: model=wide_resnet50_2, ws=8, bs=16, gb=128, lr=0.1, sched=cosine, warmup=0, mom=0.9, wd=5e-4, nesterov=true, wd_bn_bias=false, backend=nccl, hook=ring_zfp_naive, zfp=16 at Tue Sep 22 03:30:40 AM UTC 2026 ===
+[PLOTTING_COPY_RECOVERY] method=ring_zfp_naive planned_epochs=20 available_completed_epochs=17. The Epochs field below is adjusted ONLY for plotting the available-epoch subset; this does not certify completion of the planned run. Final train-only summary is recomputed from rounded logged epoch timings, excluding epoch 1. No missing epoch or hook/tail measurement has been added.
 
 ================================================================================
 DISTRIBUTED TRAINING LAUNCHER
@@ -1187,7 +1191,7 @@ DISTRIBUTED TRAINING LAUNCHER
 Distributed Training: WIDE_RESNET50_2 on CIFAR10
 Backend: NCCL, Algorithm: ring_zfp_naive
 ================================================================================
-Ranks: 8, Epochs: 20, Batch/rank: 16, Effective batch: 128
+Ranks: 8, Epochs: 17, Batch/rank: 16, Effective batch: 128
 LR: 0.1, Device: cuda:0
 
 [Cache] Pretrained weights cache (TORCH_HOME) = ./data/pretrained_weights_cache
@@ -3560,6 +3564,7 @@ Train-only epoch time (epochs 2..N): median=94.94s  min=89.19s  max=109.34s
 ================================================================================
 === Finished training: model=wide_resnet50_2, dataset=cifar10, batch=16, lr=0.1, scheduler=cosine, backend=nccl, hook=recursive_doubling, zfp_rate=none, status=0 at Tue Sep 22 03:54:13 PM UTC 2026 ===
 === Starting: model=wide_resnet50_2, ws=8, bs=16, gb=128, lr=0.1, sched=cosine, warmup=0, mom=0.9, wd=5e-4, nesterov=true, wd_bn_bias=false, backend=nccl, hook=recursive_doubling_zfp_naive, zfp=16 at Tue Sep 22 03:54:13 PM UTC 2026 ===
+[PLOTTING_COPY_RECOVERY] method=recursive_doubling_zfp_naive planned_epochs=20 available_completed_epochs=18. The Epochs field below is adjusted ONLY for plotting the available-epoch subset; this does not certify completion of the planned run. Final train-only summary is recomputed from rounded logged epoch timings, excluding epoch 1. No missing epoch or hook/tail measurement has been added.
 
 ================================================================================
 DISTRIBUTED TRAINING LAUNCHER
@@ -3589,7 +3594,7 @@ DISTRIBUTED TRAINING LAUNCHER
 Distributed Training: WIDE_RESNET50_2 on CIFAR10
 Backend: NCCL, Algorithm: recursive_doubling_zfp_naive
 ================================================================================
-Ranks: 8, Epochs: 20, Batch/rank: 16, Effective batch: 128
+Ranks: 8, Epochs: 18, Batch/rank: 16, Effective batch: 128
 LR: 0.1, Device: cuda:0
 
 [Cache] Pretrained weights cache (TORCH_HOME) = ./data/pretrained_weights_cache

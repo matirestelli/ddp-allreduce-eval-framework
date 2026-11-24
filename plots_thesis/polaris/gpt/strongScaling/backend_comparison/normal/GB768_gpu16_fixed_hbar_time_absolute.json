@@ -1,0 +1,615 @@
+{
+  "tail_context": false,
+  "training_context_basis": null,
+  "title": "GPT \u00b7 strong scaling \u00b7 effective global batch 768",
+  "metric": "time",
+  "unit": "auto",
+  "layout": "hbar",
+  "width_inches": 18,
+  "height_inches": 6.489999999999999,
+  "min_font_pt": 11,
+  "mode": "strong",
+  "x": "ranks",
+  "normalize": "absolute",
+  "repeats": "median",
+  "points": [
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 16,
+      "method": "none",
+      "value": 41.67,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_16gpu.%j.out",
+          "line": 28,
+          "id": "203769dd9aa0",
+          "raw_hook": "none",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        41.67
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 16,
+      "method": "ring",
+      "value": 44.78,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_16gpu.%j.out",
+          "line": 121,
+          "id": "2cf4d5c6a1c0",
+          "raw_hook": "ring",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        44.78
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 16,
+      "method": "ring_zfp_naive:16",
+      "value": 51.55,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_16gpu.%j.out",
+          "line": 223,
+          "id": "3eba38f20f23",
+          "raw_hook": "ring_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        51.55
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 16,
+      "method": "ring_zfp_online_coll:16",
+      "value": 50.34,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_16gpu.%j.out",
+          "line": 326,
+          "id": "6a19b5bd9e00",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        50.34
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 16,
+      "method": "ring_zfp_online_coll:8",
+      "value": 47.89,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_16gpu.%j.out",
+          "line": 430,
+          "id": "286c952e7e2e",
+          "raw_hook": "ring_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        47.89
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 16,
+      "method": "recursive_doubling",
+      "value": 50.43,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_16gpu.%j.out",
+          "line": 534,
+          "id": "2722e20db300",
+          "raw_hook": "recursive_doubling",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        50.43
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 16,
+      "method": "recursive_doubling_zfp_naive:16",
+      "value": 48.77,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_16gpu.%j.out",
+          "line": 636,
+          "id": "7e8f8e52c0fe",
+          "raw_hook": "recursive_doubling_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        48.77
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 16,
+      "method": "recursive_doubling_zfp_online_coll:16",
+      "value": 47.37,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_16gpu.%j.out",
+          "line": 739,
+          "id": "76040b6f3116",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        47.37
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 16,
+      "method": "recursive_doubling_zfp_online_coll:8",
+      "value": 44.69,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_16gpu.%j.out",
+          "line": 843,
+          "id": "7d3a726ab2eb",
+          "raw_hook": "recursive_doubling_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        44.69
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 16,
+      "method": "direct_p",
+      "value": 49.885,
+      "n_runs": 2,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_16gpu.%j.out",
+          "line": 1153,
+          "id": "47e2db2a7200",
+          "raw_hook": "direct_t16",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        },
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_16gpu.%j.out",
+          "line": 1595,
+          "id": "7c82b0bdfe5d",
+          "raw_hook": "direct_t16",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        49.87,
+        49.9
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 16,
+      "method": "hierarchical_zfp_online_coll:8",
+      "value": 43.97,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_16gpu.%j.out",
+          "line": 1284,
+          "id": "1aa7217c317c",
+          "raw_hook": "hierarchical_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        43.97
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 MPI",
+      "x": 16,
+      "method": "kring_k4",
+      "value": 44.43,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris/gpt/strongScaling/ddp_gpt_polaris_16gpu.%j.out",
+          "line": 1904,
+          "id": "06ed0bf702fa",
+          "raw_hook": "kring_k4",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        44.43
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 16,
+      "method": "none",
+      "value": 27.1,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_16gpu.out",
+          "line": 35,
+          "id": "cd45f2c09a9d",
+          "raw_hook": "none",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        27.1
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 16,
+      "method": "ring",
+      "value": 28.12,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_16gpu.out",
+          "line": 128,
+          "id": "2df28d990794",
+          "raw_hook": "ring",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        28.12
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 16,
+      "method": "ring_zfp_naive:16",
+      "value": 29.51,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_16gpu.out",
+          "line": 230,
+          "id": "3a98d690b9c2",
+          "raw_hook": "ring_zfp_naive",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        29.51
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 16,
+      "method": "recursive_doubling",
+      "value": 60.61,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_16gpu.out",
+          "line": 336,
+          "id": "7211a82ba162",
+          "raw_hook": "recursive_doubling",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        60.61
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 16,
+      "method": "hierarchical_zfp_online_coll:8",
+      "value": 22.82,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_16gpu.out",
+          "line": 438,
+          "id": "a448b90d3056",
+          "raw_hook": "hierarchical_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        22.82
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 16,
+      "method": "hierarchical_zfp_online_coll:16",
+      "value": 27.77,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_16gpu.out",
+          "line": 542,
+          "id": "d451dd94615f",
+          "raw_hook": "hierarchical_zfp_online_coll",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        27.77
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 16,
+      "method": "direct_p",
+      "value": 35.93,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_16gpu.out",
+          "line": 852,
+          "id": "a3ea02cdd233",
+          "raw_hook": "direct_t16",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        35.93
+      ]
+    },
+    {
+      "panel": "Polaris \u00b7 NCCL",
+      "x": 16,
+      "method": "kring_k4",
+      "value": 27.71,
+      "n_runs": 1,
+      "sources": [
+        {
+          "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_16gpu.out",
+          "line": 955,
+          "id": "462f692b2eec",
+          "raw_hook": "kring_k4",
+          "epochs": 3,
+          "observed_epochs": 3,
+          "complete": true,
+          "warnings": [],
+          "native_fallback": false
+        }
+      ],
+      "run_values": [
+        27.71
+      ]
+    }
+  ],
+  "omitted": [],
+  "contrast": [
+    {
+      "method": "none",
+      "color": "#575757",
+      "hatch": "",
+      "white_hatch_vs_fill": 7.226056749490168,
+      "line_vs_white": 7.226056749490168,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring",
+      "color": "#145C32",
+      "hatch": "",
+      "white_hatch_vs_fill": 8.056284051928243,
+      "line_vs_white": 8.056284051928243,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring_zfp_naive:16",
+      "color": "#2E7846",
+      "hatch": "///",
+      "white_hatch_vs_fill": 5.396798226877005,
+      "line_vs_white": 5.396798226877005,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring_zfp_online_coll:16",
+      "color": "#478B57",
+      "hatch": "\\\\",
+      "white_hatch_vs_fill": 4.118785697075467,
+      "line_vs_white": 4.118785697075467,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "ring_zfp_online_coll:8",
+      "color": "#61966F",
+      "hatch": "xx",
+      "white_hatch_vs_fill": 3.4424223974973254,
+      "line_vs_white": 3.4424223974973254,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling",
+      "color": "#174F87",
+      "hatch": "..",
+      "white_hatch_vs_fill": 8.384309628216378,
+      "line_vs_white": 8.384309628216378,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling_zfp_naive:16",
+      "color": "#2E6C9E",
+      "hatch": "oo",
+      "white_hatch_vs_fill": 5.592665861106606,
+      "line_vs_white": 5.592665861106606,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling_zfp_online_coll:16",
+      "color": "#4784AD",
+      "hatch": "++",
+      "white_hatch_vs_fill": 4.060442359416939,
+      "line_vs_white": 4.060442359416939,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "recursive_doubling_zfp_online_coll:8",
+      "color": "#5C92B6",
+      "hatch": "--",
+      "white_hatch_vs_fill": 3.3642546903909865,
+      "line_vs_white": 3.3642546903909865,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "hierarchical_zfp_online_coll:16",
+      "color": "#68408C",
+      "hatch": "*",
+      "white_hatch_vs_fill": 7.775878421056213,
+      "line_vs_white": 7.775878421056213,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "hierarchical_zfp_online_coll:8",
+      "color": "#9770AD",
+      "hatch": "||",
+      "white_hatch_vs_fill": 4.009962969714528,
+      "line_vs_white": 4.009962969714528,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "direct_p",
+      "color": "#99530B",
+      "hatch": "OO",
+      "white_hatch_vs_fill": 5.838854445101804,
+      "line_vs_white": 5.838854445101804,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    },
+    {
+      "method": "kring_k4",
+      "color": "#75433E",
+      "hatch": "--/",
+      "white_hatch_vs_fill": 7.98842490738054,
+      "line_vs_white": 7.98842490738054,
+      "text_vs_white": 21,
+      "outline_vs_white": 21
+    }
+  ],
+  "notes": [
+    "Hook work is cumulative and can overlap; do not stack it as disjoint wall time.",
+    "Tail is the measured exposed tail, not the entire communication cost.",
+    "Duplicate aliases and genuinely repeated measurements retain source provenance.",
+    "Figure design checks do not certify the final thesis PDF/EPUB."
+  ]
+}

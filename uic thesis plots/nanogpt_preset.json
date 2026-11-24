@@ -1,0 +1,34 @@
+{
+  "model_family": "gpt",
+  "included_families": [
+    "baseline",
+    "ring",
+    "recursive doubling",
+    "hierarchical"
+  ],
+  "excluded": [
+    "Direct",
+    "k-ring",
+    "DDP diagnostics",
+    "MPI Hierarchical",
+    "Other"
+  ],
+  "systems": [
+    "frontier"
+  ],
+  "argv": [
+    "experiments_frontier",
+    "experiments_frontier_rccl",
+    "--system",
+    "frontier",
+    "--mode",
+    "strong",
+    "--global-batch",
+    "768",
+    "--output-root",
+    "uic thesis plots"
+  ],
+  "manifests": [
+    "uic thesis plots/frontier/manifest.json"
+  ]
+}

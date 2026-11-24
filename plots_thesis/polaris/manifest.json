@@ -1,0 +1,222 @@
+{
+  "system": "polaris",
+  "inputs": [
+    "/home/mrest/mpiAllReduceCompressed"
+  ],
+  "completed_runs": 27,
+  "all_runs": 526,
+  "planned": 19,
+  "truncated": false,
+  "dry_run": false,
+  "plots": [
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/normal/GB128_all_bars_time_absolute",
+      "status": "written",
+      "points": 23,
+      "omitted": 0
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "lines",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/lines/GB128_all_lines_time_absolute",
+      "status": "written",
+      "points": 23,
+      "omitted": 0
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/hooks/GB128_all_bars_hook_epoch",
+      "status": "written",
+      "points": 20,
+      "omitted": 3
+    },
+    {
+      "scope": "all",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "lines",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/hooks/GB128_all_lines_hook_epoch",
+      "status": "written",
+      "points": 20,
+      "omitted": 3
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/normal/GB128_gpu8_fixed_bars_time_absolute",
+      "status": "written",
+      "points": 7,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/normal/GB128_gpu8_fixed_hbar_time_absolute",
+      "status": "written",
+      "points": 7,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/hooks/GB128_gpu8_fixed_bars_hook_epoch",
+      "status": "written",
+      "points": 6,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/hooks/GB128_gpu8_fixed_hbar_hook_epoch",
+      "status": "written",
+      "points": 6,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "tail",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/tails/GB128_gpu8_fixed_hbar_tail_epoch",
+      "status": "written",
+      "points": 6,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/normal/GB128_gpu16_fixed_bars_time_absolute",
+      "status": "written",
+      "points": 8,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/normal/GB128_gpu16_fixed_hbar_time_absolute",
+      "status": "written",
+      "points": 8,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/hooks/GB128_gpu16_fixed_bars_hook_epoch",
+      "status": "written",
+      "points": 7,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/hooks/GB128_gpu16_fixed_hbar_hook_epoch",
+      "status": "written",
+      "points": 7,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "tail",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/tails/GB128_gpu16_fixed_hbar_tail_epoch",
+      "status": "written",
+      "points": 7,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/normal/GB128_gpu32_fixed_bars_time_absolute",
+      "status": "written",
+      "points": 8,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "time",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/normal/GB128_gpu32_fixed_hbar_time_absolute",
+      "status": "written",
+      "points": 8,
+      "omitted": 0
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "bars",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/hooks/GB128_gpu32_fixed_bars_hook_epoch",
+      "status": "written",
+      "points": 7,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "hook",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/hooks/GB128_gpu32_fixed_hbar_hook_epoch",
+      "status": "written",
+      "points": 7,
+      "omitted": 1
+    },
+    {
+      "scope": "fixed",
+      "x": "ranks",
+      "metric": "tail",
+      "layout": "hbar",
+      "normalize": "absolute",
+      "stem": "plots_thesis/polaris/wideresnet224/strongScaling/nccl/tails/GB128_gpu32_fixed_hbar_tail_epoch",
+      "status": "written",
+      "points": 7,
+      "omitted": 1
+    }
+  ]
+}

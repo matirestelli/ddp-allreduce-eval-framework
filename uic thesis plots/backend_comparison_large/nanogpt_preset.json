@@ -1,0 +1,66 @@
+{
+  "model_family": "gpt",
+  "included_families": [
+    "baseline",
+    "ring",
+    "recursive doubling",
+    "hierarchical"
+  ],
+  "excluded": [
+    "Direct",
+    "k-ring",
+    "DDP diagnostics",
+    "MPI Hierarchical rates other than8",
+    "Other"
+  ],
+  "systems": [
+    "frontier"
+  ],
+  "argv": [
+    "experiments_frontier",
+    "experiments_frontier_rccl",
+    "--system",
+    "frontier",
+    "--mode",
+    "strong",
+    "--global-batch",
+    "768",
+    "--gpus",
+    "32",
+    "--combine-simulated",
+    "--include-predicted",
+    "--comparisons-only",
+    "--scopes",
+    "fixed",
+    "--metrics",
+    "time",
+    "--layouts",
+    "bars",
+    "--methods",
+    "none",
+    "ring",
+    "ring_zfp_naive:16",
+    "ring_zfp_online_coll:16",
+    "ring_zfp_online_coll:8",
+    "recursive_doubling",
+    "recursive_doubling_zfp_naive:16",
+    "recursive_doubling_zfp_online_coll:16",
+    "recursive_doubling_zfp_online_coll:8",
+    "hierarchical_zfp_online_coll:8",
+    "--columns",
+    "2",
+    "--width",
+    "18",
+    "--font-size",
+    "18",
+    "--ymax",
+    "100",
+    "--title",
+    "GPT \u00b7 strong scaling \u00b7 effective global batch 768",
+    "--output-root",
+    "uic thesis plots/backend_comparison_large"
+  ],
+  "manifests": [
+    "uic thesis plots/backend_comparison_large/frontier/manifest.json"
+  ]
+}

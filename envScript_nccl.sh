@@ -59,6 +59,18 @@ export BLIS_NUM_THREADS=1
 export FI_CXI_DEFAULT_CQ_SIZE=131072
 export FI_CXI_RX_MATCH_MODE=software
 
+# --- 9b. NCCL over Slingshot via aws-ofi-nccl (ALCF recommended) ---
+OFI_NCCL=/soft/libraries/aws-ofi-nccl/v1.9.1-aws
+export LD_LIBRARY_PATH="${OFI_NCCL}/lib:/soft/libraries/hwloc/lib:${LD_LIBRARY_PATH}"
+export NCCL_NET="AWS Libfabric"      # forces the plugin: fails instead of falling back to TCP
+export NCCL_CROSS_NIC=1
+export NCCL_COLLNET_ENABLE=1
+export FI_CXI_DISABLE_HOST_REGISTER=1
+export FI_MR_CACHE_MONITOR=userfaultfd
+# NCCL_NET_GDR_LEVEL=PHB left out on purpose for the first try (can hang Python jobs)
+
+echo "aws-ofi-nccl plugin : $(ls ${OFI_NCCL}/lib/libnccl-net*.so 2>/dev/null || echo MISSING)"
+
 # --- 10. Sanity check ---
 echo "============================================="
 echo "  Polaris NCCL test — GTL NOT loaded"

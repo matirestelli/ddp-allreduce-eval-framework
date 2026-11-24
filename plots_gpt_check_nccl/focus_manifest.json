@@ -1,0 +1,93 @@
+{
+  "inputs": [
+    "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_16gpu.out",
+    "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+    "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_64gpu.out"
+  ],
+  "zoom_gpus": 32,
+  "figures": [
+    {
+      "system": "polaris",
+      "view": "selected_scaling",
+      "stem": "plots_gpt_check_nccl/polaris/gpt/strongScaling/backend_comparison/lines/GB768__cfg061abe56_selected_hooks",
+      "layout": "lines",
+      "backends": [
+        "nccl"
+      ],
+      "notice": "Only one backend is available in this selection.",
+      "missing_requested_points": [],
+      "status": "written",
+      "points": 6,
+      "methods": [
+        "hierarchical_zfp_online_coll:8",
+        "kring_k4",
+        "none"
+      ]
+    },
+    {
+      "system": "polaris",
+      "view": "all_algorithms_zoom",
+      "stem": "plots_gpt_check_nccl/polaris/gpt/strongScaling/backend_comparison/normal/GB768__cfg061abe56_gpu32_all_algorithms",
+      "layout": "bars",
+      "backends": [
+        "nccl"
+      ],
+      "notice": "Only one backend is available in this selection.",
+      "status": "written",
+      "points": 13,
+      "methods": [
+        "direct_t16",
+        "direct_t32",
+        "direct_t4",
+        "direct_t8",
+        "hierarchical_zfp_online_coll:16",
+        "hierarchical_zfp_online_coll:8",
+        "kring_k1",
+        "kring_k4",
+        "none",
+        "recursive_doubling",
+        "recursive_doubling_zfp_naive:16",
+        "ring",
+        "ring_zfp_naive:16"
+      ]
+    },
+    {
+      "system": "polaris",
+      "view": "selected_scaling",
+      "stem": "plots_gpt_check_nccl/polaris/gpt/strongScaling/backend_comparison/lines/GB768__cfg3dcb52a9_selected_hooks",
+      "layout": "lines",
+      "backends": [
+        "nccl"
+      ],
+      "notice": "Only one backend is available in this selection.",
+      "missing_requested_points": [],
+      "status": "written",
+      "points": 3,
+      "methods": [
+        "hierarchical_zfp_online_coll:8",
+        "kring_k4",
+        "none"
+      ]
+    },
+    {
+      "system": "polaris",
+      "view": "all_algorithms_zoom",
+      "stem": "plots_gpt_check_nccl/polaris/gpt/strongScaling/backend_comparison/normal/GB768__cfg3dcb52a9_gpu32_all_algorithms",
+      "layout": "bars",
+      "status": "no_data",
+      "reason": "No completed runs at zoom GPU count"
+    }
+  ],
+  "issues": [
+    {
+      "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+      "line": 336,
+      "warning": "multiple internal hook labels in one block; inspect source"
+    },
+    {
+      "source": "/home/mrest/mpiAllReduceCompressed/experiments_polaris_nccl/gpt/strongScaling/ddp_gpt_polaris_nccl_32gpu.out",
+      "line": 440,
+      "warning": "multiple internal hook labels in one block; inspect source"
+    }
+  ]
+}
